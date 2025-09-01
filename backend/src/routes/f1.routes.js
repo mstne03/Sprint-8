@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { fetchAndSaveMeetings, getAllMeetings } from '../controllers/meetings.controller.js'
+import { fetchAndSaveMeetings } from '../controllers/meetings.controller.js'
 import { importSaveDriversSeason } from '../controllers/driversSeason.controller.js'
 import { importSaveDrivers } from '../controllers/drivers.controller.js'
 

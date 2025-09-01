@@ -26,13 +26,3 @@ export const fetchAndSaveMeetings = async (req, res) => {
     res.status(500).json({ message: 'Error fetching and saving meetings', error: error.message });
   }
 };
-
-export const getAllMeetings = async (req, res) => {
-    try {
-        const meetings = await getMeetings(req.params.year);
-        res.status(200).json(meetings);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error fetching meetings.', error: error.message });
-    }
-};
