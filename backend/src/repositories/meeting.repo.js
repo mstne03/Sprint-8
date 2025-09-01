@@ -12,10 +12,6 @@ export const createMeeting = async (meetingData) => {
     }
 }
 
-export const getMeetings = async (year) => {
-    return await Meeting.find({ year }).sort({ date_start: 1 }).lean();
-}
-
 function escapeRegex(s="") { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
 
 export async function searchMeetingsByName({ q, year, limit = 20, page = 1 }) {

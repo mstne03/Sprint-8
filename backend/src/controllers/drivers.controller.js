@@ -1,6 +1,6 @@
-import { mapDriver } from '../utils/map.js'
 import { DriverSeason } from '../models/Driver_Season.js'
 import Driver from '../models/Driver.js'
+import { upsertDrivers } from '../repositories/driver.repo.js'
 
 export async function importSaveDrivers(req, res) {
     try {
@@ -14,38 +14,7 @@ export async function importSaveDrivers(req, res) {
             },
         ]);
 
-        const mappedDrivers = uniqueDrivers.map(({ doc }) => {
-            console.log("Driver number:", doc.driver_number, "Team name: ", doc.team_name)
-
-            const {
-                driver_uid,
-                last_seen_season,
-                driver_number,
-                name_acronym,
-                full_name,
-                team_name,
-                team_color,
-                country_code,
-            } = mapDriver(doc, doc.season);
-
-            return {
-                updateOne: {
-                    filter: { driver_uid },
-                    update: { 
-                        $set: {
-                            driver_number,
-                            name_acronym,
-                            full_name,
-                            team_name,
-                            team_color,
-                            country_code,
-                            last_seen_season,
-                        },
-                    },
-                    upsert: true,
-                }
-            }
-        });
+        const mappedDrivers = uniqueDrivers.map(({ doc }) => upsertDrivers(doc));
 
         await Driver.bulkWrite(mappedDrivers);
 

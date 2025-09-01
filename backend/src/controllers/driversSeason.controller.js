@@ -1,69 +1,42 @@
 import { openf1Get, paths } from '../services/openf1.rest.js'
-import { mapDriverSeason } from '../utils/map.js'
+import { upsertDriversSeason } from '../repositories/driver.repo.js'
 import { DriverSeason } from '../models/Driver_Season.js'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 export async function importSaveDriversSeason(req, res) {
     try {
-        const years = req.query.years.split(',');
+        const years = req.query.years.split(',').map(y => y.trim());
 
         for (const year of years) {
-            const uniqueDrivers = [];
+            const driversRaw = [];
+            const seenDrivers = [];
 
             const meetingsYear = await openf1Get(paths.meetings, { year });
 
-            console.log(`Meetings ${year}: `, meetingsYear);
-
-            const driversRaw = [];
+            console.log("Meetings year:", meetingsYear)
 
             for (const meeting of meetingsYear) {
-                const ds = await openf1Get(paths.drivers, { meeting_key: meeting.meeting_key });
-                driversRaw.push(ds);
+                const d = await openf1Get(paths.drivers, { meeting_key: meeting.meeting_key });
+                driversRaw.push(d);
                 await sleep(300);
             }
 
             console.log("Drivers Raw:", driversRaw);
 
-            driversRaw.flat().forEach(d => {
-                const DN = Number(d.driver_number);
-                const exists = uniqueDrivers.some(driver => Number(driver.driver_number) === DN);
+            const uniqueDrivers = driversRaw.flat().filter(d => {
+                const number = Number(d.driver_number);
 
-                if (!exists) {
-                    uniqueDrivers.push(d);
-                }
-            })
+                if (seenDrivers.includes(number)) {
+                    return false;
+                };
 
-            const mappedDrivers = uniqueDrivers.map(d => {
-                const {
-                    driver_uid,
-                    season,
-                    driver_number,
-                    name_acronym,
-                    full_name,
-                    team_name,
-                    team_color,
-                    country_code,
-                } = mapDriverSeason(d, year);
+                seenDrivers.push(number);
 
-                return {
-                        updateOne: {
-                        filter: { 
-                            driver_uid, 
-                            season, 
-                            driver_number, 
-                            name_acronym, 
-                            full_name, 
-                            country_code,
-                        },
-                        update: { $set: {
-                            team_name,
-                            team_color,
-                        }},
-                        upsert: true,
-                    }
-                }
+                return true;
             });
+
+            const mappedDrivers = uniqueDrivers.map(d => upsertDriversSeason(d, year));
 
             await DriverSeason.bulkWrite(mappedDrivers);
         }

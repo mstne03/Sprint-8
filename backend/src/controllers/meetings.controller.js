@@ -1,5 +1,5 @@
 import { openf1Get, paths } from '../services/openf1.rest.js'
-import { createMeeting, getMeetings } from '../repositories/meeting.repo.js'
+import { createMeeting } from '../repositories/meeting.repo.js'
 import { mapMeeting } from '../utils/map.js'
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
