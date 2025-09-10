@@ -1,7 +1,7 @@
 import Home from '../pages/Home/Home'
 import ThemeProvider from '../context/Theme/Theme'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import Charts from '../pages/Charts/Charts'
+import Charts from '../pages/ChartPage/ChartPage'
 import Map from '../pages/Map/Map'
 import FullCalendar from '../pages/FullCalendar/FullCalendar'
 import NotFound from '../pages/NotFound/NotFound'

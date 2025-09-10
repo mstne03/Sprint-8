@@ -1,42 +1,38 @@
-import Meeting from '../models/Meeting.js'
+import { mapMeeting } from '../utils/map.js'
 
-export const createMeeting = async (meetingData) => {
-    try {
-        return await Meeting.updateOne(
-            { year: meetingData.year, meeting_key: meetingData.meeting_key },
-            { $set: meetingData },
-            { upsert: true }
-        );
-    } catch (error) {
-        throw error;
+export function upsertMeeting (meeting) {
+    const {
+        circuit_key,
+        circuit_short_name,
+        country_code,
+        country_key,
+        country_name,
+        date_start,
+        location,
+        meeting_key,
+        meeting_name,
+        year,
+    } = mapMeeting(meeting);
+
+    return {
+        updateOne: {
+            filter: {
+                circuit_key,
+                date_start,
+                year,
+            },
+            update: {
+                $set: {    
+                    circuit_short_name,
+                    country_code,
+                    country_key,
+                    country_name,
+                    location,
+                    meeting_key,
+                    meeting_name,
+                }
+            },
+            upsert: true,
+        }
     }
-}
-
-function escapeRegex(s="") { return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }
-
-export async function searchMeetingsByName({ q, year, limit = 20, page = 1 }) {
-  const safeLimit = Math.min(Math.max(1, Number(limit) || 20), 100);
-  const safePage  = Math.max(1, Number(page) || 1);
-
-  const filter = {};
-  if (year != null) filter.year = Number(year);
-
-  if (q && q.trim()) {
-    const rx = new RegExp(escapeRegex(q.trim()), "i");
-    filter.$or = [
-      { meeting_name: rx },
-      { meeting_official_name: rx },
-      { event_name: rx },
-      { circuit_short_name: rx },
-      { circuit_name: rx },
-      { location: rx },
-    ];
-  }
-
-  return Meeting.find(filter)
-    .collation({ locale: "es", strength: 1 })
-    .sort({ date_start: 1 })
-    .skip((safePage - 1) * safeLimit)
-    .limit(safeLimit)
-    .lean();
 }

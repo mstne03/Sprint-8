@@ -1,8 +1,8 @@
-import { DriverSeason } from '../models/Driver_Season.js'
-import Driver from '../models/Driver.js'
+import { DriverSeason } from '../models/DriverSeason.js'
 import { upsertDrivers } from '../repositories/driver.repo.js'
+import Driver from '../models/Driver.js'
 
-export async function importSaveDrivers(req, res) {
+export async function importSaveDrivers() {
     try {
         const uniqueDrivers = await DriverSeason.aggregate([
             { $sort: { driver_uid: 1, season: -1 } },
@@ -14,13 +14,14 @@ export async function importSaveDrivers(req, res) {
             },
         ]);
 
-        const mappedDrivers = uniqueDrivers.map(({ doc }) => upsertDrivers(doc));
+        const mappedDrivers = uniqueDrivers.map(({ doc }) => {
+            return upsertDrivers(doc)
+        });
 
         await Driver.bulkWrite(mappedDrivers);
 
-        res.status(200).json({ message: `Driver profiles successfully saved` });
+        console.log("Successfully imported drivers identity docs");
     } catch (e) {
-        console.log("Error:", e.message);
-        res.status(401).json({ message: e.message });
+        console.error("Error in importSaveDrivers:", e.message);
     }
 }

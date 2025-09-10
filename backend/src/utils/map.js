@@ -5,19 +5,20 @@ function buildDriverUID({ full_name, name_acronym }) {
   return crypto.createHash('sha1').update(raw).digest('hex');
 }
 
+function buildChartKey(key) {
+    return crypto.createHash('sha1').update(key).digest('hex');
+}
+
 export function mapDriver(raw, season) {
     return {
-        driver_uid: raw.driver_uid,
-        driver_number: raw.driver_number,
-        broadcast_name: raw.broadcast_name,
-        full_name: raw.full_name,
-        first_name: raw.first_name,
-        last_name: raw.last_name,
-        name_acronym: raw.name_acronym,
-        team_name: raw.team_name,
-        team_color: raw.team_color,
-        country_code: raw.country_code,
-        last_seen_season: season,
+        driverUid: raw.driverUid,
+        driverNumber: raw.driverNumber,
+        fullName: raw.fullName,
+        nameAcronym: raw.nameAcronym,
+        team: raw.team,
+        teamColour: raw.teamColour,
+        countryCode: raw.countryCode,
+        season: season,
     }
 }
 
@@ -26,14 +27,34 @@ export function mapDriverSeason(raw, season) {
         season: Number(season),
         driver_uid: buildDriverUID(raw),
         driver_number: raw.driver_number,
-        broadcast_name: raw.broadcast_name,
         name_acronym: raw.name_acronym,
-        first_name: raw.first_name,
-        last_name: raw.last_name,
         full_name: raw.full_name,
+        team_name: raw.team_name,
+        team_colour: raw.team_colour,
         country_code: raw.country_code,
         headshot_url: raw.headshot_url,
     }
+}
+
+export function mapQualiChart(raw) {
+    const charts = []
+
+    for (const chart of raw) {
+        charts.push({
+            key: buildChartKey(chart.key),
+            searchKey: chart.key,
+            team: chart.team,
+            drivers: chart.drivers,
+            driversAcr: chart.drivers_acr,
+            chartType: chart.chart_type,
+            sessionType: chart.session_type,
+            year: chart.year,
+            svg: chart.svg,
+            eventName: chart.event_name
+        });
+    }
+
+    return charts
 }
 
 export function mapMeeting(raw) {

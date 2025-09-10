@@ -8,8 +8,9 @@ export function upsertDriversSeason (driver, year) {
         name_acronym,
         full_name,
         team_name,
-        team_color,
+        team_colour,
         country_code,
+        headshot_url,
     } = mapDriverSeason(driver, year);
 
     return {
@@ -17,15 +18,16 @@ export function upsertDriversSeason (driver, year) {
             filter: {
                 driver_uid,
                 season,
-                driver_number,
-                name_acronym,
-                full_name,
-                country_code,
             },
             update: {
-                $set: {
+                $set: {    
+                    driver_number,
+                    name_acronym,
+                    full_name,
+                    country_code,
                     team_name,
-                    team_color,
+                    team_colour,
+                    headshot_url,
                 }
             },
             upsert: true,
@@ -41,7 +43,7 @@ export function upsertDrivers (driver) {
         name_acronym,
         full_name,
         team_name,
-        team_color,
+        team_colour,
         country_code,
     } = mapDriver(driver, driver.season);
 
@@ -54,7 +56,7 @@ export function upsertDrivers (driver) {
                     name_acronym,
                     full_name,
                     team_name,
-                    team_color,
+                    team_colour,
                     country_code,
                     last_seen_season,
                 },

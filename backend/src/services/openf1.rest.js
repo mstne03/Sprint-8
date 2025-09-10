@@ -40,13 +40,3 @@ export async function openf1Get(path, params = {}) {
         throw e;
     }
 }
-
-export async function openf1GetCsv(path, params = {}) {
-    const { data } = await api.get(path, {
-        params: { ...params, csv: true },
-        responseType: "text",
-        headers: { accept: "text/csv" },
-    });
-
-    return data;
-}

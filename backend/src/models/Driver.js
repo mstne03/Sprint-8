@@ -1,16 +1,17 @@
 import { Schema, model } from 'mongoose'
 
 const DriverSchema = new Schema({
-    driver_uid: { type: String, required: true },
-    broadcast_name: { type: String, required: true },
-    full_name: String,
-    first_name: { type: String, required: true },
-    last_name: String,
-    name_acronym: { type: String, required: true },
-    country_code: String,
-    last_seen_season: Number,
+    driverUid: { type: String, required: true, unique: true },
+    fullName: { type: String, required: true },
+    nameAcronym: { type: String, required: true },
+    team: { type: Schema.Types.ObjectId, ref: "Team", required: true },
+    raceResults: { type: [Number], required: false },
+    qualiResults: { type: [Number], required: false },
+    countryCode: String,
+    year: { type: Number, required: true },
+    season: { type: Schema.Types.ObjectId, ref: "Season", required: true },
 }, { timestamps: true });
 
-DriverSchema.index({ driver_uid: 1 }, { unique: true })
+DriverSchema.index({ driverUid: 1, nameAcronym: 1, year: 1 }, { unique: true })
 
 export default model("Driver", DriverSchema);

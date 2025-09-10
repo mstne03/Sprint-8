@@ -10,6 +10,4 @@ app.use(express.json());
 
 app.use('/api', f1Routes);
 
-
-
 export default app;
