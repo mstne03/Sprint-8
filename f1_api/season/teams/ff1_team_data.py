@@ -1,33 +1,46 @@
 import logging
 import fastf1 as ff1
-from .ff1_team_standings_results import get_standings_data
-from .ff1_team_race_results import get_race_results
+from fastf1 import plotting
+from ...models.f1_models import Teams
 
-def get_team_data(schedule, year):
+def get_team_data(schedule, year:int):
     try:
         teams = []
+        added_team_names = set()
 
-        event = schedule.iloc[1]["EventName"]
+        for _, event in schedule.iloc[1:].iterrows():
+            event_name = event["EventName"]
+            sessions = [
+                event["Session1"],
+                event["Session2"],
+                event["Session3"],
+                event["Session4"],
+                event["Session5"]
+            ]
 
-        session = ff1.get_session(year,event,'R')
+            for session_type in sessions:
+                session = ff1.get_session(year=year,gp=event_name,identifier=session_type)
 
-        team_names = ff1.plotting.list_team_names(session)
+                session.load(laps=False, telemetry=False, weather=False, messages=False)
 
-        for name in team_names:
+                results = session.results
+                
+                team_names = plotting.list_team_names(session)
 
-            standings = get_standings_data(schedule,year,name)
-            
-            race_results = get_race_results(schedule,year,name)
+                for name in team_names:
+                    if name in added_team_names:
+                        continue
+                    
+                    added_team_names.add(name)
 
-            teams.append({
-                "year": year,
-                "team_name": name,
-                "drivers": ff1.plotting.get_driver_names_by_team(name, session),
-                "raceResults": race_results,
-                "standings": standings
-            })
+                    drivers_id = results.loc[results["TeamName"] == name, "DriverNumber"].tolist()
+
+                    teams.append(Teams(
+                        driver1_id = int(drivers_id[0]),
+                        driver2_id = int(drivers_id[1]),
+                        team_name = str(name)
+                    ))
+        return teams
     except Exception as e:
-        logging.warning(f'During the execution of get_team_data function, the following exception ocurred: {e}')
-        return
-
-    return teams
+        logging.warning(f'During get_team_data for year {year}, exception: {e}')
+        return []

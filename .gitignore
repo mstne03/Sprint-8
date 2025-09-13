@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 .env
+.venv
 ff1_cache
 
 # Editor directories and files
