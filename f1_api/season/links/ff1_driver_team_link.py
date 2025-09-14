@@ -1,9 +1,8 @@
 import logging
-import fastf1 as ff1
 from fastf1 import plotting
 from f1_api.models.f1_models import DriverTeamLink
 
-def get_all_driver_team_links(year, driver_id_map, team_id_map):
+def get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map):
     """
     Returns a list of DriverTeamLink objects for all (driver, team, round) assignments in the given year.
     driver_id_map: dict mapping driver full name to driver_id
@@ -11,13 +10,8 @@ def get_all_driver_team_links(year, driver_id_map, team_id_map):
     """
     links = set()
     driver_team_links = []
-    schedule = ff1.get_event_schedule(year)
-
     for _, event in schedule.iloc[1:].iterrows():
-        if event["EventFormat"] == "testing":
-            continue
         round_number = event["RoundNumber"]
-        event_name = event["EventName"]
 
         sessions = [
             event["Session1"],
@@ -29,9 +23,7 @@ def get_all_driver_team_links(year, driver_id_map, team_id_map):
 
         for session_type in sessions:
             try:
-                session = ff1.get_session(year=year, gp=event_name, identifier=session_type)
-                
-                session.load(laps=False, telemetry=False, weather=False, messages=False)
+                session = session_map.get((round_number, session_type))
                 
                 driver_list = session.drivers
                 results = session.results

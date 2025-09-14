@@ -1,18 +1,13 @@
 import logging
 import math
-import fastf1 as ff1
 from fastf1 import plotting
 from f1_api.models.f1_models import SessionResult
 
-def get_session_results(year:int, driver_id_map, team_id_map):
+def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_map):
     session_results = []
-    schedule = ff1.get_event_schedule(year)
 
     for _, event in schedule.iloc[1:].iterrows():
-        if event["EventFormat"] == "testing":
-            continue
         round_number = event["RoundNumber"]
-        event_name = event["EventName"]
 
         sessions = [
             event["Session1"],
@@ -24,12 +19,7 @@ def get_session_results(year:int, driver_id_map, team_id_map):
 
         for session_number, session_type in enumerate(sessions, start=1):
             try:
-                session = ff1.get_session(year=year, gp=event_name, identifier=session_type)
-                try:
-                    session.load(laps=True, telemetry=False, weather=False, messages=False)
-                except Exception as e:
-                    logging.warning(f"Skipping session {session_type} for event {event_name} in year {year}: {e}")
-                    return session_results
+                session = session_map.get((round_number, session_type))
 
                 driver_list = session.drivers
                 results = session.results
@@ -93,6 +83,6 @@ def get_session_results(year:int, driver_id_map, team_id_map):
                         fastest_lap=fastest_lap
                     ))
             except Exception as e:
-                logging.warning(f"Skipping session {session_type} for event {event_name} in year {year}: {e}")
-                continue
+                logging.warning(f"Skipping session {session_type} for event {event["EventName"]} in year {year}: {e}")
+                return session_results
     return session_results

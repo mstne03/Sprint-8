@@ -3,13 +3,13 @@ import fastf1 as ff1
 from fastf1 import plotting
 from f1_api.models.f1_models import Teams
 
-def get_team_data(year:int,schedule):
+def get_team_data(year:int,schedule,session_map):
     
     teams = []
     added_team_names = set()
 
     for _, event in schedule.iloc[1:].iterrows():
-        event_name = event["EventName"]
+        round_number = event["RoundNumber"]
         sessions = [
             event["Session1"],
             event["Session2"],
@@ -20,8 +20,7 @@ def get_team_data(year:int,schedule):
 
         for session_type in sessions:
             try:
-                session = ff1.get_session(year=year,gp=event_name,identifier=session_type)
-                session.load(laps=False, telemetry=False, weather=False, messages=False)
+                session = session_map.get((round_number,session_type))
                 
                 team_names = plotting.list_team_names(session)
 

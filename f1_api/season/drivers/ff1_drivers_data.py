@@ -3,15 +3,12 @@ from f1_api.models.f1_models import Drivers
 import fastf1 as ff1
 from fastf1 import plotting
 
-def get_driver_data(year:int):
+def get_driver_data(year:int,schedule,session_map):
     drivers_list = []
     added_driver_names = set()
 
-    schedule = ff1.get_event_schedule(year)
     for _, event in schedule.iloc[1:].iterrows():
-        if event["EventFormat"] == "testing":
-                continue
-        event_name = event["EventName"]
+        round_number = event["RoundNumber"]
 
         sessions = [
             event["Session1"],
@@ -22,10 +19,8 @@ def get_driver_data(year:int):
         ]
 
         for session_type in sessions:
-            try:     
-                session = ff1.get_session(year=year,gp=event_name,identifier=session_type)
-                
-                session.load(laps=False, telemetry=False, weather=False, messages=False)
+            try:
+                session = session_map.get((round_number,session_type))
                 
                 results = session.results
 
@@ -43,9 +38,9 @@ def get_driver_data(year:int):
 
                     drivers_list.append(Drivers(
                         driver_number = int(driver_number),
-                        full_name = str(driver),
-                        acronym = str(acronym),
-                        country_code = str(country)
+                        full_name = driver,
+                        acronym = acronym,
+                        country_code = country
                     ))
             except Exception as e:
                 logging.warning(f"Round {event["RoundNumber"]} not availavle yet: {e}")
