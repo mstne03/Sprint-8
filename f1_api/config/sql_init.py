@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from sqlmodel import SQLModel, create_engine
-from f1_api.models.f1_models import Drivers, Teams, Seasons, Sessions, Events
+from f1_api.models.f1_models import Drivers, Teams, Seasons, Sessions, Events, EventSessionLink, SessionDriverLink, SessionTeamLink, SessionResult
 
 load_dotenv()
 
@@ -11,9 +11,6 @@ engine = create_engine(sqlite_url, echo=True)
 
 def create_models():
     SQLModel.metadata.create_all(engine)
-
-def create_driver():
-    return
 
 if __name__ == "__main__":
     create_models()

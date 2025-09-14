@@ -1,16 +1,12 @@
 import logging
-from ...models.f1_models import Sessions
+from f1_api.models.f1_models import Sessions
 import fastf1 as ff1
 
-def get_session_data(schedule, year):
+def get_session_data(year, schedule):
     try:
         sessions = []
 
-        for _,e in schedule.iloc[1:].iterrows():
-            name = e["EventName"]
-
-            event = ff1.get_event(year=year,gp=name)
-
+        for _,event in schedule.iloc[1:].iterrows():
             session_names = [
                 event["Session1"],
                 event["Session2"],

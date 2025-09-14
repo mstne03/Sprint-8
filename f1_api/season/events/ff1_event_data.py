@@ -1,13 +1,12 @@
 import logging
-from ...models.f1_models import Events
+from f1_api.models.f1_models import Events
 import fastf1 as ff1
 
-def get_event_data(schedule, year:int):
+def get_event_data(year:int, schedule):
     events = []
     try:
-        for _, e in schedule.iloc[1:].iterrows():
-            name = e["EventName"]
-            event = ff1.get_event(year=year, gp=name)
+        for _, event in schedule.iloc[1:].iterrows():
+            name = event["EventName"]
             rn = event["RoundNumber"]
             events.append(Events(
                 round_number = int(rn),

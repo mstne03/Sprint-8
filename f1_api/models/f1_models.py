@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKeyConstraint, UniqueConstraint, DateTime, Integer
+from sqlalchemy import Column, ForeignKeyConstraint, UniqueConstraint, DateTime, String
 from sqlmodel import Field, SQLModel
 from datetime import datetime
 
@@ -36,6 +36,7 @@ class Teams(SQLModel, table=True):
 
 class Drivers(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
+    driver_number: int
     full_name: str
     acronym: str
     country_code: str | None
@@ -88,38 +89,23 @@ class SessionTeamLink(SQLModel, table=True):
         ),
     )
 
-class DriverRaceResults(SQLModel, table=True):
-    season_id: int = Field(foreign_key="seasons.year", primary_key=True)
-    driver_id: int = Field(foreign_key="drivers.id", primary_key=True)
-    position: int
-    points: int
-    finish_time: float
-    f_lap: bool
-    dnf: bool
-
-class TeamRaceResults(SQLModel, table=True):
-    season_id: int = Field(foreign_key="seasons.year", primary_key=True)
-    session_id: int = Field(foreign_key="sessions.round_number", primary_key=True)
+class SessionResult(SQLModel, table=True):
+    season_id: int | None = Field(default=None,primary_key=True)
+    round_number: int = Field(primary_key=True)
+    session_number: int = Field(primary_key=True)
+    driver_id: int = Field(foreign_key="drivers.id", primary_key=True) 
     team_id: int = Field(foreign_key="teams.id", primary_key=True)
-    points: int
+    position: str | None = Field(default=None, sa_column=Column(String(10)))
+    grid_position: int | None
+    best_lap_time: float | None
+    total_time: float | None
+    points: int | None
+    status: str | None
+    fastest_lap: bool | None
 
-class DriverQualiResults(SQLModel, table=True):
-    season_id: int = Field(foreign_key="seasons.year", primary_key=True)
-    session_id: int = Field(foreign_key="sessions.round_number", primary_key=True)
-    driver_id: int = Field(foreign_key="drivers.id", primary_key=True)
-    position: int
-    quali_time: float
-    q1_ko: bool
-    q2_ko: bool
-
-class DriverChampionshipStandings(SQLModel, table=True):
-    season_id: int = Field(foreign_key="seasons.year", primary_key=True)
-    round_number: int = Field(foreign_key="events.round_number", primary_key=True)
-    driver_id: int = Field(foreign_key="drivers.id", primary_key=True)
-    points: int
-
-class TeamChampionshipStandings(SQLModel, table=True):
-    season_id: int = Field(foreign_key="seasons.year", primary_key=True)
-    round_number: int = Field(foreign_key="events.round_number", primary_key=True)
-    team_id: int = Field(foreign_key="teams.id", primary_key=True)
-    points: int
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['round_number', 'season_id', 'session_number'],
+            ['sessions.round_number', 'sessions.season_id', 'sessions.session_number']
+        ),
+    )
