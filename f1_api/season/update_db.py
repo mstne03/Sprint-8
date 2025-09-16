@@ -1,7 +1,7 @@
 import logging
 import fastf1 as ff1
 from sqlmodel import Session, select
-from f1_api.models.f1_models import Events, Seasons, SessionDriverLink, SessionResult, Sessions, Teams, Drivers, EventSessionLink, DriverTeamLink, SessionTeamLink
+from f1_api.models.f1_models import Events, Seasons, SessionResult, Sessions, Teams, Drivers, DriverTeamLink
 from .teams.ff1_team_data import get_team_data
 from .events.ff1_event_data import get_event_data
 from .sessions.ff1_sessions_data import get_session_data
@@ -30,8 +30,8 @@ async def update_db(engine,year:int):
 
             try:
                 for _,event in schedule.iloc[1:].iterrows():
-                    round_number = event["RoundNumber"]
-                    if round_number in existing_rounds:
+                    rn = event["RoundNumber"]
+                    if rn in existing_rounds:
                         logging.info(f"{event["EventName"]} already in DB")
                         continue
                     if event["EventFormat"] == "testing":
@@ -54,7 +54,7 @@ async def update_db(engine,year:int):
                                 logging.warning(f"No data for session {session_type} at {name}, skipping.")
                                 raise Exception("No more sessions to load")
                             
-                            session_map[(event["RoundNumber"],session_type)] = f1_session
+                            session_map[(rn, session_type)] = f1_session
                         except Exception as e:
                             logging.warning(f"Failed to load session {session_type} at {name}")
                             raise SessionLoadError from e
@@ -63,37 +63,23 @@ async def update_db(engine,year:int):
 
             events: list[Events] = get_event_data(year,schedule)
             sessions: list[Sessions] = get_session_data(year,schedule)
-            teams: list[Teams] = get_team_data(year,schedule,session_map)
-            drivers: list[Drivers] = get_driver_data(year,schedule,session_map)
+            teams: list[Teams] = get_team_data(schedule,session_map)
+            drivers: list[Drivers] = get_driver_data(schedule,session_map)
             session.add_all([*events,*sessions,*teams,*drivers])
             session.commit()
-            all_sessions: list[Sessions] = list(session.exec(select(Sessions)))
+            #all_sessions: list[Sessions] = list(session.exec(select(Sessions).where(Sessions.season_id == year)))
             all_teams: list[Teams] = list(session.exec(select(Teams)))
             all_drivers: list[Drivers] = list(session.exec(select(Drivers)))
-            for s in all_sessions:
-                session.add(EventSessionLink(
-                    round_number=s.round_number,
-                    season_id=s.season_id,
-                    session_number=s.session_number
-                ))
-                for team in all_teams:
-                    session.add(SessionTeamLink(
-                        event_id=s.round_number,
-                        season_id=s.season_id,
-                        session_number=s.session_number,
-                        team_id=team.id
-                    ))
 
                     
             driver_id_map = {driver.driver_number: driver.id for driver in all_drivers}
             team_id_map = {team.team_name: team.id for team in all_teams}
-            all_driver_team_links = get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map)
+            all_driver_team_links = get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map, session)
             session.add_all(all_driver_team_links)
             session.commit()
-            all_session_results = get_session_results(year, schedule, session_map, driver_id_map, team_id_map)
+            all_session_results = get_session_results(year, schedule, session_map, driver_id_map, team_id_map, session)
             session.add_all(all_session_results)
             session.commit()
             session.close()
-            logging.info(f"Session_map: {session_map}")
     except Exception as e:
         logging.warning(f'During the execution of update_db function, the following exception ocurred: {e}')

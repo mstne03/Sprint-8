@@ -1,8 +1,9 @@
 import logging
+from sqlalchemy import select
 from fastf1 import plotting
-from f1_api.models.f1_models import DriverTeamLink
+from f1_api.models.f1_models import DriverTeamLink, Events
 
-def get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map):
+def get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map, session):
     """
     Returns a list of DriverTeamLink objects for all (driver, team, round) assignments in the given year.
     driver_id_map: dict mapping driver full name to driver_id
@@ -23,16 +24,16 @@ def get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_i
 
         for session_type in sessions:
             try:
-                session = session_map.get((round_number, session_type))
+                f1_session = session_map.get((round_number, session_type))
                 
-                driver_list = session.drivers
-                results = session.results
+                driver_list = f1_session.drivers
+                results = f1_session.results
 
                 for driver_num in driver_list:
                     try:
                         driver_id = driver_id_map.get(int(driver_num))
                         driver_abb = results.loc[results["DriverNumber"] == driver_num, "Abbreviation"].values[0]
-                        team_name = plotting.get_team_name_by_driver(identifier=driver_abb,session=session)
+                        team_name = plotting.get_team_name_by_driver(identifier=driver_abb,session=f1_session)
                         team_id = team_id_map.get(team_name)
                         if driver_id is None or team_id is None:
                             continue

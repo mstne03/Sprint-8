@@ -1,12 +1,14 @@
 import logging
 import math
+from sqlmodel import select
 from fastf1 import plotting
-from f1_api.models.f1_models import SessionResult
+from f1_api.models.f1_models import SessionResult, Events
 
-def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_map):
+def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_map, sql_session):
     session_results = []
 
     for _, event in schedule.iloc[1:].iterrows():
+        event_name = event["EventName"]
         round_number = event["RoundNumber"]
 
         sessions = [
@@ -68,9 +70,11 @@ def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_
                     if session_type == "Qualifying":
                         position = int(driver_results["Position"])
 
+                    rn = sql_session.exec(select(Events.round_number).where(Events.event_name == event_name)).first()
+
                     session_results.append(SessionResult(
                         season_id=year,
-                        round_number=round_number,
+                        round_number=rn,
                         session_number=session_number,
                         driver_id=driver_id,
                         team_id=team_id,

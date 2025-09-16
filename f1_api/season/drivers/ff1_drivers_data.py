@@ -3,7 +3,7 @@ from f1_api.models.f1_models import Drivers
 import fastf1 as ff1
 from fastf1 import plotting
 
-def get_driver_data(year:int,schedule,session_map):
+def get_driver_data(schedule,session_map):
     drivers_list = []
     added_driver_names = set()
 

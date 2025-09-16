@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKeyConstraint, UniqueConstraint, DateTime, String
+from sqlalchemy import Column, ForeignKeyConstraint, UniqueConstraint, PrimaryKeyConstraint, DateTime, String
 from sqlmodel import Field, SQLModel
 from datetime import datetime
 
@@ -6,8 +6,8 @@ class Seasons(SQLModel, table=True):
     year: int = Field(primary_key=True)
 
 class Events(SQLModel, table=True):
-    round_number: int = Field(primary_key=True)
-    season_id: int = Field(foreign_key="seasons.year", primary_key=True)
+    round_number: int = Field(default=None, primary_key=True)
+    season_id: int = Field(default=None, foreign_key="seasons.year", primary_key=True)
     event_name: str
     event_type: str
     event_country: str
@@ -47,54 +47,11 @@ class DriverTeamLink(SQLModel, table=True):
     season_id: int = Field(foreign_key="seasons.year",primary_key=True)
     round_number: int = Field(foreign_key="events.round_number",primary_key=True)
 
-class EventSessionLink(SQLModel, table=True):
-    round_number: int = Field(primary_key=True)
-    season_id: int = Field(primary_key=True)
-    session_number: int = Field(primary_key=True)
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['round_number', 'season_id'],
-            ['events.round_number', 'events.season_id']
-        ),
-        ForeignKeyConstraint(
-            ['round_number', 'season_id', 'session_number'],
-            ['sessions.round_number', 'sessions.season_id', 'sessions.session_number']
-        ),
-    )
-
-class SessionDriverLink(SQLModel, table=True):
-    event_id: int = Field(primary_key=True)
-    season_id: int = Field(primary_key=True)
-    session_number: int = Field(primary_key=True)
-    driver_id: int = Field(foreign_key="drivers.id", primary_key=True)
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['event_id', 'season_id', 'session_number'],
-            ['sessions.round_number', 'sessions.season_id', 'sessions.session_number']
-        ),
-    )
-
-class SessionTeamLink(SQLModel, table=True):
-    event_id: int = Field(primary_key=True)
-    season_id: int = Field(primary_key=True)
-    session_number: int = Field(primary_key=True)
-    team_id: int = Field(foreign_key="teams.id", primary_key=True)
-
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['event_id', 'season_id', 'session_number'],
-            ['sessions.round_number', 'sessions.season_id', 'sessions.session_number']
-        ),
-    )
-
 class SessionResult(SQLModel, table=True):
     season_id: int | None = Field(default=None,primary_key=True)
     round_number: int = Field(primary_key=True)
     session_number: int = Field(primary_key=True)
-    driver_id: int = Field(foreign_key="drivers.id", primary_key=True) 
-    team_id: int = Field(foreign_key="teams.id", primary_key=True)
+    driver_id: int = Field(foreign_key="drivers.id", primary_key=True)
     position: str | None = Field(default=None, sa_column=Column(String(10)))
     grid_position: int | None
     best_lap_time: float | None

@@ -3,7 +3,7 @@ import fastf1 as ff1
 from fastf1 import plotting
 from f1_api.models.f1_models import Teams
 
-def get_team_data(year:int,schedule,session_map):
+def get_team_data(schedule,session_map):
     
     teams = []
     added_team_names = set()
@@ -34,7 +34,7 @@ def get_team_data(year:int,schedule,session_map):
                         team_name=name
                     ))
             except Exception as e:
-                logging.warning(f'During get_team_data for year {year}, exception: {e}')
+                logging.warning(f'During get_team_data, exception: {e}')
                 return teams
     return teams
     
