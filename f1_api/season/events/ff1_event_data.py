@@ -1,13 +1,16 @@
 import logging
+from sqlmodel import select
 from f1_api.models.f1_models import Events
-import fastf1 as ff1
 
-def get_event_data(year:int, schedule):
+def get_event_data(year:int, schedule, session):
     events = []
     try:
+        round_numbers = set(session.exec(select(Events.round_number)).all())
         for _, event in schedule.iloc[1:].iterrows():
             name = event["EventName"]
             rn = event["RoundNumber"]
+            if rn in round_numbers:
+                continue
             events.append(Events(
                 round_number = int(rn),
                 season_id = year,

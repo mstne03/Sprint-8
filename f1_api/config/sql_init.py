@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from sqlmodel import SQLModel, create_engine
 from f1_api.models.f1_models import Drivers, Teams, Seasons, Sessions, Events, SessionResult
 
-load_dotenv(r'C:/Users/Marc/Documents/ITA/Sprint 7/f1_api/.env')
+load_dotenv(r'C:/Users/Marc/Documents/ITA/Sprint 8/f1_api/.env')
 
 sqlite_url = f"mysql+mysqlconnector://root:{os.environ.get("DB_PASSWORD", "MserrM76685")}@localhost/{os.environ['DATABASE']}"
 

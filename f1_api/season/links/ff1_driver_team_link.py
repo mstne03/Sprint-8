@@ -11,6 +11,7 @@ def get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_i
     """
     links = set()
     driver_team_links = []
+    existing_links = set(session.exec(select(DriverTeamLink.driver_id, DriverTeamLink.team_id)).all())
     for _, event in schedule.iloc[1:].iterrows():
         round_number = event["RoundNumber"]
 
@@ -35,6 +36,8 @@ def get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_i
                         driver_abb = results.loc[results["DriverNumber"] == driver_num, "Abbreviation"].values[0]
                         team_name = plotting.get_team_name_by_driver(identifier=driver_abb,session=f1_session)
                         team_id = team_id_map.get(team_name)
+                        if (driver_id, team_id) in existing_links:
+                            continue
                         if driver_id is None or team_id is None:
                             continue
                         link_key = (driver_id, team_id, year, round_number)

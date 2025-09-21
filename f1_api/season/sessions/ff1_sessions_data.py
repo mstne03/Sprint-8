@@ -1,11 +1,11 @@
 import logging
+from sqlmodel import select
 from f1_api.models.f1_models import Sessions
-import fastf1 as ff1
 
-def get_session_data(year, schedule):
+def get_session_data(year, schedule, session):
     try:
         sessions = []
-
+        existing_sessions = set(session.exec(select(Sessions.round_number, Sessions.session_number)).all())
         for _,event in schedule.iloc[1:].iterrows():
             session_names = [
                 event["Session1"],
@@ -17,6 +17,8 @@ def get_session_data(year, schedule):
 
             for i, s in enumerate(session_names):
                 rn = int(event["RoundNumber"])
+                if (rn, i+1) in existing_sessions:
+                    continue
                 if not rn:
                     continue
 

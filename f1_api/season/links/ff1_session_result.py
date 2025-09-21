@@ -6,6 +6,7 @@ from f1_api.models.f1_models import SessionResult, Events
 
 def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_map, sql_session):
     session_results = []
+    existing_results = existing_results = set(sql_session.exec(select(SessionResult.round_number, SessionResult.session_number, SessionResult.driver_id)).all())
 
     for _, event in schedule.iloc[1:].iterrows():
         event_name = event["EventName"]
@@ -26,6 +27,14 @@ def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_
                 driver_list = session.drivers
                 results = session.results
                 laps = session.laps
+                
+                if session_type in ("Sprint", "Race"):
+                    fastest_driver = laps.pick_fastest()["Driver"]
+
+                    disq_drivers = results.loc[results["Status"] == "Disqualified", "Abbreviation"]
+
+                    if fastest_driver in disq_drivers.values:
+                        laps = laps[laps["Driver"] != fastest_driver]
 
                 for driver_num in driver_list:
                     driver_name = results.loc[results["DriverNumber"] == driver_num, "Abbreviation"].values[0]
@@ -64,13 +73,20 @@ def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_
 
                         points = int(driver_results["Points"])
                         status = driver_results["Status"]
-                        session_fastest = laps.pick_fastest()["LapTime"].total_seconds()
-                        fastest_lap = fastest == session_fastest
+                        session_fastest = laps["LapTime"].min().total_seconds()
+                        classified = str(driver_results["ClassifiedPosition"])
+                        if classified.isdigit():
+                            fastest_lap = fastest == session_fastest
+                        else:
+                            fastest_lap = False
 
                     if session_type == "Qualifying":
                         position = int(driver_results["Position"])
 
                     rn = sql_session.exec(select(Events.round_number).where(Events.event_name == event_name)).first()
+
+                    if (rn, session_number, driver_id) in existing_results:
+                        continue
 
                     session_results.append(SessionResult(
                         season_id=year,

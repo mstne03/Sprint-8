@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime
 import fastf1 as ff1
 from sqlmodel import Session, select
 from f1_api.models.f1_models import Events, Seasons, SessionResult, Sessions, Teams, Drivers, DriverTeamLink
@@ -14,8 +15,13 @@ class SessionLoadError(Exception):
 
 logging.basicConfig(level=logging.INFO)
 
-async def update_db(engine,year:int):
+async def update_db(engine):
+    """
+    This function updates the db automatically for the current F1 season
+    """
     try:
+        year = datetime.now().year
+
         with Session(engine) as session:
             season_exists = session.exec(select(Seasons).where(Seasons.year == year)).first()
             existing_rounds = set(session.exec(select(SessionResult.round_number)).all())
@@ -61,13 +67,24 @@ async def update_db(engine,year:int):
             except SessionLoadError:
                 logging.warning("Stopped loading further sessions")
 
-            events: list[Events] = get_event_data(year,schedule)
-            sessions: list[Sessions] = get_session_data(year,schedule)
-            teams: list[Teams] = get_team_data(schedule,session_map)
-            drivers: list[Drivers] = get_driver_data(schedule,session_map)
-            session.add_all([*events,*sessions,*teams,*drivers])
+            events: list[Events] = get_event_data(year,schedule,session)
+            sessions: list[Sessions] = get_session_data(year,schedule,session)
+            teams: list[Teams] = get_team_data(schedule,session_map,session)
+
+            session.add_all([*events,*sessions,*teams])
+
+            drivers: list[Drivers] = get_driver_data(schedule,session_map,session,year)
+            
+            for driver in drivers:
+                existing = session.exec(select(Drivers).where(Drivers.driver_number == driver.driver_number)).first()
+                if existing:
+                    existing.driver_color = driver.driver_color
+                    existing.headshot_url = driver.headshot_url
+                    session.add(existing)
+                else:
+                    session.add(driver)
+            
             session.commit()
-            #all_sessions: list[Sessions] = list(session.exec(select(Sessions).where(Sessions.season_id == year)))
             all_teams: list[Teams] = list(session.exec(select(Teams)))
             all_drivers: list[Drivers] = list(session.exec(select(Drivers)))
 
@@ -77,6 +94,24 @@ async def update_db(engine,year:int):
             all_driver_team_links = get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map, session)
             session.add_all(all_driver_team_links)
             session.commit()
+
+            current_driver_team_links = list(session.exec(select(DriverTeamLink)))
+
+            latest_links = {}
+
+            for link in current_driver_team_links:
+                if (link.driver_id not in latest_links) or (link.round_number > latest_links[link.driver_id].round_number):
+                    latest_links[link.driver_id] = link
+
+            for driver_id, link in latest_links.items():
+                driver = session.exec(select(Drivers).where(Drivers.id == driver_id)).first()
+                team = session.exec(select(Teams).where(Teams.id == link.team_id)).first()
+
+                if driver.driver_color != team.team_color:
+                    driver.driver_color = team.team_color
+                    session.add(driver)
+            session.commit()
+
             all_session_results = get_session_results(year, schedule, session_map, driver_id_map, team_id_map, session)
             session.add_all(all_session_results)
             session.commit()

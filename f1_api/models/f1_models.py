@@ -33,13 +33,16 @@ class Sessions(SQLModel, table=True):
 class Teams(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     team_name: str
+    team_color: str
 
 class Drivers(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     driver_number: int
     full_name: str
     acronym: str
+    driver_color: str
     country_code: str | None
+    headshot_url: str
 
 class DriverTeamLink(SQLModel, table=True):
     driver_id: int = Field(foreign_key="drivers.id",primary_key=True)
