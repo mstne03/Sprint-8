@@ -1,22 +1,19 @@
-import type { Driver } from '@/features/drivers/types'
 import { motion } from 'framer-motion'
 import ReactCountryFlag from 'react-country-flag'
+import type { Driver } from '@/features/drivers/types'
 
-interface DriverCardProps {
-    drivers?: Driver[]
+type DriverCardProps = {
+    d:Driver
 }
 
-const DriverCard = ({ drivers }: DriverCardProps) => {
-
+const DriverCard = ({ d }: DriverCardProps) =>  {
     return (
-        <div className="text-white m-20 mx-15 grid md:grid-cols-2 grid-cols-1 gap-20 overflow-hidden">
-            {drivers?.map((d) => (
-                <motion.div
+        <motion.div
                     className={`
                         flex
                         items-center
                         relative
-                        md:min-h-[70vh]
+                        md:min-h-[55vh]
                         min-h-[50vh]
                         min-w-[50vw]
                         md:min-w-[20vw]
@@ -24,7 +21,6 @@ const DriverCard = ({ drivers }: DriverCardProps) => {
                         rounded-4xl
                         border-2
                         border-[rgba(255,255,255,0.05)]
-                        hover:cursor-pointer
                         p-2
                     `}
                     key={d.driver_number}
@@ -36,7 +32,8 @@ const DriverCard = ({ drivers }: DriverCardProps) => {
                             top-[0.05%] 
                             left-[55%] 
                             text-[30vw]
-                            md:left-[20%]
+                            md:text-[20vw]
+                            md:left-[40%]
                             pointer-events-none
                             select-none
                         "
@@ -47,14 +44,14 @@ const DriverCard = ({ drivers }: DriverCardProps) => {
                     >
                         {d.driver_number}
                     </span>
-                    <div className="md:max-h-[40vh] max-h-[20vh] overflow-hidden">
+                    <div className="md:max-h-[40vh] max-h-[35vh] top-[4%] md:top-[3%] overflow-hidden absolute">
                         <img
-                            className="w-[30vw] left-[-6%] md:left-[-20%] relative"
+                            className="md:w-[30vw] w-[45vw] left-[-5%] md:left-[-20%] relative"
                             src={`${d.headshot_url}`}
                             alt={`${d.full_name}`}
                         />
                     </div>
-                    <div className="mt-5 space-y-10 absolute left-[43%] top-[7%]">
+                    <div className="mt-5 text-right space-y-10 absolute left-[30%] md:left-[35%] md:top-[5%]">
                         {(() => {
                             const parts = d.full_name.split(" ");
                             const beforeLast = parts.slice(0, -1).join(" ");
@@ -67,12 +64,12 @@ const DriverCard = ({ drivers }: DriverCardProps) => {
                             );
                         })()}
 
-                        <div className="">
+                        <div className="text-[2vw]">
                             <p>CHAMPIONSHIP</p>
                             <p className="font-bold">{d.points} pts.</p>
                         </div>
                         
-                        <div className="flex gap-5 text-[10px] md:text-[75%]">
+                        <div className="flex gap-5 text-[10px] md:text-[80%]">
                             <span>
                                 <p className="">NATIONALITY</p>
                                 <ReactCountryFlag 
@@ -96,8 +93,6 @@ const DriverCard = ({ drivers }: DriverCardProps) => {
                         </div>
                     </div>
                 </motion.div>
-            ))}
-        </div>
     )
 }
 

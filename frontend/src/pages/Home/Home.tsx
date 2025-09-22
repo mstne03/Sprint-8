@@ -1,14 +1,12 @@
 import { useDrivers } from '@/features/drivers/hooks'
-import DriverCard from '@/components/DriverCard/DriverCard'
+import DriverSection from '@/components/DriverSection/DriverSection'
 
 export default function Home () {
     const { data: drivers } = useDrivers();
 
     return (
         <main>
-           <DriverCard 
-                drivers={drivers}
-           />
+           <DriverSection />
         </main>
     )
 }
