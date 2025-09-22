@@ -79,11 +79,24 @@ async def get_drivers():
                         "poles": 0,
                         "podiums": 0,
                         "fastest_laps": 0,
+                        "victories": 0,
+                        "sprint_podiums": 0,
+                        "sprint_victories": 0,
                     }
-                if r.grid_position == 1:
-                    stats[driver_id]["poles"] += 1
-                if r.position in ["1", "2", "3"]:
-                    stats[driver_id]["podiums"] += 1
+                
+                if r.session_number == 5:
+                    if r.grid_position == 1:
+                        stats[driver_id]["poles"] += 1
+                    if r.position in ["1", "2", "3"]:
+                        stats[driver_id]["podiums"] += 1
+                    if r.position == "1":
+                        stats[driver_id]["victories"] +=1
+                if r.session_number == 3:
+                    if r.position in ["1", "2", "3"]:
+                        stats[driver_id]["sprint_podiums"] += 1
+                    if r.position == "1":
+                        stats[driver_id]["sprint_victories"] += 1
+                        
                 if r.fastest_lap == 1:
                     stats[driver_id]["fastest_laps"] += 1
 
@@ -103,6 +116,9 @@ async def get_drivers():
                 driver_dict["poles"] = driver_stats.get("poles", 0)
                 driver_dict["podiums"] = driver_stats.get("podiums", 0)
                 driver_dict["fastest_laps"] = driver_stats.get("fastest_laps", 0)
+                driver_dict["victories"] = driver_stats.get("victories", 0)
+                driver_dict["sprint_podiums"] = driver_stats.get("sprint_podiums", 0)
+                driver_dict["sprint_victories"] = driver_stats.get("sprint_victories", 0)
                 drivers.append(driver_dict)
 
             return drivers
