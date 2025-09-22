@@ -66,7 +66,7 @@ async def get_drivers():
                 select(SessionResult)
                 .where(
                     (SessionResult.round_number <= max_round) &
-                    ((SessionResult.session_number == 5))
+                    ((SessionResult.session_number == 5) | (SessionResult.session_number == 3))
                 )
             ).all()
 
@@ -82,6 +82,7 @@ async def get_drivers():
                         "victories": 0,
                         "sprint_podiums": 0,
                         "sprint_victories": 0,
+                        "sprint_poles": 0,
                     }
                 
                 if r.session_number == 5:
@@ -90,15 +91,18 @@ async def get_drivers():
                     if r.position in ["1", "2", "3"]:
                         stats[driver_id]["podiums"] += 1
                     if r.position == "1":
-                        stats[driver_id]["victories"] +=1
+                        stats[driver_id]["victories"] += 1
+                    if r.fastest_lap == 1:
+                        stats[driver_id]["fastest_laps"] += 1
                 if r.session_number == 3:
                     if r.position in ["1", "2", "3"]:
                         stats[driver_id]["sprint_podiums"] += 1
                     if r.position == "1":
                         stats[driver_id]["sprint_victories"] += 1
+                    if r.grid_position == 1:
+                        stats[driver_id]["sprint_poles"] += 1
                         
-                if r.fastest_lap == 1:
-                    stats[driver_id]["fastest_laps"] += 1
+                
 
             drivers = session.exec(select(Drivers)).all()
             drivers_sorted = sorted(
@@ -119,6 +123,7 @@ async def get_drivers():
                 driver_dict["victories"] = driver_stats.get("victories", 0)
                 driver_dict["sprint_podiums"] = driver_stats.get("sprint_podiums", 0)
                 driver_dict["sprint_victories"] = driver_stats.get("sprint_victories", 0)
+                driver_dict["sprint_poles"] = driver_stats.get("sprint_poles", 0)
                 drivers.append(driver_dict)
 
             return drivers

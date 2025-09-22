@@ -3,6 +3,9 @@ from sqlmodel import select
 from f1_api.models.f1_models import Sessions
 
 def get_session_data(year, schedule, session):
+    """
+    Creates session models returning them in an array
+    """
     try:
         sessions = []
         existing_sessions = set(session.exec(select(Sessions.round_number, Sessions.session_number)).all())

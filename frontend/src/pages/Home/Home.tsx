@@ -5,7 +5,7 @@ export default function Home () {
     const { data: drivers } = useDrivers();
 
     return (
-        <main>
+        <main className="py-10">
            <DriverSection />
         </main>
     )

@@ -13,4 +13,5 @@ export type Driver = {
   victories: number
   sprint_podiums: number
   sprint_victories: number
+  sprint_poles: number
 }
