@@ -1,8 +1,8 @@
-import { AgGridReact } from 'ag-grid-react'
+import { useDrivers } from '@/features/drivers/hooks'
 
-const API_BASE = import.meta.env.VITE_API_BASE ?? "http://localhost:8000/api";
 export default function Table() {
-
+    const { data: drivers } = useDrivers();
+    
     return (
         <div className="p-10 space-y-4">
 

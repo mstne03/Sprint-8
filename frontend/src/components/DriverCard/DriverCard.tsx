@@ -38,7 +38,7 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
                     top-[-15%]
                     text-[30vw]
                     md:text-[20vw]
-                    ${d.driver_number.toString().length > 1 
+                    ${d.driver_number.toString().length > 1
                         ? "md:left-[40%] left-[50%]"
                         : "md:left-[65%] left-[65%]"
                     }
@@ -52,24 +52,24 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
             >
                 {d.driver_number}
             </span>
-            <div className="md:max-h-[60vh] max-h-[60vh] top-[4%] md:top-[3%] overflow-hidden absolute">
+            <div className="md:max-h-[70vh] max-h-[60vh] top-[4%] md:top-[3%] overflow-hidden absolute">
                 <img
                     className="md:w-[20vw] w-[45vw] left-[-20%] md:left-[-15%] relative"
                     src={`${d.headshot_url}`}
                     alt={`${d.full_name} headshot`}
                     style={{
-                        WebkitMaskImage: `linear-gradient(to bottom, ${d.driver_color} 35%, transparent 80%)`,
+                        WebkitMaskImage: `linear-gradient(to bottom, ${d.driver_color} 60%, transparent 83%)`,
                         WebkitMaskRepeat: "no-repeat",
                         WebkitMaskSize: isDesktop 
-                            ? "100% 47%"
-                            : "100% 40%",
+                            ? "100% 48%"
+                            : "100% 41%",
                         maskImage: isDesktop
-                            ? `linear-gradient(to bottom, ${d.driver_color} 0%, transparent 80%)`
-                            : `linear-gradient(to bottom, ${d.driver_color} 30%, transparent 80%)`,
+                            ? `linear-gradient(to bottom, ${d.driver_color} 60%, transparent 80%)`
+                            : `linear-gradient(to bottom, ${d.driver_color} 60%, transparent 80%)`,
                         maskRepeat: "no-repeat",
                         maskSize: isDesktop
-                            ? "100% 50%"
-                            : "100% 43%",
+                            ? "100% 48%"
+                            : "100% 41%",
                     }}
                 />
             </div>
@@ -102,9 +102,10 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
                     <div className="
                             grid grid-cols-3 gap-5 
                             rounded-3xl bg-white/20 border-white/30 
-                            border-2 md:p-5 p-4 
+                            border-0 md:p-5 p-4
+                            left-[-4%] md:left-0
                             absolute min-w-[43vw] min-h-[17vh] 
-                            top-[103%] md:min-w-[23vw] md:top-[100%]
+                            top-[101%] md:min-w-[23vw] md:top-[100%]
                     " >
                         <span>
                             <p className="">VICTORIES</p>

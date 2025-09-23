@@ -45,7 +45,7 @@ from sqlmodel import select, func
 @app.get("/drivers/")
 async def get_drivers():
     """
-    Devuelve los drivers ordenados por puntos acumulados en todas las sesiones hasta el último round.
+    Returns all drivers sorted by championship points up to the last round
     """
     try:
         with Session(engine) as session:
