@@ -46,7 +46,7 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
                     select-none
                 `}
                 style={{
-                    WebkitTextStroke: "2px rgba(255,255,255,0.07)",
+                    WebkitTextStroke: "2px rgba(255,255,255,0.10)",
                     color: "transparent",
                 }}
             >
@@ -72,16 +72,51 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
                             : "100% 41%",
                     }}
                 />
+                <motion.button
+                    className="
+                        absolute text-[150%] left-[25%] top-[65%] 
+                        bg-black/66 border-white/30 border-2 
+                        p-2 rounded-2xl hover:bg-black hover:cursor-pointer"
+                >
+                    <svg width="2em" height="2em" viewBox="0 0 24 24" fill="none">
+                        <path d="M12 5V19" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
+                        <path d="M5 12H19" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
+                    </svg>
+                </motion.button>
             </div>
+            
             <div className="mt-5 space-y-3 absolute left-[45%] md:left-[40%] md:top-0 top-0">
                 {(() => {
                     const parts = d.full_name.split(" ");
                     const beforeLast = parts.slice(0, -1).join(" ");
                     const last = parts[parts.length - 1];
                     return (
-                        <div className="text-4xl flex flex-col gap-3">
-                            <span className="font-light ">{beforeLast}</span>
-                            <span className="font-bold ">{last}</span>
+                        <div className="md:text-4xl text-[170%] flex flex-col gap-3">
+                            <div className="flex gap-20">
+                                <div className="flex flex-col md:gap-3 gap-1">
+                                    <span className="font-light ">{beforeLast}</span>
+                                    <span className="font-bold ">{last}</span>
+                                </div>
+                                <img
+                                    className={`
+                                        ${
+                                            d.team_name === "Ferrari" 
+                                            ? "md:min-w-[60px] md:top-[5%] md:left-[130%]"
+                                            : ((d.team_name == "Mercedes") || (d.team_name == "Williams"))
+                                            ? "md:left-[110%] md:top-[5%]"
+                                            : "md:min-w-[100px] md:top-[5%] top-[15%] md:left-[110%] left-[110%]"
+                                        }
+                                        absolute
+                                        min-w-[80px]
+                                        w-[20%] 
+                                        object-contain 
+                                         
+                                        
+                                    `}
+                                    src={`/teams/${(d.team_name || "").replace(/\s+/g, "").toLowerCase()}.svg`} 
+                                    alt={`${d.team_name}`}
+                                />
+                            </div>
                             <span className="text-[15px]">
                                 <ReactCountryFlag 
                                     countryCode={d.country_code}
@@ -95,41 +130,42 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
 
                 <div className="md:text-[20px]">
                     <p>CHAMPIONSHIP</p>
-                    <p className="font-bold">{d.points} pts.</p>
+                    <p className="font-bold">{d.season_results.points} pts.</p>
                 </div>
                 
                 <div className="flex gap-5 text-[10px] md:text-[70%]">
                     <div className="
-                            grid grid-cols-3 gap-5 
-                            rounded-3xl bg-white/20 border-white/30 
-                            border-0 md:p-5 p-4
+                            grid grid-cols-3 gap-5
+                            rounded-3xl bg-black/50 border-white/30 
+                            border-2 md:p-5 p-4
                             left-[-4%] md:left-0
                             absolute min-w-[43vw] min-h-[17vh] 
                             top-[101%] md:min-w-[23vw] md:top-[100%]
-                    " >
+                        "
+                    >
                         <span>
                             <p className="">VICTORIES</p>
-                            <p className="font-bold ">{d.victories}</p>
+                            <p className="font-bold ">{d.season_results.victories}</p>
                         </span>
                         <span>
                             <p className="">POLES</p>
-                            <p className="font-bold ">{d.poles}</p>
+                            <p className="font-bold ">{d.season_results.poles}</p>
                         </span>
                         <span>
                             <p className="">PODIUMS</p>
-                            <p className="font-bold ">{d.podiums}</p>
+                            <p className="font-bold ">{d.season_results.podiums}</p>
                         </span>
                         <span>
-                            <p className="">FASTEST LAPS</p>
-                            <p className="font-bold ">{d.fastest_laps}</p>
+                            <p className="">AVERAGE FINISH</p>
+                            <p className="font-bold ">{d.fantasy_stats.avg_finish}</p>
                         </span>
                         <span>
-                            <p className="">SPRINT VICTORIES</p>
-                            <p className="font-bold ">{d.sprint_victories}</p>
+                            <p className="">AVERAGE GRID POS</p>
+                            <p className="font-bold ">{d.fantasy_stats.avg_grid_position}</p>
                         </span>
                         <span>
-                            <p className="">SPRINT POLES</p>
-                            <p className="font-bold ">{d.sprint_poles}</p>
+                            <p className="">POLE TO WIN CONVERSION</p>
+                            <p className="font-bold ">{d.fantasy_stats.pole_win_conversion}%</p>
                         </span>
                     </div>
                 </div>

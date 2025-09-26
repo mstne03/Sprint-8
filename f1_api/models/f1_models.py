@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKeyConstraint, UniqueConstraint, PrimaryKeyConstraint, DateTime, String
+from sqlalchemy import Column, ForeignKeyConstraint, UniqueConstraint, DateTime, String
 from sqlmodel import Field, SQLModel
 from datetime import datetime
 

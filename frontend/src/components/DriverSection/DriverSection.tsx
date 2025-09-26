@@ -5,7 +5,7 @@ const DriverSection = () => {
     const { data: drivers } = useDrivers();
 
     return (
-        <>
+        <section>
             <h1 className="text-center text-white font-medium text-4xl">
                 2025 DRIVER STANDINGS
             </h1>
@@ -14,7 +14,7 @@ const DriverSection = () => {
                     <DriverCard d={d}/>
                 ))}
             </div>
-        </>
+        </section>
     )
 }
 

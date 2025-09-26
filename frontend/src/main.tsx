@@ -5,7 +5,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import './index.css'
 import DataServiceProvider from '@/providers/ServiceProvider'
-import App from './routes/AppRouter'
+import App from './App'
+import DriversServiceProvider from './providers/DriversProvider'
 
 const queryClient = new QueryClient();
 
@@ -13,9 +14,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <DataServiceProvider>
-          <App/>
-        </DataServiceProvider>
+        <DriversServiceProvider>
+          <DataServiceProvider>
+            <App/>
+          </DataServiceProvider>
+        </DriversServiceProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </BrowserRouter>
     </QueryClientProvider>

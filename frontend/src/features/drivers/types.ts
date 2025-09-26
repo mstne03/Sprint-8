@@ -1,17 +1,31 @@
 export type Driver = {
-  driver_number: number
-  full_name: string
-  acronym: string
-  team_name: string
-  driver_color: string
-  country_code: string
-  headshot_url: string
-  points: number
-  poles: number
-  podiums: number
-  fastest_laps: number
-  victories: number
-  sprint_podiums: number
-  sprint_victories: number
-  sprint_poles: number
+  driver_number: number;
+  full_name: string;
+  acronym: string;
+  team_name: string;
+  driver_color: string;
+  country_code: string;
+  headshot_url: string;
+  season_results: {
+    points: number;
+    poles: number;
+    podiums: number;
+    fastest_laps: number;
+    victories: number;
+    sprint_podiums: number;
+    sprint_victories: number;
+    sprint_poles: number;
+  };
+  fantasy_stats: {
+    avg_finish: number; 
+    avg_grid_position: number; 
+    pole_win_conversion: number; 
+    price: number;
+    overtake_efficiency: number;
+  }
+}
+
+export type Team = {
+  team_name: string;
+  team_color: string;
 }

@@ -1,11 +1,11 @@
 """In this module the api exposes the endpoints"""
 import logging
-from sqlmodel import select, Session
+from sqlmodel import select, Session, func
 from .config.sql_init import engine
 import fastf1 as ff1
 from .season.update_db import update_db
 from .app import app
-from .models.f1_models import Drivers, Teams, SessionResult
+from .models.f1_models import Drivers, Teams, SessionResult, DriverTeamLink
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
@@ -39,8 +39,6 @@ async def get_teams():
     except Exception as e:
         logging.warning(f"/teams/ execution interrupted by the following exception: {e}")
         return []
-
-from sqlmodel import select, func
 
 @app.get("/drivers/")
 async def get_drivers():
@@ -83,17 +81,33 @@ async def get_drivers():
                         "sprint_podiums": 0,
                         "sprint_victories": 0,
                         "sprint_poles": 0,
+                        "finish_positions": [],
+                        "grid_positions": [],
+                        "pole_victories": 0,
+                        "overtakes": [],
                     }
                 
                 if r.session_number == 5:
                     if r.grid_position == 1:
                         stats[driver_id]["poles"] += 1
+                        if r.position == "1":
+                            stats[driver_id]["pole_victories"] += 1
+                    if r.grid_position and isinstance(r.grid_position, int):
+                        stats[driver_id]["grid_positions"].append(r.grid_position)
                     if r.position in ["1", "2", "3"]:
                         stats[driver_id]["podiums"] += 1
+                    if r.position and r.position.isdigit():
+                        stats[driver_id]["finish_positions"].append(int(r.position))
+                    else:
+                        stats[driver_id]["finish_positions"].append(20)
                     if r.position == "1":
                         stats[driver_id]["victories"] += 1
                     if r.fastest_lap == 1:
                         stats[driver_id]["fastest_laps"] += 1
+                    if r.position and r.position.isdigit() and r.grid_position and isinstance(r.grid_position, int):
+                        stats[driver_id]["overtakes"].append(int(r.position) - r.grid_position)
+                    else:
+                        stats[driver_id]["overtakes"].append(0)
                 if r.session_number == 3:
                     if r.position in ["1", "2", "3"]:
                         stats[driver_id]["sprint_podiums"] += 1
@@ -101,8 +115,6 @@ async def get_drivers():
                         stats[driver_id]["sprint_victories"] += 1
                     if r.grid_position == 1:
                         stats[driver_id]["sprint_poles"] += 1
-                        
-                
 
             drivers = session.exec(select(Drivers)).all()
             drivers_sorted = sorted(
@@ -115,15 +127,50 @@ async def get_drivers():
 
             for d in drivers_sorted:
                 driver_dict = d.model_dump()
-                driver_dict["points"] = points_map.get(d.id, 0)
+                team_id = session.exec(
+                    select(DriverTeamLink.team_id)
+                    .where((DriverTeamLink.driver_id == d.id) & (DriverTeamLink.round_number == max_round))
+                ).first()
+                team_name = session.exec(
+                    select(Teams.team_name)
+                    .where(Teams.id == team_id)
+                ).first() if team_id else None
+                if team_id == None:
+                    team_id = session.exec(
+                        select(DriverTeamLink.team_id)
+                        .where((DriverTeamLink.driver_id == d.id))
+                    ).first()
+                    team_name = session.exec(
+                        select(Teams.team_name)
+                        .where(Teams.id == team_id)
+                    ).first()
+                driver_dict["team_name"] = team_name
                 driver_stats = stats.get(d.id, {})
-                driver_dict["poles"] = driver_stats.get("poles", 0)
-                driver_dict["podiums"] = driver_stats.get("podiums", 0)
-                driver_dict["fastest_laps"] = driver_stats.get("fastest_laps", 0)
-                driver_dict["victories"] = driver_stats.get("victories", 0)
-                driver_dict["sprint_podiums"] = driver_stats.get("sprint_podiums", 0)
-                driver_dict["sprint_victories"] = driver_stats.get("sprint_victories", 0)
-                driver_dict["sprint_poles"] = driver_stats.get("sprint_poles", 0)
+                finishes = driver_stats.get("finish_positions", None)
+                grids = driver_stats.get("grid_positions", None)
+                pole_victories = driver_stats.get("pole_victories", None)
+                poles = driver_stats.get("poles", 0)
+                points = points_map.get(d.id, 0)
+                podiums = driver_stats.get("podiums", 0)
+                victories = driver_stats.get("victories", 0)
+                overtakes = driver_stats.get("overtakes", 0)
+                driver_dict["season_results"] = {
+                    "points": points,
+                    "poles": poles,
+                    "podiums": podiums,
+                    "fastest_laps": driver_stats.get("fastest_laps", 0),
+                    "victories": victories,
+                    "sprint_podiums": driver_stats.get("sprint_podiums", 0),
+                    "sprint_victories": driver_stats.get("sprint_victories", 0),
+                    "sprint_poles": driver_stats.get("sprint_poles", 0)
+                }
+                driver_dict["fantasy_stats"] = {
+                    "avg_finish": round(sum(finishes) / len(finishes), 1) if finishes else 0,
+                    "avg_grid_position": round(sum(grids) / len(grids), 1) if grids else 0,
+                    "pole_win_conversion": round(((pole_victories * 100) / poles ), 1) if poles else 0,
+                    "price": round(1000000 + (points * 1000) + (podiums * 5000) + (victories * 10000), 0),
+                    "overtake_efficiency": round(sum(overtakes) / len(overtakes), 1) if overtakes else 0,
+                }
                 drivers.append(driver_dict)
 
             return drivers

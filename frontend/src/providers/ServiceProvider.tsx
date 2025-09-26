@@ -1,12 +1,12 @@
 import { useContext, createContext } from 'react'
 import type { PropsWithChildren } from 'react'
-import type { DataService } from '@/features/drivers/service'
-import { driverService } from '@/infra/dbService'
+import type { DataService } from '@/types/dataService'
+import { dataService } from '@/services/dbService'
 
 const Ctx = createContext<DataService | null>(null);
 
 export default function DataServiceProvider({ children }: PropsWithChildren) {
-    return <Ctx.Provider value={driverService}>{children}</Ctx.Provider>
+    return <Ctx.Provider value={dataService}>{children}</Ctx.Provider>
 }
 
 export function useDataService(): DataService {
