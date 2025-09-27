@@ -5,7 +5,7 @@ from .config.sql_init import engine
 import fastf1 as ff1
 from .season.update_db import update_db
 from .app import app
-from .models.f1_models import Drivers, Teams, SessionResult, DriverTeamLink
+from .models.f1_models import Drivers, Teams, SessionResult, DriverTeamLink, Sessions
 from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
@@ -50,6 +50,12 @@ async def get_drivers():
             max_round = session.exec(
                 select(func.max(SessionResult.round_number))
             ).one()
+            
+            sprint_rounds = session.exec(
+                select(Sessions)
+                .where((Sessions.session_type == "Sprint") and (Sessions.round_number <= max_round))
+            ).all()
+
             results = session.exec(
                 select(
                     SessionResult.driver_id,
@@ -69,6 +75,7 @@ async def get_drivers():
             ).all()
 
             stats = {}
+            available_points = 25 * max_round + len(sprint_rounds) * 8
 
             for r in all_results:
                 driver_id = r.driver_id
@@ -170,6 +177,7 @@ async def get_drivers():
                     "pole_win_conversion": round(((pole_victories * 100) / poles ), 1) if poles else 0,
                     "price": round(1000000 + (points * 1000) + (podiums * 5000) + (victories * 10000), 0),
                     "overtake_efficiency": round(sum(overtakes) / len(overtakes), 1) if overtakes else 0,
+                    "available_points_percentatge": round(points * 100 / available_points, 1) if available_points > 0 else 0,
                 }
                 drivers.append(driver_dict)
 
