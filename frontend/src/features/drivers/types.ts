@@ -22,6 +22,7 @@ export type Driver = {
     pole_win_conversion: number; 
     price: number;
     overtake_efficiency: number;
+    available_points_percentatge: number;
   }
 }
 

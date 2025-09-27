@@ -4,10 +4,11 @@ import ReactCountryFlag from 'react-country-flag'
 import type { Driver } from '@/features/drivers/types'
 
 type DriverCardProps = {
-    d:Driver
+    d:Driver;
+    setExpanded: (name: string) => void;
 }
 
-const DriverCard = ({ d }: DriverCardProps) =>  {
+const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
     const isDesktop = useMediaQuery({ minWidth: 768 });
 
     return (
@@ -72,7 +73,8 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
                             : "100% 41%",
                     }}
                 />
-                <motion.button
+                <button
+                    onClick={() => setExpanded(d.full_name)}
                     className="
                         absolute text-[150%] left-[25%] top-[65%] 
                         bg-black/66 border-white/30 border-2 
@@ -81,8 +83,8 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
                     <svg width="2em" height="2em" viewBox="0 0 24 24" fill="none">
                         <path d="M12 5V19" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
                         <path d="M5 12H19" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
-                    </svg>
-                </motion.button>
+                    </svg> 
+                </button>
             </div>
             
             <div className="mt-5 space-y-3 absolute left-[45%] md:left-[40%] md:top-0 top-0">
@@ -110,7 +112,7 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
                                         min-w-[80px]
                                         w-[20%] 
                                         object-contain 
-                                         
+                                        
                                         
                                     `}
                                     src={`/teams/${(d.team_name || "").replace(/\s+/g, "").toLowerCase()}.svg`} 
@@ -140,7 +142,7 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
                             border-2 md:p-5 p-4
                             left-[-4%] md:left-0
                             absolute min-w-[43vw] min-h-[17vh] 
-                            top-[101%] md:min-w-[23vw] md:top-[100%]
+                            top-[101%] md:min-w-[23vw] md:top-[98%]
                         "
                     >
                         <span>
@@ -163,14 +165,23 @@ const DriverCard = ({ d }: DriverCardProps) =>  {
                             <p className="">AVERAGE GRID POS</p>
                             <p className="font-bold ">{d.fantasy_stats.avg_grid_position}</p>
                         </span>
-                        <span>
+                        <span className="space-y-1">
                             <p className="">POLE TO WIN CONVERSION</p>
-                            <p className="font-bold ">{d.fantasy_stats.pole_win_conversion}%</p>
+                            <span className="block w-full mb-2">
+                                <div className="relative h-4 rounded bg-white/50 overflow-hidden">
+                                    <div
+                                    className="absolute left-0 top-0 h-4 bg-green-500"
+                                    style={{ width: `${d.fantasy_stats.pole_win_conversion}%` }}
+                                    />
+                                    <span className="absolute left-1 top-0 text-xs text-black">{d.fantasy_stats.pole_win_conversion}%</span>
+                                </div>
+                            </span>
                         </span>
                     </div>
                 </div>
             </div>
         </motion.div>
+        
     )
 }
 
