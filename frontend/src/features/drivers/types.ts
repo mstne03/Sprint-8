@@ -25,8 +25,3 @@ export type Driver = {
     available_points_percentatge: number;
   }
 }
-
-export type Team = {
-  team_name: string;
-  team_color: string;
-}

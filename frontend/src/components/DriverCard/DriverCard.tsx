@@ -2,6 +2,7 @@ import { useMediaQuery } from 'react-responsive'
 import { motion } from 'framer-motion'
 import ReactCountryFlag from 'react-country-flag'
 import type { Driver } from '@/features/drivers/types'
+import CustomButton from '../CustomButton/CustomButton'
 
 type DriverCardProps = {
     d:Driver;
@@ -28,8 +29,8 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
             `}
             key={d.driver_number}
             style={{ 
-                background: `linear-gradient(135deg, ${d.driver_color}40 0%, #80808025 100%)`,
-                borderColor: `${d.driver_color}30`
+                background: `linear-gradient(135deg, ${d.driver_color}75 30%, #00000050 100%)`,
+                borderColor: `${d.driver_color}50`
             }}
         >
             <span
@@ -76,7 +77,7 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                 <button
                     onClick={() => setExpanded(d.full_name)}
                     className="
-                        absolute text-[150%] left-[25%] top-[65%] 
+                        absolute text-[150%] md:left-[5%] left-[7%] top-[64.5%] 
                         bg-black/66 border-white/30 border-2 
                         p-2 rounded-2xl hover:bg-black hover:cursor-pointer"
                 >
@@ -142,7 +143,7 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                             border-2 md:p-5 p-4
                             left-[-4%] md:left-0
                             absolute min-w-[43vw] min-h-[17vh] 
-                            top-[101%] md:min-w-[23vw] md:top-[98%]
+                            top-[97%] md:min-w-[23vw] md:top-[98%]
                         "
                     >
                         <span>
@@ -179,6 +180,13 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                         </span>
                     </div>
                 </div>
+            </div>
+            <div
+                className="absolute md:left-[17%] left-[20%] md:top-[81%] top-[77%]"
+            >
+                <CustomButton 
+                    text={"PICK"}
+                />
             </div>
         </motion.div>
         

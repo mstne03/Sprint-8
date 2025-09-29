@@ -1,12 +1,15 @@
 """In this module the api exposes the endpoints"""
 import logging
+from passlib.context import CryptContext
 from sqlmodel import select, Session, func
-from .config.sql_init import engine
 import fastf1 as ff1
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi import HTTPException
+from .config.sql_init import engine
 from .season.update_db import update_db
 from .app import app
 from .models.f1_models import Drivers, Teams, SessionResult, DriverTeamLink, Sessions
-from fastapi.middleware.cors import CORSMiddleware
+from .models.app_models import Users, UserCreate, UserResponse
 
 app.add_middleware(
     CORSMiddleware,
@@ -185,3 +188,53 @@ async def get_drivers():
     except Exception as e:
         logging.warning(f"/drivers/ execution interrupted by the following exception: {e}")
         return []
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+@app.post("/users/", response_model=UserResponse)
+async def create_user(user: UserCreate):
+    """
+    Create a new user
+    """
+    try:
+        with Session(engine) as session:
+            # Verificar si el usuario ya existe
+            existing_user = session.exec(
+                select(Users).where(
+                    (Users.user_name == user.user_name) | 
+                    (Users.email == user.email)
+                )
+            ).first()
+            
+            if existing_user:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Username or email already registered"
+                )
+            
+            # Hash de la contraseña
+            hashed_password = pwd_context.hash(user.password)
+            
+            # Crear nuevo usuario
+            new_user = Users(
+                user_name=user.user_name,
+                email=user.email,
+                hashed_password=hashed_password
+            )
+            
+            session.add(new_user)
+            session.commit()
+            session.refresh(new_user)
+            
+            return UserResponse(
+                id=new_user.id,
+                user_name=new_user.user_name,
+                email=new_user.email,
+                is_active=new_user.is_active,
+                created_at=new_user.created_at
+            )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error creating user: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")

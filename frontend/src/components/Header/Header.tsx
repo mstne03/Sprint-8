@@ -3,7 +3,7 @@ import F1Logo from '@/assets/gridfans_logo.svg'
 
 export default function Header () {
     return (
-        <header className="py-5 px-20 flex justify-between items-center border-b-2 border-white/45 text-white">
+        <header className="py-5 px-20 flex justify-between items-center text-white">
             <span className="hover:scale-120 transition-all ease-in-out duration-300 hover:cursor-pointer active:scale-90">
                 <Link to="/">
                     <img 

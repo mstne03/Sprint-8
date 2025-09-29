@@ -2,6 +2,7 @@ import { useMediaQuery } from 'react-responsive'
 import { motion } from 'framer-motion'
 import ReactCountryFlag from 'react-country-flag'
 import type { Driver } from '@/features/drivers/types'
+import CustomButton from '../CustomButton/CustomButton'
 
 type DriverCardProps = {
     d:Driver;
@@ -81,9 +82,9 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
             >
                 {d.driver_number}
             </span>
-            <div className="md:left-[11%] md:max-h-[70vh] max-h-[60vh] top-[4%] md:top-[10%] overflow-hidden absolute">
+            <div className="md:left-[2%] left-[-5%] md:max-h-[70vh] max-h-[60vh] top-[20%] md:top-[10%] overflow-hidden absolute">
                 <img
-                    className="md:w-[20vw] w-[45vw] relative"
+                    className="md:w-[20vw] w-[40vw] relative"
                     src={`${d.headshot_url}`}
                     alt={`${d.full_name} headshot`}
                     style={{
@@ -104,10 +105,9 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
             </div>
             
             <div className="
-                    absolute border-2 
-                    border-white/50 rounded-2xl 
-                    py-5 px-10 bg-black/50
-                    left-[18.5%] top-[77.5%]
+                    absolute border-2 border-white/50 rounded-2xl 
+                    md:py-3 md:px-10 px-5 py-4 bg-black/50
+                    md:left-[30%] left-[40%] md:top-[80%] top-[80%]
             ">
                 <p className="font-bold">Price</p>
                 {`${(d.fantasy_stats.price / 1_000_000).toFixed(2)}M`}
@@ -117,7 +117,7 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
             <button
                 onClick={() => setExpanded(d.full_name)}
                 className="
-                    absolute text-[150%] top-[80%] left-[3%] 
+                    absolute md:text-[150%] text-[120%] md:top-[80%] top-[82.4%] md:left-[5%] left-[3%] 
                     bg-black/66 border-white/30 border-2 
                     p-2 rounded-2xl hover:bg-black hover:cursor-pointer"
             >
@@ -128,14 +128,14 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
             
             <img
                 className={`
-                    md:w-[10%] md:top-[15%] top-[15%] md:left-[3%] left-[-80%]
+                    md:w-[10%] w-[20%] md:top-[5%] top-[5%] md:left-[80%] left-[70%]
                     absolute object-contain
                 `}
                 src={`/teams/${(d.team_name || "").replace(/\s+/g, "").toLowerCase()}.svg`} 
                 alt={`${d.team_name}`}
             />
 
-            <div className="mt-5 space-y-3 absolute left-[45%] md:left-[40%] md:top-[5%] top-0">
+            <div className="mt-5 space-y-3 absolute left-[10%] md:left-[30%] md:top-2 top-0">
                 {(() => {
                     const parts = d.full_name.split(" ");
                     const beforeLast = parts.slice(0, -1).join(" ");
@@ -164,10 +164,10 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
 
             <div className="
                     text-[10px] md:text-[85%]
-                    flex gap-10 rounded-3xl bg-black/50 border-white/30 
-                    border-2 md:py-5 md:px-10 md:left-[35%]
-                    absolute md:min-h-[20%]
-                    md:min-w-[33vw] md:top-[25%]
+                    flex md:gap-10 gap-5 rounded-3xl bg-black/50 border-white/30 
+                    border-2 md:py-5 py-5 md:px-10 px-5 md:left-[30%] left-[40%]
+                    absolute md:min-h-[10%]
+                    md:min-w-[33vw] md:top-[20%] top-[20%]
                     ">
                 <span className="space-y-3">
                     <p className="">VICTORIES</p>
@@ -190,9 +190,9 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
             <div className="
                     text-[10px] md:text-[85%]
                     flex gap-10 rounded-3xl bg-black/50 border-white/30 
-                    border-2 md:py-5 md:px-10 md:left-[45%]
-                    absolute md:min-h-[20%]
-                    md:min-w-[33vw] md:top-[50%]
+                    border-2 md:py-5 md:px-10 md:left-[30%] left-[40%]
+                    absolute md:min-h-[10%] px-10 py-5
+                    md:min-w-[33vw] md:top-[40%] top-[40%]
             ">
                 <span className="space-y-3">
                     <p>OVERTAKE EFFICIENCY</p>
@@ -202,10 +202,9 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
 
             <div className="
                     text-[10px] md:text-[85%]
-                    flex gap-10 rounded-3xl bg-black/50 border-white/30 
-                    border-2 md:py-5 md:px-10 md:left-[55%]
-                    absolute md:min-h-[20%]
-                    md:min-w-[33vw] md:top-[74%]
+                    flex gap-6 rounded-3xl bg-black/50 border-white/30 
+                    border-2 md:py-5 md:px-10 px-5 py-3 md:left-[30%] left-[40%]
+                    absolute md:min-h-[10%] md:min-w-[33vw] md:top-[60%] top-[60%]
             ">
                 <span className="space-y-3">
                     <p className="">AVAILABLE POINTS %</p>
@@ -232,8 +231,14 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                     </span>
                 </span>
             </div>
+            <span
+                className="absolute md:left-[15%] left-[15%] md:top-[80.6%] top-[82%]"
+            >
+                <CustomButton 
+                    text={"PICK"}
+                />
+            </span>
         </motion.div>
-        
     )
 }
 
