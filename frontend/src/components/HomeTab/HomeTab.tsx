@@ -7,7 +7,7 @@ type HomeTabProps = {
 
 const HomeTab = ({ seeDrivers, setSeeDrivers }: HomeTabProps) => {
     return (
-        <div className="relative text-center self-center space-x-10 p-5 bg-red-900 md:max-w-[50%] rounded-[28px]">
+        <div className="relative text-center self-center space-x-5 px-3 py-5 bg-red-700 md:max-w-[55%] rounded-[28px]">
                 <div className="absolute p-1 top-0 left-0 w-full h-full pointer-events-none">
                     <div className="flex w-full h-full relative">
                         <span className="w-1/2 h-full relative">

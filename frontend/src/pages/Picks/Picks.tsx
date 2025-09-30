@@ -1,49 +1,52 @@
-import PickTable from '@/components/PickTable/PickTable'
-import Table from '@/components/Table/Table'
-import { useDrivers } from '@/features/drivers/hooks'
-import { useDriversService } from '@/providers/DriversProvider'
-import { useEffect } from 'react'
+import DriverSection from '@/components/DriverSection/DriverSection'
+import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import ConstructorSection from '@/components/ConstructorSection/ConstructorSection';
+import HomeTab from '@/components/HomeTab/HomeTab';
+import { PicksProvider } from '@/context/PicksContext';
+import PickSideBar from '@/components/PickSideBar/PickSideBar';
 
-const Picks = () => {
-    const {
-       selectedRows,
-       setSelectedRows
-    } = useDriversService()
-
-    const { data: drivers } = useDrivers();
-
-    useEffect(() => {
-        return () => {
-            setSelectedRows([]);
-        }
-    }, []);
+const PicksContent = () => {
+    const [seeDrivers, setSeeDrivers] = useState(true);
 
     return (
-        <main className="flex flex-col gap-7 p-10 md:h-[85.45vh] h-[96vh] text-white">
-            <div className="flex-1/6 min-h-[520px] md:min-h-[520px] min-w-[40vw]">
-                <Table />
-            </div>
-            <div className="flex-1/2 space-y-6 md:h-[90vh]">
-                <p className="font-bold text-3xl text-center">Your picks</p>
-
-                <div className="flex md:flex-row flex-col justify-center gap-3">
-                    {[0, 1, 2].map(i => {
-                        const r = selectedRows[i];
-                        const driver = (r && drivers?.find(d => d.full_name === r.data.driver.name)) || null;
-                        return (
-                            <PickTable 
-                                key={i} 
-                                driver={driver} 
-                                col={i === 2 
-                                    ? "col-span-2" 
-                                    : ""}
+        <main className="py-10">
+            <AnimatePresence>
+                <motion.div
+                    key="main"
+                    initial={{ opacity: 0, y: 100 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -100 }}
+                    transition={{ duration: 1, ease: "easeInOut" }}
+                    className="-mt-5 text-white"
+                >
+                    <div className="flex gap-6 min-h-screen">
+                        <div className="flex flex-col gap-5 w-[65%]">
+                            <h1 className="text-center font-bold text-5xl text-white">
+                                YOUR PICKS
+                            </h1>
+                            <HomeTab
+                                seeDrivers={seeDrivers}
+                                setSeeDrivers={setSeeDrivers}
                             />
-                        )
-                    })}
-                </div>
-            </div>
-        </main>
-    )
-}
+                            {seeDrivers 
+                                ? <DriverSection />
+                                : <ConstructorSection />
+                            }
+                        </div>
 
-export default Picks
+                        <PickSideBar />
+                    </div>
+                </motion.div>
+            </AnimatePresence>
+        </main>
+    );
+};
+
+export default function Home() {
+    return (
+        <PicksProvider>
+            <PicksContent />
+        </PicksProvider>
+    );
+}

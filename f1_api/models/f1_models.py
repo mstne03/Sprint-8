@@ -45,10 +45,17 @@ class Drivers(SQLModel, table=True):
     headshot_url: str
 
 class DriverTeamLink(SQLModel, table=True):
-    driver_id: int = Field(foreign_key="drivers.id",primary_key=True)
-    team_id: int = Field(foreign_key="teams.id",primary_key=True)
-    season_id: int = Field(foreign_key="seasons.year",primary_key=True)
-    round_number: int = Field(foreign_key="events.round_number",primary_key=True)
+    driver_id: int = Field(foreign_key="drivers.id", primary_key=True)
+    team_id: int = Field(foreign_key="teams.id", primary_key=True)
+    season_id: int = Field(foreign_key="seasons.year", primary_key=True)
+    round_number: int = Field(primary_key=True)
+
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['round_number', 'season_id'],
+            ['events.round_number', 'events.season_id']
+        ),
+    )
 
 class SessionResult(SQLModel, table=True):
     season_id: int | None = Field(default=None,primary_key=True)

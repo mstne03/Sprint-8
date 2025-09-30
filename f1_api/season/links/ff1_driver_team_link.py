@@ -27,6 +27,10 @@ def get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_i
             try:
                 f1_session = session_map.get((round_number, session_type))
                 
+                # Skip if session data not available
+                if f1_session is None:
+                    continue
+                
                 driver_list = f1_session.drivers
                 results = f1_session.results
 

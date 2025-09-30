@@ -21,9 +21,17 @@ def get_team_data(schedule,session_map,session):
 
         for session_type in sessions:
             try:
-                session = session_map.get((round_number,session_type))
+                f1_session = session_map.get((round_number,session_type))
                 
-                team_names = plotting.list_team_names(session)
+                # Skip if session data not available
+                if f1_session is None:
+                    continue
+                
+                try:
+                    team_names = plotting.list_team_names(f1_session)
+                except Exception as e:
+                    logging.warning(f'Failed to get team names for round {round_number}, session {session_type}: {e}')
+                    continue
 
                 for name in team_names:
                     if name in existing_teams:
@@ -33,14 +41,18 @@ def get_team_data(schedule,session_map,session):
                     
                     added_team_names.add(name)
 
-                    team_color = plotting.get_team_color(name, session)
-
+                    try:
+                        team_color = plotting.get_team_color(name, f1_session)
+                    except Exception as e:
+                        logging.warning(f'Failed to get color for team {name}: {e}')
+                        team_color = "#FFFFFF"  # Default color
+                    
                     teams.append(Teams(
                         team_name=name,
                         team_color=team_color
                     ))
             except Exception as e:
-                logging.warning(f'During get_team_data, exception: {e}')
-                return teams
+                logging.warning(f'Error processing session {session_type} for round {round_number}: {e}')
+                continue  # Continue with next session instead of returning
     return teams
     

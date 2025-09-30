@@ -31,16 +31,27 @@ async def update_db(engine):
                 session.commit()
 
             schedule = ff1.get_event_schedule(year)
+            logging.info("✅ Schedule loaded successfully")
 
             session_map = load_sessions(year,schedule,existing_rounds)
+            logging.info(f"✅ Sessions loaded. Session map has {len(session_map)} entries")
 
             events: list[Events] = get_event_data(year,schedule,session)
+            logging.info(f"✅ Events processed: {len(events)} events")
+            
             sessions: list[Sessions] = get_session_data(year,schedule,session)
+            logging.info(f"✅ Sessions processed: {len(sessions)} sessions")
+            
+            logging.info("🔄 Starting team data processing...")
             teams: list[Teams] = get_team_data(schedule,session_map,session)
+            logging.info(f"✅ Teams processed: {len(teams)} teams")
 
             session.add_all([*events,*sessions,*teams])
+            logging.info("✅ Events, sessions and teams added to database session")
 
+            logging.info("🔄 Starting driver data processing...")
             drivers: list[Drivers] = get_driver_data(schedule,session_map,session,year)
+            logging.info(f"✅ Drivers processed: {len(drivers)} drivers")
             
             for driver in drivers:
                 existing = session.exec(select(Drivers).where(Drivers.driver_number == driver.driver_number)).first()
@@ -54,11 +65,16 @@ async def update_db(engine):
             session.commit()
             all_teams: list[Teams] = list(session.exec(select(Teams)))
             all_drivers: list[Drivers] = list(session.exec(select(Drivers)))
+            logging.info("✅ Driver data committed to database")
 
                     
             driver_id_map = {driver.driver_number: driver.id for driver in all_drivers}
             team_id_map = {team.team_name: team.id for team in all_teams}
+            
+            logging.info("🔄 Starting driver-team links processing...")
             all_driver_team_links = get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map, session)
+            logging.info(f"✅ Driver-team links processed: {len(all_driver_team_links)} links")
+            
             session.add_all(all_driver_team_links)
             session.commit()
 
@@ -78,10 +94,15 @@ async def update_db(engine):
                     driver.driver_color = team.team_color
                     session.add(driver)
             session.commit()
+            logging.info("✅ Driver colors updated")
 
+            logging.info("🔄 Starting session results processing...")
             all_session_results = get_session_results(year, schedule, session_map, driver_id_map, team_id_map, session)
+            logging.info(f"✅ Session results processed: {len(all_session_results)} results")
+            
             session.add_all(all_session_results)
             session.commit()
             session.close()
+            logging.info("🎉 Database update completed successfully!")
     except Exception as e:
         logging.warning(f'During the execution of update_db function, the following exception ocurred: {e}')

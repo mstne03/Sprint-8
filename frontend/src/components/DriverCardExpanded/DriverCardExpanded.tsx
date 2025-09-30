@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import ReactCountryFlag from 'react-country-flag'
 import type { Driver } from '@/features/drivers/types'
 import CustomButton from '../CustomButton/CustomButton'
+import { usePicks } from '@/context/PicksContext'
 
 type DriverCardProps = {
     d:Driver;
@@ -11,6 +12,18 @@ type DriverCardProps = {
 
 const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
     const isDesktop = useMediaQuery({ minWidth: 768 });
+    const { addDriver, removeDriver, isDriverSelected, isMaxDriversSelected } = usePicks();
+
+    const isSelected = isDriverSelected(d.full_name);
+    const canSelect = !isMaxDriversSelected || isSelected;
+
+    const handlePickClick = () => {
+        if (isSelected) {
+            removeDriver(d.full_name);
+        } else {
+            addDriver(d);
+        }
+    };
     
     return (
         <motion.div
@@ -118,7 +131,7 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                 onClick={() => setExpanded(d.full_name)}
                 className="
                     absolute md:text-[150%] text-[120%] md:top-[80%] top-[82.4%] md:left-[5%] left-[3%] 
-                    bg-black/66 border-white/30 border-2 
+                    bg-black/30 border-white border-2 
                     p-2 rounded-2xl hover:bg-black hover:cursor-pointer"
             >
                 <svg width="2em" height="2em" viewBox="0 0 24 24" fill="none">
@@ -235,7 +248,9 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                 className="absolute md:left-[15%] left-[15%] md:top-[80.6%] top-[82%]"
             >
                 <CustomButton 
-                    text={"PICK"}
+                    text={isSelected ? "REMOVE" : "PICK"}
+                    onClick={handlePickClick}
+                    disabled={!canSelect}
                 />
             </span>
         </motion.div>

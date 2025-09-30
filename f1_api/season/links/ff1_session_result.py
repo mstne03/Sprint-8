@@ -22,11 +22,15 @@ def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_
 
         for session_number, session_type in enumerate(sessions, start=1):
             try:
-                session = session_map.get((round_number, session_type))
+                f1_session = session_map.get((round_number, session_type))
+                
+                # Skip if session data not available
+                if f1_session is None:
+                    continue
 
-                driver_list = session.drivers
-                results = session.results
-                laps = session.laps
+                driver_list = f1_session.drivers
+                results = f1_session.results
+                laps = f1_session.laps
                 
                 if session_type in ("Sprint", "Race"):
                     fastest_driver = laps.pick_fastest()["Driver"]
@@ -40,7 +44,7 @@ def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_
                     driver_name = results.loc[results["DriverNumber"] == driver_num, "Abbreviation"].values[0]
 
                     try:
-                        team_name = plotting.get_team_name_by_driver(identifier=driver_name,session=session)
+                        team_name = plotting.get_team_name_by_driver(identifier=driver_name,session=f1_session)
                     except Exception as e:
                         logging.warning(f"Skipping driver {driver_name} with id {driver_id_map.get(int(driver_num))}: {e}")
                         continue
@@ -51,7 +55,7 @@ def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_
                     if driver_id is None or team_id is None:
                         continue
 
-                    driver_results = session.get_driver(driver_name)
+                    driver_results = f1_session.get_driver(driver_name)
                     position = None
                     grid_position = None
                     fastest = None

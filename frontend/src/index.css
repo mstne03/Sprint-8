@@ -43,7 +43,7 @@
 }
 
 body {
-  @apply bg-slate-900 /*bg-gradient-to-br from-[rgba(100,0,70,1)] via-[rgba(80,70,140,1)] to-[rgba(0,0,0,1)] bg-cover bg-fixed min-h-[100vh] w-[100%]*/ ;
+  @apply bg-black /*bg-gradient-to-br from-[rgba(100,0,70,1)] via-[rgba(80,70,140,1)] to-[rgba(0,0,0,1)] bg-cover bg-fixed min-h-[100vh] w-[100%]*/ ;
   font-family: 'Formula1', sans-serif;
   overflow-x: hidden;
 }

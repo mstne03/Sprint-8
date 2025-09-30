@@ -25,25 +25,34 @@ def get_driver_data(schedule,session_map,session,year):
         ]
 
         race = session_map.get((round_number,sessions[4]))
-        teams = plotting.list_team_names(session=race)
         accept_drivers = set()
-
-        for t in teams:
-            accept_drivers.update(plotting.get_driver_names_by_team(identifier=t,session=race))
+        
+        # Only proceed if we have race data
+        if race is not None:
+            teams = plotting.list_team_names(session=race)
+            for t in teams:
+                accept_drivers.update(plotting.get_driver_names_by_team(identifier=t,session=race))
+        else:
+            logging.warning(f"No race data available for round {round_number}, skipping driver processing for this round")
+            continue
 
         for session_type in sessions:
             try:
-                session = session_map.get((round_number,session_type))
+                f1_session = session_map.get((round_number,session_type))
                 
-                results = session.results
+                # Skip if session data not available
+                if f1_session is None:
+                    continue
+                
+                results = f1_session.results
 
-                driver_names = plotting.list_driver_names(session)
+                driver_names = plotting.list_driver_names(f1_session)
 
                 for driver in driver_names:
                     if driver not in accept_drivers:
                         continue
 
-                    driver_color = plotting.get_driver_color(driver,session)
+                    driver_color = plotting.get_driver_color(driver,f1_session)
 
                     driver_number = results.loc[results["FullName"] == driver, "DriverNumber"].values[0] if not results.loc[results["FullName"] == driver, "DriverNumber"].empty else None
 
