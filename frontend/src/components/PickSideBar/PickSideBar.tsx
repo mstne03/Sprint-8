@@ -60,7 +60,7 @@ const PickSideBar = () => {
                                 key={index}
                                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
                                     index < selectedDrivers.length 
-                                        ? 'bg-amber-500' 
+                                        ? 'bg-amber-600' 
                                         : 'bg-white/20'
                                 }`}
                             />
@@ -71,7 +71,7 @@ const PickSideBar = () => {
                         disabled={!canContinue}
                         className={`mt-6 px-8 py-4 rounded-lg font-bold text-lg transition-all duration-300 ${
                             canContinue
-                                ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
+                                ? 'bg-red-700 hover:bg-red-800 text-white shadow-lg hover:shadow-xl transform hover:scale-105'
                                 : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50'
                         }`}
                     >

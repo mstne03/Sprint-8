@@ -7,13 +7,9 @@ export type DriverRow = {
     team: { name: string; logo: string; };
 }
 
-export type DriverTable = {
+export type FantasyTable = {
     gridRef: React.RefObject<AgGridReact<any> | null>;
     rowData: DriverRow[] | null;
     setRowData: React.Dispatch<React.SetStateAction<DriverRow[] | null>>;
     colDefs: ColDef<DriverRow, any>[];
-    rowSelection: RowSelectionOptions | "single" | "multiple";
-    getSelectedRows: () => void;
-    selectedRows: IRowNode<any>[];
-    setSelectedRows: (rows: IRowNode<any>[]) => void;
 }

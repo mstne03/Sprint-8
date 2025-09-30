@@ -1,8 +1,8 @@
 import { PerspectiveCamera, Preload } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import MclarenModel from "../../components/Models/mclaren";
+import MclarenModel from "../../components/ui/Models/mclaren";
 import { motion } from 'framer-motion';
-import CustomButton from "../../components/CustomButton/CustomButton";
+import CustomButton from "../../components/ui/CustomButton/CustomButton";
 import { Link } from "react-router-dom";
 
 const Home = () => {

@@ -1,7 +1,7 @@
 import type { Team } from "@/features/teams/types"
 import { Canvas } from '@react-three/fiber'
 import { CameraControls, PerspectiveCamera } from '@react-three/drei'
-import MclarenModel from '@/components/Models/mclaren'
+import MclarenModel from '@/components/ui/Models/mclaren'
 
 type ConstructorCardProps = {
     t: Team

@@ -2,8 +2,7 @@ import DriverSection from '@/components/DriverSection/DriverSection'
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import ConstructorSection from '@/components/ConstructorSection/ConstructorSection';
-import HomeTab from '@/components/HomeTab/HomeTab';
-import { PicksProvider } from '@/context/PicksContext';
+import HomeTab from '@/components/ui/HomeTab/HomeTab';
 import PickSideBar from '@/components/PickSideBar/PickSideBar';
 
 const PicksContent = () => {
@@ -43,10 +42,4 @@ const PicksContent = () => {
     );
 };
 
-export default function Home() {
-    return (
-        <PicksProvider>
-            <PicksContent />
-        </PicksProvider>
-    );
-}
+export default PicksContent

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useDrivers } from '@/features/drivers/hooks'
 import { themeQuartz } from 'ag-grid-community'
 import type { DriverRow } from '@/types/tableTypes'
-import { useDriversService } from '@/providers/DriversProvider'
+import { useFantasyTable } from '@/providers/TableProvider'
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -15,7 +15,7 @@ const myTheme = themeQuartz.withParams({
     backgroundColor: 'rgba(000,00,0,.20)',
     foregroundColor: '#ffffff',
     borderColor: '#ffffff50',
-    rowBorder: { width: 3.5, },
+    rowBorder: { width: 0, },
 })
 
 export default function Table() {
@@ -26,9 +26,7 @@ export default function Table() {
         rowData,
         setRowData,
         colDefs,
-        rowSelection,
-        getSelectedRows,
-    } = useDriversService()
+    } = useFantasyTable()
 
     useEffect(() => {
         if (drivers) {
@@ -54,8 +52,6 @@ export default function Table() {
             rowData={rowData}
             columnDefs={colDefs}
             suppressHorizontalScroll={true}
-            rowSelection={rowSelection}
-            onSelectionChanged={getSelectedRows}
         />
     )
 }

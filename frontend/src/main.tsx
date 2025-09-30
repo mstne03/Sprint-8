@@ -6,7 +6,8 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import './index.css'
 import DataServiceProvider from '@/providers/ServiceProvider'
 import App from './App'
-import DriversServiceProvider from './providers/DriversProvider'
+import DriversServiceProvider from './providers/TableProvider'
+import { PicksProvider } from './context/PicksContext'
 
 const queryClient = new QueryClient();
 
@@ -14,11 +15,13 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <DriversServiceProvider>
-          <DataServiceProvider>
-            <App/>
-          </DataServiceProvider>
-        </DriversServiceProvider>
+        <PicksProvider>
+          <DriversServiceProvider>
+            <DataServiceProvider>
+              <App/>
+            </DataServiceProvider>
+          </DriversServiceProvider>
+        </PicksProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </BrowserRouter>
     </QueryClientProvider>
