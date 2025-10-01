@@ -49,8 +49,6 @@ class UserCreate(BaseModel):
     user_name: str
     email: str
     password: str
-
-# Modelo para la response (sin contraseña)
 class UserResponse(BaseModel):
     id: int
     user_name: str

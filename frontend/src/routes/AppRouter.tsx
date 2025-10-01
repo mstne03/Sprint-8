@@ -1,6 +1,9 @@
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from '@/context/AuthContext';
 import { ProtectedRoute, PublicRoute } from '@/components/ProtectedRoute/ProtectedRoute';
+import DataServiceProvider from '@/providers/ServiceProvider'
+import DriversServiceProvider from '@/providers/TableProvider'
+import { PicksProvider } from '@/context/PicksContext'
 import Picks from '@/pages/Picks/Picks'
 import Teams from '@/pages/Teams/Teams'
 import Charts from '@/pages/ChartPage/ChartPage'
@@ -17,36 +20,44 @@ import Home from "@/pages/Home/Home";
 function AppRouter() {
   return (
     <AuthProvider>
-      <Routes>
-        {/* Public routes */}
-        <Route path="/login" element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        } />
-        <Route path="/register" element={
-          <PublicRoute>
-            <Register />
-          </PublicRoute>
-        } />
-        <Route path="/auth/confirm" element={<EmailConfirmation />} />
-        <Route path="/check-email" element={<CheckEmail />} />
-        <Route path="/" element={<Home/>}/>
-        {/* Protected routes */}
-        <Route path="/*" element={
-          <ProtectedRoute>
-            <Header />
+      <PicksProvider>
+        <DriversServiceProvider>
+          <DataServiceProvider>
             <Routes>
-              <Route path="/picks" element={<Picks/>}/>
-              <Route path="/teams" element={<Teams/>}/>
-              <Route path="/charts" element={<Charts/>}/>
-              <Route path="/map" element={<Map/>}/>
-              <Route path="/calendar" element={<FullCalendar/>}/>
-              <Route path="*" element={<NotFound/>}/>
+              <Route path="/" element={
+                <PublicRoute>
+                  <Home/>
+                </PublicRoute>
+              }/>
+              <Route path="/login" element={
+                <PublicRoute>
+                  <Login />
+                </PublicRoute>
+              } />
+              <Route path="/register" element={
+                <PublicRoute>
+                  <Register />
+                </PublicRoute>
+              } />
+              <Route path="/auth/confirm" element={<EmailConfirmation />} />
+              <Route path="/check-email" element={<CheckEmail />} />
+              <Route path="/*" element={
+                <ProtectedRoute>
+                  <Header />
+                  <Routes>
+                    <Route path="/picks" element={<Picks/>}/>
+                    <Route path="/teams" element={<Teams/>}/>
+                    <Route path="/charts" element={<Charts/>}/>
+                    <Route path="/map" element={<Map/>}/>
+                    <Route path="/calendar" element={<FullCalendar/>}/>
+                    <Route path="*" element={<NotFound/>}/>
+                  </Routes>
+                </ProtectedRoute>
+              }/>
             </Routes>
-          </ProtectedRoute>
-        } />
-      </Routes>
+          </DataServiceProvider>
+        </DriversServiceProvider>
+      </PicksProvider>
     </AuthProvider>
   )
 }

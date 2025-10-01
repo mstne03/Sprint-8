@@ -2,7 +2,7 @@ import type { Team } from "@/features/teams/types"
 import type { Driver } from "@/features/drivers/types"
 import { motion } from 'framer-motion'
 import { usePicks } from '@/context/PicksContext'
-import CustomButton from '../ui/CustomButton/CustomButton'
+import PickButton from "../ui/PickButton/PickButton"
 
 type ConstructorCardProps = {
     t: Team;
@@ -37,33 +37,35 @@ const ConstructorCard = ({ t, d }: ConstructorCardProps) => {
                 borderColor: `${t.team_color}50`
             }}
         >
-            <div className="mt-5 space-y-3 absolute left-[45%] md:left-[8%] md:top-0 top-0">
-                <div className="md:text-4xl text-[170%] flex flex-col gap-3">
-                    <div className="flex gap-15 items-center">
-                        <div className="flex flex-col md:gap-3 gap-1">
-                            <span className="font-bold text-white">{t.team_name}</span>
-                        </div>
-                        <img
-                            className="md:w-[55%] w-[25%] object-contain"
-                            src={t.team_url}
-                            alt={`${t.team_name} img`}
-                        />
-                    </div>
-                    <div className="md:text-[20px] space-y-2">
-                        <p className="text-white">CHAMPIONSHIP</p>
-                        <p className="font-bold text-white">{points} pts.</p>
+            <div className="mt-10 space-y-3 absolute left-[45%] md:left-[8%] md:top-0 top-0">
+                <div className="md:text-4xl text-[170%] flex gap-5">
+                    <div className="flex flex-col md:gap-3 gap-1 md:max-w-[55%]">
+                        <span className="font-bold text-white">{t.team_name}</span>
+                        <p className="text-white text-[20px]">CHAMPIONSHIP</p>
+                        <p className="font-bold text-white text-[20px]">{points} pts.</p>
                     </div>
                 </div>
             </div>
-            
-            {/* Pick Button */}
+            <div className="absolute md:left-[35%] md:top-13 md:max-w-[10%]">
+                <img
+                    className=""
+                    src={`/teams/${(t.team_name || "").replace(/\s+/g, "").toLowerCase()}.svg`} 
+                    alt="" 
+                />
+            </div>
+            <div className="absolute md:bottom-5 md:left-15">
+                <img
+                    className="md:min-w-[30vw] w-[25%] object-contain"
+                    src={t.team_url}
+                    alt={`${t.team_name} img`}
+                />
+            </div>
             <div className="absolute bottom-4 right-4">
-                <CustomButton 
+                <PickButton
+                    isSelected={isSelected}
                     onClick={handlePickClick}
                     disabled={false}
-                >
-                    {isSelected ? "REMOVE" : "PICK"}
-                </CustomButton>
+                />
             </div>
         </motion.div>
     )

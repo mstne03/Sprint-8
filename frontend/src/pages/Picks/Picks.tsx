@@ -19,8 +19,8 @@ const PicksContent = () => {
                     transition={{ duration: 1, ease: "easeInOut" }}
                     className="-mt-5 text-white"
                 >
-                    <div className="flex gap-6 min-h-screen">
-                        <div className="flex flex-col gap-5 w-[65%]">
+                    <div className="flex md:flex-row flex-col-reverse gap-6 min-h-screen">
+                        <div className="flex flex-col gap-5 md:w-[65%]">
                             <h1 className="text-center font-bold text-5xl text-white">
                                 YOUR PICKS
                             </h1>
@@ -33,8 +33,9 @@ const PicksContent = () => {
                                 : <ConstructorSection />
                             }
                         </div>
-
-                        <PickSideBar />
+                        <div className="flex justify-center w-[100%] md:w-[35%] md:sticky top-4 me-15 md:h-fit">
+                            <PickSideBar />
+                        </div>
                     </div>
                 </motion.div>
             </AnimatePresence>

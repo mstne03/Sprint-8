@@ -1,7 +1,10 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
+import { useAuth } from '@/context/AuthContext'
 
 const CheckEmail = () => {
+    const { user } = useAuth()
+    
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black flex items-center justify-center p-4">
             <motion.div
@@ -27,8 +30,19 @@ const CheckEmail = () => {
                     </h1>
                     
                     <p className="text-gray-300 text-center mb-6">
-                        Te hemos enviado un enlace de confirmación a tu correo electrónico.
-                        Haz clic en el enlace para activar tu cuenta.
+                        {user?.email ? (
+                            <>
+                                Te hemos enviado un enlace de confirmación a <strong className="text-white">{user.email}</strong>.
+                                <br />
+                                Haz clic en el enlace para activar tu cuenta.
+                            </>
+                        ) : (
+                            <>
+                                Te hemos enviado un enlace de confirmación a tu correo electrónico.
+                                <br />
+                                Haz clic en el enlace para activar tu cuenta.
+                            </>
+                        )}
                     </p>
                     
                     <Link

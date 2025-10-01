@@ -1,15 +1,24 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect } from 'react'
 import type { ReactNode } from 'react'
-import type { User, Session } from '@supabase/supabase-js'
+import { useAuth as useAuthHooks } from '@/features/auth/hooks'
 import { supabase } from '@/config/supabase'
+import { useQueryClient } from '@tanstack/react-query'
+import { authKeys } from '@/features/auth/hooks'
 
 interface AuthContextType {
-    user: User | null
-    session: Session | null
+    user: any | null
+    session: any | null
     signUp: (email: string, password: string, userData?: any) => Promise<any>
     signIn: (email: string, password: string) => Promise<any>
     signOut: () => Promise<void>
     loading: boolean
+    isAuthenticated: boolean
+    isSigningIn: boolean
+    isSigningUp: boolean
+    isSigningOut: boolean
+    signInError: any
+    signUpError: any
+    signOutError: any
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -19,112 +28,74 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [user, setUser] = useState<User | null>(null)
-    const [session, setSession] = useState<Session | null>(null)
-    const [loading, setLoading] = useState(true)
+    const queryClient = useQueryClient()
+    const auth = useAuthHooks()
 
     useEffect(() => {
-        // Get initial session
-        const getInitialSession = async () => {
-            const { data: { session }, error } = await supabase.auth.getSession()
-            
-            if (error) {
-                console.error('Error getting session:', error)
-            } else {
-                setSession(session)
-                setUser(session?.user ?? null)
-            }
-            setLoading(false)
-        }
-
-        getInitialSession()
-
-        // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
                 console.log('Auth event:', event, session)
                 
-                if (event === 'SIGNED_IN') {
-                    setSession(session)
-                    setUser(session?.user ?? null)
+                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                    queryClient.setQueryData(authKeys.session(), {
+                        data: { session },
+                        error: null
+                    })
+                    if (session?.user) {
+                        queryClient.setQueryData(authKeys.user(), {
+                            data: { user: session.user },
+                            error: null
+                        })
+                    }
                 } else if (event === 'SIGNED_OUT') {
-                    setSession(null)
-                    setUser(null)
-                } else if (event === 'TOKEN_REFRESHED') {
-                    setSession(session)
-                    setUser(session?.user ?? null)
+                    queryClient.removeQueries({ queryKey: authKeys.all })
                 }
-                
-                setLoading(false)
             }
         )
 
         return () => subscription.unsubscribe()
-    }, [])
+    }, [queryClient])
 
-    const signUp = async (email: string, password: string, userData?: any) => {
+    const signUpWrapper = async (email: string, password: string, userData?: any) => {
         try {
-            setLoading(true)
-            const { data, error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: userData || {},
-                    emailRedirectTo: `${window.location.origin}/auth/confirm`
-                }
-            })
-
-            if (error) {
-                throw error
-            }
-
-            return { data, error: null }
+            const result = await auth.signUp({ email, password, userData })
+            return result
         } catch (error) {
-            console.error('Error signing up:', error)
-            return { data: null, error }
-        } finally {
-            setLoading(false)
+            throw error
         }
     }
 
-    const signIn = async (email: string, password: string) => {
+    const signInWrapper = async (email: string, password: string) => {
         try {
-            setLoading(true)
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email,
-                password
-            })
-
-            if (error) throw error
-
-            return { data, error: null }
+            const result = await auth.signIn({ email, password })
+            return result
         } catch (error) {
-            console.error('Error signing in:', error)
-            return { data: null, error }
-        } finally {
-            setLoading(false)
+            throw error
         }
     }
 
-    const signOut = async () => {
+    const signOutWrapper = async () => {
         try {
-            setLoading(true)
-            const { error } = await supabase.auth.signOut()
-            if (error) throw error
+            await auth.signOut()
         } catch (error) {
-            console.error('Error signing out:', error)
-        } finally {
-            setLoading(false)
+            throw error
         }
     }
 
-    const value = {
-        user,
-        session,
-        signUp,
-        signIn,
-        signOut,
-        loading
+    const value: AuthContextType = {
+        user: auth.user,
+        session: auth.session,
+        signUp: signUpWrapper,
+        signIn: signInWrapper,
+        signOut: signOutWrapper,
+        loading: auth.isLoading || auth.isSigningIn || auth.isSigningUp || auth.isSigningOut,
+        isAuthenticated: auth.isAuthenticated,
+        isSigningIn: auth.isSigningIn,
+        isSigningUp: auth.isSigningUp,
+        isSigningOut: auth.isSigningOut,
+        signInError: auth.signInError,
+        signUpError: auth.signUpError,
+        signOutError: auth.signOutError,
     }
 
     return (

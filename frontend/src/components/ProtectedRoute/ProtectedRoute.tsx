@@ -1,5 +1,7 @@
 import { Navigate, useLocation } from 'react-router-dom'
+import React from 'react'
 import { useAuth } from '@/context/AuthContext'
+import LoadingSpinner from '../ui/LoadingSpinner/LoadingSpinner'
 
 interface ProtectedRouteProps {
     children: React.ReactNode
@@ -33,16 +35,12 @@ export const PublicRoute = ({ children }: ProtectedRouteProps) => {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-900">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-700 border-solid mx-auto"></div>
-                    <p className="mt-4 text-white text-lg font-medium">Loading...</p>
-                </div>
+                <LoadingSpinner />
             </div>
         )
     }
 
     if (user) {
-        // Redirect to dashboard if already logged in
         return <Navigate to="/picks" replace />
     }
 

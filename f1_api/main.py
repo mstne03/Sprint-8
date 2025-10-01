@@ -1,16 +1,15 @@
 """In this module the api exposes the endpoints"""
 import logging
 from passlib.context import CryptContext
-from sqlmodel import select, Session, func
+from sqlmodel import select, Session
 import fastf1 as ff1
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import HTTPException
-
 from f1_api.season.utils.driver_calc import get_database_data, get_driver_stats, get_drivers_mapped
 from .config.sql_init import engine
 from .season.update_db import update_db
 from .app import app
-from .models.f1_models import Drivers, Teams, SessionResult, DriverTeamLink, Sessions
+from .models.f1_models import Teams
 from .models.app_models import Users, UserCreate, UserResponse
 
 app.add_middleware(
@@ -100,7 +99,7 @@ async def create_user(user: UserCreate):
             
             if existing_user:
                 raise HTTPException(
-                    status_code=400, 
+                    status_code=400,
                     detail="Username or email already registered"
                 )
             
