@@ -243,10 +243,11 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                     className="absolute md:left-[55%] left-[15%] md:top-[82%] top-[82%]"
                 >
                     <CustomButton 
-                        text={isSelected ? "REMOVE" : "PICK"}
                         onClick={handlePickClick}
                         disabled={!canSelect}
-                    />
+                    >
+                        {isSelected ? "REMOVE" : "PICK"}
+                    </CustomButton>
                 </span>
             </div>
         </motion.div>

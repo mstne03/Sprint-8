@@ -28,17 +28,9 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
     return (
         <motion.div
             className={`
-                flex
-                items-center
-                relative
-                md:min-h-[60vh]
-                min-h-[55vh]
-                min-w-[50vw]
-                md:min-w-[20vw]
-                overflow-hidden
-                rounded-4xl
-                border-4
-                p-2
+                flex items-center relative md:min-h-[60vh]
+                min-h-[55vh] min-w-[50vw] md:min-w-[20vw]
+                overflow-hidden rounded-4xl border-4 p-2
             `}
             key={d.driver_number}
             style={{ 
@@ -48,11 +40,7 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
         >
             <span
                 className={`
-                    absolute 
-                    md:top-[-25%]
-                    top-[-15%]
-                    text-[30vw]
-                    md:text-[20vw]
+                    absolute md:top-[-25%] top-[-15%] text-[30vw] md:text-[20vw]
                     ${d.driver_number.toString().length > 1
                         ? "md:left-[40%] left-[50%]"
                         : "md:left-[40%] left-[50%]"
@@ -200,10 +188,11 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                     className="absolute md:left-[40%] left-[20%] md:top-[66%] top-[77%]"
                 >
                     <CustomButton 
-                        text={isSelected ? "REMOVE" : "PICK"}
                         onClick={handlePickClick}
                         disabled={!canSelect}
-                    />
+                    >
+                        {isSelected ? "REMOVE" : "PICK"}
+                    </CustomButton>
                 </div>
             </div>
         </motion.div>

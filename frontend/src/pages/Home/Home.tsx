@@ -28,9 +28,9 @@ const Home = () => {
                     READY TO RACE?
                 </h1>
                 <Link to={"/picks/"}>
-                    <CustomButton 
-                        text={"BEGIN"}
-                    />
+                    <CustomButton>
+                        BEGIN
+                    </CustomButton>
                 </Link>
             </div>
             <div className="w-[50%] h-[50%] bg-amber-600/50 border-4 rounded-full border-amber-700">

@@ -31,18 +31,12 @@ const CheckEmail = () => {
                         Haz clic en el enlace para activar tu cuenta.
                     </p>
                     
-                    <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="w-full"
+                    <Link
+                        to="/login"
+                        className="w-full hover:scale-[1.05] active:scale-[0.95] bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl block text-center"
                     >
-                        <Link
-                            to="/login"
-                            className="w-full bg-gradient-to-r from-red-700 to-red-800 hover:from-red-800 hover:to-red-900 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl block text-center"
-                        >
-                            Volver al login
-                        </Link>
-                    </motion.div>
+                        Volver al login
+                    </Link>
                     
                     <p className="text-sm text-gray-400 text-center mt-4">
                         ¿No recibiste el correo? Revisa tu carpeta de spam.

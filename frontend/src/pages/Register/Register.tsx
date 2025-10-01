@@ -39,14 +39,35 @@ const Register = () => {
             })
             
             if (error) {
-                setError(error.message)
+                // Manejo específico de errores de registro
+                switch (error.message) {
+                    case 'User already registered':
+                        setError('Ya existe una cuenta con este email. ¿Quieres iniciar sesión?')
+                        break
+                    case 'Password should be at least 6 characters':
+                        setError('La contraseña debe tener al menos 6 caracteres.')
+                        break
+                    case 'Invalid email':
+                        setError('El formato del email no es válido.')
+                        break
+                    case 'Signup requires a valid password':
+                        setError('Se requiere una contraseña válida para el registro.')
+                        break
+                    default:
+                        if (error.message.toLowerCase().includes('already') || error.message.toLowerCase().includes('exists')) {
+                            setError('Ya existe una cuenta con este email.')
+                        } else {
+                            setError(error.message || 'Error al crear la cuenta')
+                        }
+                        break
+                }
             } else {
                 // Navigate to check email page
                 navigate('/check-email')
             }
         } catch (err) {
             console.error('SignUp catch error:', err)
-            setError('An unexpected error occurred')
+            setError('Error inesperado. Por favor, inténtalo de nuevo.')
         } finally {
             setLoading(false)
         }
@@ -157,31 +178,39 @@ const Register = () => {
                     </div>
 
                     {error && (
-                        <div className="text-red-500 text-sm text-center">
-                            {error}
-                        </div>
+                        <motion.div 
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="bg-red-500/10 border border-red-500/20 rounded-lg p-4"
+                        >
+                            <div className="flex items-center gap-3">
+                                <svg className="w-5 h-5 text-red-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                </svg>
+                                <p className="text-red-400 text-sm font-medium">
+                                    {error}
+                                </p>
+                            </div>
+                        </motion.div>
                     )}
 
-                    <motion.div
+                    <motion.button
+                        type="submit"
+                        disabled={loading}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
+                        className="
+                            group relative w-full flex 
+                            justify-center py-2 px-4 border 
+                            border-transparent text-sm font-medium 
+                            rounded-md text-white bg-red-700 
+                            hover:bg-red-800 hover:cursor-pointer 
+                            focus:outline-none focus:ring-2 focus:ring-offset-2 
+                            focus:ring-red-700 disabled:opacity-50 
+                            disabled:cursor-not-allowed"
                     >
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="
-                                group relative w-full flex 
-                                justify-center py-2 px-4 border 
-                                border-transparent text-sm font-medium 
-                                rounded-md text-white bg-red-700 
-                                hover:bg-red-800 hover:cursor-pointer 
-                                focus:outline-none focus:ring-2 focus:ring-offset-2 
-                                focus:ring-red-700 disabled:opacity-50 
-                                disabled:cursor-not-allowed"
-                        >
-                            {loading ? 'Creating account...' : 'Create account'}
-                        </button>
-                    </motion.div>
+                        {loading ? 'Creating account...' : 'Create account'}
+                    </motion.button>
                 </form>
             </motion.div>
         </div>

@@ -39,8 +39,12 @@ async def get_teams():
     try:
         with Session(engine) as session:
             teams = session.exec(select(Teams)).all()
-
-            return teams
+            teams_mapped = [
+                {**team.model_dump(), "points": 0} 
+                for team in teams
+            ]
+            
+            return teams_mapped
     except Exception as e:
         logging.warning(f"/teams/ execution interrupted by the following exception: {e}")
         return []

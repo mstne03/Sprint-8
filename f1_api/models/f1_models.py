@@ -34,6 +34,7 @@ class Teams(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     team_name: str
     team_color: str
+    team_url: str | None = None
 
 class Drivers(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
