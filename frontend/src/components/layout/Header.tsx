@@ -30,8 +30,8 @@ export default function Header () {
                     <Link className="hover:text-red-400 active:backdrop-opacity-5 transition-all ease-in-out" to={`/picks`}>
                         <h2>Picks</h2>
                     </Link>
-                    <Link className="hover:text-red-400 active:backdrop-opacity-5 transition-all ease-in-out" to={`/map`}>
-                        <h2>Map</h2>
+                    <Link className="hover:text-red-400 active:backdrop-opacity-5 transition-all ease-in-out" to={`/my-teams`}>
+                        <h2>Teams</h2>
                     </Link>
                     <Link className="hover:text-red-400 active:backdrop-opacity-5 transition-all ease-in-out" to={`/charts`}>
                         <h2>Charts</h2>

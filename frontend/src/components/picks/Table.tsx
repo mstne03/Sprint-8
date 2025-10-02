@@ -3,7 +3,7 @@ import { AgGridReact } from 'ag-grid-react'
 import { useEffect } from 'react'
 import { useDrivers } from '@/hooks/drivers'
 import { themeQuartz } from 'ag-grid-community'
-import type { DriverRow } from '@/types/tableTypes'
+import type { UserTeamsRow } from '@/types/tableTypes'
 import { useFantasyTable } from '@/providers/TableProvider'
 
 ModuleRegistry.registerModules([AllCommunityModule]);
@@ -45,7 +45,7 @@ export default function Table() {
     }, [drivers]);
 
     return (
-        <AgGridReact<DriverRow>
+        <AgGridReact<UserTeamsRow>
             ref={gridRef}
             rowHeight={70}
             theme={myTheme}

@@ -1,7 +1,7 @@
 import type { AgGridReact } from "ag-grid-react";
-import type { ColDef, IRowNode, RowSelectionOptions } from 'ag-grid-community'
+import type { ColDef } from 'ag-grid-community'
 
-export type DriverRow = { 
+export interface UserTeamsRow { 
     driver: {name: string; headshot: string; }; 
     points: number; 
     team: { name: string; logo: string; };
@@ -9,7 +9,7 @@ export type DriverRow = {
 
 export type FantasyTable = {
     gridRef: React.RefObject<AgGridReact<any> | null>;
-    rowData: DriverRow[] | null;
-    setRowData: React.Dispatch<React.SetStateAction<DriverRow[] | null>>;
-    colDefs: ColDef<DriverRow, any>[];
+    rowData: UserTeamsRow[] | null;
+    setRowData: React.Dispatch<React.SetStateAction<UserTeamsRow[] | null>>;
+    colDefs: ColDef<UserTeamsRow, any>[];
 }

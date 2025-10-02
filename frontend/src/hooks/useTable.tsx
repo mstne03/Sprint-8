@@ -1,12 +1,12 @@
-import type { DriverRow } from "@/types/tableTypes";
+import type { UserTeamsRow } from "@/types/tableTypes";
 import type { ColDef, ICellRendererParams, IRowNode, RowSelectionOptions } from "ag-grid-community";
 import type { AgGridReact } from "ag-grid-react";
 import { useCallback, useMemo, useRef, useState } from "react";
 
 export const useTable = () => {
     const gridRef = useRef<AgGridReact>(null);
-    const [rowData, setRowData] = useState<DriverRow[] | null>(null)
-    const [colDefs, setColDefs] = useState<ColDef<DriverRow>[]>([
+    const [rowData, setRowData] = useState<UserTeamsRow[] | null>(null)
+    const [colDefs, setColDefs] = useState<ColDef<UserTeamsRow>[]>([
         { 
             field: "team",
             flex: 0.5,

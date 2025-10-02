@@ -28,7 +28,6 @@ const PickSideBar = () => {
                     driver_3_id: driver_ids[2].id,
                     constructor_id: constructor.id,
                 })
-                // ✅ Navegar DESPUÉS de que se complete exitosamente
                 navigate("/my-teams");
             } catch (error) {
                 console.error(error)
