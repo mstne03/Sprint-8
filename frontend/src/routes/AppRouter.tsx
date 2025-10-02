@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from '@/context/AuthContext';
-import { ProtectedRoute, PublicRoute } from '@/components/ProtectedRoute/ProtectedRoute';
+import { ProtectedRoute, PublicRoute } from '@/components/auth/ProtectedRoute';
 import DataServiceProvider from '@/providers/ServiceProvider'
 import DriversServiceProvider from '@/providers/TableProvider'
 import { PicksProvider } from '@/context/PicksContext'
@@ -14,7 +14,7 @@ import Login from '@/pages/Login/Login'
 import Register from '@/pages/Register/Register'
 import EmailConfirmation from '@/pages/EmailConfirmation/EmailConfirmation'
 import CheckEmail from '@/pages/CheckEmail/CheckEmail'
-import Header from "@/components/Header/Header"
+import Header from "@/components/layout/Header"
 import Home from "@/pages/Home/Home";
 
 function AppRouter() {
@@ -39,14 +39,14 @@ function AppRouter() {
                   <Register />
                 </PublicRoute>
               } />
-              <Route path="/auth/confirm" element={<EmailConfirmation />} />
               <Route path="/check-email" element={<CheckEmail />} />
+              <Route path="/auth/confirm" element={<EmailConfirmation />} />
               <Route path="/*" element={
                 <ProtectedRoute>
                   <Header />
                   <Routes>
                     <Route path="/picks" element={<Picks/>}/>
-                    <Route path="/teams" element={<Teams/>}/>
+                    <Route path="/my-teams" element={<Teams/>}/>
                     <Route path="/charts" element={<Charts/>}/>
                     <Route path="/map" element={<Map/>}/>
                     <Route path="/calendar" element={<FullCalendar/>}/>

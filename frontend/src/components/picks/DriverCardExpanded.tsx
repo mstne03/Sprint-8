@@ -1,7 +1,7 @@
 import { useMediaQuery } from 'react-responsive'
 import { motion } from 'framer-motion'
 import ReactCountryFlag from 'react-country-flag'
-import type { Driver } from '@/features/drivers/types'
+import type { Driver } from '@/types/driverTypes'
 import CustomButton from '../ui/CustomButton/CustomButton'
 import { usePicks } from '@/context/PicksContext'
 

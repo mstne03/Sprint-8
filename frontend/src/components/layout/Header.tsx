@@ -17,7 +17,7 @@ export default function Header () {
     return (
         <header className="py-5 px-20 flex justify-between items-center text-white">
             <span className="hover:scale-120 transition-all ease-in-out duration-300 hover:cursor-pointer active:scale-90">
-                <Link to="/">
+                <Link to="/home">
                     <img 
                         className="max-w-30"
                         src={F1Logo}
@@ -42,7 +42,7 @@ export default function Header () {
                 </ul>
                 <div className="flex items-center gap-4 ml-6 pl-6 border-l border-gray-600">
                     <span className="text-sm text-gray-300">
-                        {user?.user_metadata?.username || user?.user_metadata?.full_name || user?.email}
+                        {user?.user_metadata?.username || user?.user_metadata?.full_name.split(" ")[0] || user?.email}
                     </span>
                     <CustomButton
                         onClick={handleLogout}

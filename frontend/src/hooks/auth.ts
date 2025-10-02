@@ -1,20 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { authService } from '@/services/authService'
+import { backendUserService } from '@/services/backendUserService'
 
-// Query Keys
 export const authKeys = {
     all: ['auth'] as const,
     session: () => [...authKeys.all, 'session'] as const,
     user: () => [...authKeys.all, 'user'] as const,
 }
 
-// Hook para obtener la sesión actual
 export const useSession = () => {
     return useQuery({
         queryKey: authKeys.session(),
         queryFn: authService.getSession,
-        staleTime: 5 * 60 * 1000, // 5 minutos
-        gcTime: 10 * 60 * 1000, // 10 minutos
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
         retry: 1,
         select: (data) => ({
             session: data.data.session,
@@ -23,13 +22,12 @@ export const useSession = () => {
     })
 }
 
-// Hook para obtener el usuario actual
 export const useCurrentUser = () => {
     return useQuery({
         queryKey: authKeys.user(),
         queryFn: authService.getCurrentUser,
-        staleTime: 5 * 60 * 1000, // 5 minutos
-        gcTime: 10 * 60 * 1000, // 10 minutos
+        staleTime: 5 * 60 * 1000,
+        gcTime: 10 * 60 * 1000,
         retry: 1,
         select: (data) => ({
             user: data.data.user,
@@ -38,7 +36,18 @@ export const useCurrentUser = () => {
     })
 }
 
-// Hook para sign up
+export const useBackendUser = () => {
+    const { data } = useCurrentUser()
+    const supabaseUser = data?.user
+
+    return useQuery({
+        queryKey: ['backend-user', supabaseUser?.id],
+        queryFn: () => backendUserService.getUserBySupabaseId(supabaseUser?.id || ''),
+        enabled: !!supabaseUser?.id,
+        select: (data) => data
+    })
+}
+
 export const useSignUp = () => {
     const queryClient = useQueryClient()
     
@@ -50,7 +59,6 @@ export const useSignUp = () => {
         }) => {
             const result = await authService.signUp(email, password, userData)
             
-            // Si hay un error de Supabase, lanzarlo para que React Query lo maneje
             if (result.error) {
                 throw result.error
             }
@@ -59,7 +67,6 @@ export const useSignUp = () => {
         },
         onSuccess: (data) => {
             if (data.data && !data.error) {
-                // Invalidar queries relacionadas con auth
                 queryClient.invalidateQueries({ queryKey: authKeys.all })
             }
         },
@@ -69,7 +76,6 @@ export const useSignUp = () => {
     })
 }
 
-// Hook para sign in
 export const useSignIn = () => {
     const queryClient = useQueryClient()
     
@@ -80,7 +86,6 @@ export const useSignIn = () => {
         }) => {
             const result = await authService.signIn(email, password)
             
-            // Si hay un error de Supabase, lanzarlo para que React Query lo maneje
             if (result.error) {
                 throw result.error
             }
@@ -89,7 +94,6 @@ export const useSignIn = () => {
         },
         onSuccess: (data) => {
             if (data.data && !data.error) {
-                // Invalidar y refetch de todas las queries de auth
                 queryClient.invalidateQueries({ queryKey: authKeys.all })
                 queryClient.refetchQueries({ queryKey: authKeys.session() })
                 queryClient.refetchQueries({ queryKey: authKeys.user() })
@@ -101,7 +105,32 @@ export const useSignIn = () => {
     })
 }
 
-// Hook para sign out
+export const useSignInWithGoogle = () => {
+    const queryClient = useQueryClient()
+    
+    return useMutation({
+        mutationFn: async () => {
+            const result = await authService.signInWithGoogle()
+            
+            if (result.error) {
+                throw result.error
+            }
+            
+            return result
+        },
+        onSuccess: (data) => {
+            if (data.data && !data.error) {
+                queryClient.invalidateQueries({ queryKey: authKeys.all })
+                queryClient.refetchQueries({ queryKey: authKeys.session() })
+                queryClient.refetchQueries({ queryKey: authKeys.user() })
+            }
+        },
+        onError: (error) => {
+            console.error('Google sign in mutation error:', error)
+        }
+    })
+}
+
 export const useSignOut = () => {
     const queryClient = useQueryClient()
     
@@ -120,7 +149,6 @@ export const useSignOut = () => {
     })
 }
 
-// Hook para refresh session
 export const useRefreshSession = () => {
     const queryClient = useQueryClient()
     
@@ -139,44 +167,41 @@ export const useRefreshSession = () => {
     })
 }
 
-// Hook compuesto que combina session y user para facilitar el uso
 export const useAuth = () => {
     const sessionQuery = useSession()
     const userQuery = useCurrentUser()
     const signInMutation = useSignIn()
     const signUpMutation = useSignUp()
+    const signInWithGoogleMutation = useSignInWithGoogle()
     const signOutMutation = useSignOut()
     const refreshMutation = useRefreshSession()
 
     return {
-        // Datos
         session: sessionQuery.data?.session || null,
         user: userQuery.data?.user || null,
         
-        // Estados de loading
         isLoading: sessionQuery.isLoading || userQuery.isLoading,
-        loading: signInMutation.isPending, // Para compatibilidad con componente Login
+        loading: signInMutation.isPending || signInWithGoogleMutation.isPending,
         isSigningIn: signInMutation.isPending,
+        isSigningInWithGoogle: signInWithGoogleMutation.isPending,
         isSigningUp: signUpMutation.isPending,
         isSigningOut: signOutMutation.isPending,
         
-        // Estados de error
         sessionError: sessionQuery.data?.error || null,
         userError: userQuery.data?.error || null,
         signInError: signInMutation.error,
+        signInWithGoogleError: signInWithGoogleMutation.error,
         signUpError: signUpMutation.error,
         signOutError: signOutMutation.error,
         
-        // Acciones
         signIn: signInMutation.mutateAsync,
+        signInWithGoogle: signInWithGoogleMutation.mutateAsync,
         signUp: signUpMutation.mutateAsync,
         signOut: signOutMutation.mutateAsync,
         refreshSession: refreshMutation.mutateAsync,
         
-        // Utilidades
         isAuthenticated: !!sessionQuery.data?.session && !!userQuery.data?.user,
         
-        // Para refetch manual si es necesario
         refetchSession: sessionQuery.refetch,
         refetchUser: userQuery.refetch,
     }

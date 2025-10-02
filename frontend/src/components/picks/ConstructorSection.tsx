@@ -1,6 +1,6 @@
-import { useTeams } from "@/features/teams/hooks"
-import ConstructorCard from "../ConstructorCard/ConstructorCard"
-import { useDrivers } from "@/features/drivers/hooks";
+import { useTeams } from "@/hooks/teams"
+import ConstructorCard from "./ConstructorCard"
+import { useDrivers } from "@/hooks/drivers";
 import LoadingSpinner from '@/components/ui/LoadingSpinner/LoadingSpinner';
 import ErrorMessage from '@/components/ui/ErrorMessage/ErrorMessage';
 import EmptyState from '@/components/ui/EmptyState/EmptyState';

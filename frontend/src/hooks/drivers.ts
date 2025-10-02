@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useDataService } from '@/providers/ServiceProvider'
-import type { Driver } from './types';
+import type { Driver } from '../types/driverTypes';
 
 export const useDrivers = () => {
     const dataService = useDataService();

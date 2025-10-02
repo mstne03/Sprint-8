@@ -1,7 +1,7 @@
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community'
 import { AgGridReact } from 'ag-grid-react'
 import { useEffect } from 'react'
-import { useDrivers } from '@/features/drivers/hooks'
+import { useDrivers } from '@/hooks/drivers'
 import { themeQuartz } from 'ag-grid-community'
 import type { DriverRow } from '@/types/tableTypes'
 import { useFantasyTable } from '@/providers/TableProvider'

@@ -1,4 +1,4 @@
-import Table from '@/components/Table/Table'
+import Table from '@/components/picks/Table'
 
 const Teams = () => {
 

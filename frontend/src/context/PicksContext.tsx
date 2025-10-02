@@ -1,6 +1,6 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { Driver } from '@/features/drivers/types';
+import type { Driver } from '@/types/driverTypes';
 
 interface PicksContextType {
     selectedDrivers: Driver[];
@@ -22,6 +22,10 @@ interface PicksProviderProps {
 export const PicksProvider = ({ children }: PicksProviderProps) => {
     const [selectedDrivers, setSelectedDrivers] = useState<Driver[]>([]);
     const [selectedConstructor, setSelectedConstructorState] = useState<string | null>(null);
+
+    useEffect(() => {
+        setSelectedDrivers([])
+    }, [])
 
     const addDriver = (driver: Driver): boolean => {
         if (selectedDrivers.length >= 3 || isDriverSelected(driver.full_name)) {
@@ -45,6 +49,8 @@ export const PicksProvider = ({ children }: PicksProviderProps) => {
 
     const isMaxDriversSelected = selectedDrivers.length >= 3;
     const canContinue = selectedDrivers.length === 3 && selectedConstructor !== null;
+
+    
 
     const value: PicksContextType = {
         selectedDrivers,

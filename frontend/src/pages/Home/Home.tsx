@@ -8,7 +8,7 @@ import { Link } from "react-router-dom";
 const Home = () => {
     return (
         <motion.div
-            className="mt-30 flex flex-col justify-center items-center gap-0 relative text-white"
+            className="mt-20 flex flex-col justify-center items-center gap-0 relative text-white"
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -100 }}

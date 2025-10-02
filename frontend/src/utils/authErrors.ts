@@ -1,40 +1,40 @@
 export const mapAuthError = (error: any): string => {
     if (!error?.message) {
-        return 'Error inesperado'
+        return 'Unexpected error'
     }
 
     const message = error.message.toLowerCase()
 
     if (message.includes('invalid login credentials')) {
-        return 'Email o contraseña incorrectos'
+        return 'Invalid email or password'
     }
     
     if (message.includes('email not confirmed')) {
-        return 'Por favor confirma tu email antes de iniciar sesión'
+        return 'Please confirm your email before signing in'
     }
     
     if (message.includes('too many requests')) {
-        return 'Demasiados intentos. Inténtalo de nuevo más tarde'
+        return 'Too many attempts. Please try again later'
     }
     
     if (message.includes('invalid email')) {
-        return 'El email no es válido'
+        return 'Invalid email address'
     }
     
     if (message.includes('user not found')) {
-        return 'Usuario no encontrado'
+        return 'User not found'
     }
 
     if (message.includes('already registered')) {
-        return 'Este email ya está registrado'
+        return 'This email is already registered'
     }
     
     if (message.includes('password should be')) {
-        return 'La contraseña no cumple con los requisitos'
+        return 'Password does not meet requirements'
     }
 
     if (message.includes('session not found')) {
-        return 'Sesión expirada. Inicia sesión nuevamente'
+        return 'Session expired. Please sign in again'
     }
 
     return error.message

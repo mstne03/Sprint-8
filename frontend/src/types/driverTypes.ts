@@ -1,4 +1,5 @@
 export type Driver = {
+  id: number;
   driver_number: number;
   full_name: string;
   acronym: string;

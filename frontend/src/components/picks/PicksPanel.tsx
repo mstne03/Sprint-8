@@ -1,5 +1,5 @@
-import type { Driver } from "@/features/drivers/types"
-import type { Team } from "@/features/teams/types"
+import type { Driver } from "@/types/driverTypes"
+import type { Team } from "@/types/teamsTypes"
 
 type PicksPanelProps = {
     drivers: Driver[],

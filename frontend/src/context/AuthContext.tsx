@@ -1,24 +1,28 @@
-import { createContext, useContext, useEffect } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { useAuth as useAuthHooks } from '@/features/auth/hooks'
+import { useAuth as useAuthHooks } from '@/hooks/auth'
 import { supabase } from '@/config/supabase'
 import { useQueryClient } from '@tanstack/react-query'
-import { authKeys } from '@/features/auth/hooks'
+import { authKeys } from '@/hooks/auth'
 
 interface AuthContextType {
     user: any | null
     session: any | null
     signUp: (email: string, password: string, userData?: any) => Promise<any>
     signIn: (email: string, password: string) => Promise<any>
+    signInWithGoogle: () => Promise<any>
     signOut: () => Promise<void>
     loading: boolean
     isAuthenticated: boolean
     isSigningIn: boolean
+    isSigningInWithGoogle: boolean
     isSigningUp: boolean
     isSigningOut: boolean
     signInError: any
+    signInWithGoogleError: any
     signUpError: any
     signOutError: any
+    isInitialized: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -30,11 +34,27 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const queryClient = useQueryClient()
     const auth = useAuthHooks()
+    const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
+        // Initial session check to set initialized state
+        const checkInitialSession = async () => {
+            try {
+                await supabase.auth.getSession()
+                setIsInitialized(true)
+            } catch (error) {
+                setIsInitialized(true)
+            }
+        }
+
+        checkInitialSession()
+
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
-                console.log('Auth event:', event, session)
+                
+                if (!isInitialized) {
+                    setIsInitialized(true)
+                }
                 
                 if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
                     queryClient.setQueryData(authKeys.session(), {
@@ -54,7 +74,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         )
 
         return () => subscription.unsubscribe()
-    }, [queryClient])
+    }, [queryClient, isInitialized])
 
     const signUpWrapper = async (email: string, password: string, userData?: any) => {
         try {
@@ -74,6 +94,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
     }
 
+    const signInWithGoogleWrapper = async () => {
+        try {
+            const result = await auth.signInWithGoogle()
+            return result
+        } catch (error) {
+            throw error
+        }
+    }
+
     const signOutWrapper = async () => {
         try {
             await auth.signOut()
@@ -87,15 +116,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         session: auth.session,
         signUp: signUpWrapper,
         signIn: signInWrapper,
+        signInWithGoogle: signInWithGoogleWrapper,
         signOut: signOutWrapper,
-        loading: auth.isLoading || auth.isSigningIn || auth.isSigningUp || auth.isSigningOut,
+        loading: auth.isLoading || auth.isSigningIn || auth.isSigningUp || auth.isSigningOut || auth.isSigningInWithGoogle,
         isAuthenticated: auth.isAuthenticated,
         isSigningIn: auth.isSigningIn,
+        isSigningInWithGoogle: auth.isSigningInWithGoogle,
         isSigningUp: auth.isSigningUp,
         isSigningOut: auth.isSigningOut,
         signInError: auth.signInError,
+        signInWithGoogleError: auth.signInWithGoogleError,
         signUpError: auth.signUpError,
         signOutError: auth.signOutError,
+        isInitialized,
     }
 
     return (

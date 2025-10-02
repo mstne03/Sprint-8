@@ -1,9 +1,9 @@
 import { http } from '@/services/axios'
-import type { DataService } from '@/types/dataService'
-import type { Driver } from '@/features/drivers/types'
-import type { Team } from '@/features/teams/types'
+import type { F1DataService } from '@/types/f1DataService'
+import type { Driver } from '@/types/driverTypes'
+import type { Team } from '@/types/teamsTypes'
 
-export const dataService: DataService = {
+export const f1DataService: F1DataService = {
     async getAllDrivers() {
         const { data } = await http.get("/drivers/")
 

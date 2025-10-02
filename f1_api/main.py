@@ -1,6 +1,5 @@
 """In this module the api exposes the endpoints"""
 import logging
-from passlib.context import CryptContext
 from sqlmodel import select, Session
 import fastf1 as ff1
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,11 +9,11 @@ from .config.sql_init import engine
 from .season.update_db import update_db
 from .app import app
 from .models.f1_models import Teams
-from .models.app_models import Users, UserCreate, UserResponse
+from .models.app_models import UserTeamsCreate, Users, UserCreate, UserResponse, UserTeams
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # o ["*"] para permitir todos los orígenes
+    allow_origins=["http://localhost:5173", "http://localhost:5174"],  # Agregar puerto 5174 también
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -81,34 +80,32 @@ async def get_drivers():
         logging.warning(f"/drivers/ execution interrupted by the following exception: {e}")
         return []
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 @app.post("/users/", response_model=UserResponse)
 async def create_user(user: UserCreate):
     """
-    Create a new user
+    Create a new user with Supabase integration
     """
     try:
         with Session(engine) as session:
             existing_user = session.exec(
                 select(Users).where(
                     (Users.user_name == user.user_name) | 
-                    (Users.email == user.email)
+                    (Users.email == user.email) |
+                    (Users.supabase_user_id == user.supabase_user_id)
                 )
             ).first()
             
             if existing_user:
                 raise HTTPException(
                     status_code=400,
-                    detail="Username or email already registered"
+                    detail="Username, email, or Supabase user already registered"
                 )
-            
-            hashed_password = pwd_context.hash(user.password)
             
             new_user = Users(
                 user_name=user.user_name,
                 email=user.email,
-                hashed_password=hashed_password
+                supabase_user_id=user.supabase_user_id,
+                is_verified=True
             )
             
             session.add(new_user)
@@ -119,7 +116,7 @@ async def create_user(user: UserCreate):
                 id=new_user.id,
                 user_name=new_user.user_name,
                 email=new_user.email,
-                is_active=new_user.is_active,
+                is_verified=new_user.is_verified,
                 created_at=new_user.created_at
             )
     except HTTPException:
@@ -127,3 +124,39 @@ async def create_user(user: UserCreate):
     except Exception as e:
         logging.error(f"Error creating user: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.post("/user-team/")
+async def create_user_team(user_team: UserTeamsCreate):
+    """
+    Post a new user team into the database
+    """
+
+    try:
+        with Session(engine) as session:
+            session.add(UserTeams(
+                user_id=user_team.user_id,
+                league_id=None,
+                team_name=None,
+                driver_1_id=user_team.driver_1_id,
+                driver_2_id=user_team.driver_2_id,
+                driver_3_id=user_team.driver_3_id,
+                constructor_id=user_team.constructor_id,
+                total_points=0,
+                is_active=True,
+            ))
+            session.commit()
+    except Exception as e:
+        logging.error(f"Error creating user team: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+    
+@app.get("/users/by-id/{supabase_user_id}")
+async def get_user_by_id(supabase_user_id: str):
+    with Session(engine) as session:
+        user = session.exec(
+            select(Users).where(Users.supabase_user_id == supabase_user_id)
+        ).first()
+
+        if not user:
+            raise HTTPException(status_code=400, detail="User not found")
+        
+        return { "data": user }

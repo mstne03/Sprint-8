@@ -11,6 +11,10 @@ export interface AuthService {
         data: any;
         error: AuthError | null;
     }>;
+    signInWithGoogle(): Promise<{
+        data: any;
+        error: AuthError | null;
+    }>;
     signOut(): Promise<{
         error: AuthError | null;
     }>;
@@ -60,6 +64,25 @@ export const authService: AuthService = {
             return { data, error }
         } catch (error) {
             console.error('Error in authService.signIn:', error)
+            return { 
+                data: null, 
+                error: error as AuthError 
+            }
+        }
+    },
+
+    async signInWithGoogle() {
+        try {
+            const { data, error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${ENV.APP_URL}/auth/confirm`
+                }
+            })
+
+            return { data, error }
+        } catch (error) {
+            console.error('Error in authService.signInWithGoogle:', error)
             return { 
                 data: null, 
                 error: error as AuthError 
