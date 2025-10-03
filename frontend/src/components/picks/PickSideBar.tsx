@@ -1,45 +1,14 @@
-import { usePicks } from "@/context/PicksContext";
 import CustomButton from "@/components/ui/CustomButton/CustomButton";
-import { useDrivers } from "@/hooks/drivers";
-import { useTeams } from "@/hooks/teams";
-import { useBackendUser } from "@/hooks/auth";
-import { backendUserService } from "@/services/backendUserService";
-import { useNavigate } from "react-router-dom";
+import usePicksSubmission from "@/hooks/picksSubmission";
 
 const PickSideBar = () => {
-    const { selectedDrivers, selectedConstructor, removeDriver, canContinue } = usePicks();
-    const { data: drivers } = useDrivers();
-    const { data: constructors } = useTeams();
-    const { data: backendUser, isLoading: isLoadingUser } = useBackendUser();
-    const navigate = useNavigate();
-
-    const driver_ids = drivers?.filter(d => selectedDrivers.some(selected => selected.full_name == d.full_name))
-    const constructor = constructors?.find(c => c.team_name === selectedConstructor);
-
-    const addUserTeam = async () => {
-        if (canContinue && driver_ids?.length === 3 && backendUser?.id && constructor?.id) {
-            try {
-                await backendUserService.createUserTeam({
-                    user_id: backendUser.id,
-                    league_id: null,
-                    team_name: null,
-                    driver_1_id: driver_ids[0].id,
-                    driver_2_id: driver_ids[1].id,
-                    driver_3_id: driver_ids[2].id,
-                    constructor_id: constructor.id,
-                })
-                navigate("/my-teams");
-            } catch (error) {
-                console.error(error)
-            }
-        } else {
-            return;
-        }
-    }
-
-    if (isLoadingUser) {
-        return <div>Loading user...</div>
-    }
+    const {
+        selectedDrivers,
+        selectedConstructor,
+        canContinue,
+        addUserTeam,
+        removeDriver,
+    } = usePicksSubmission();
 
     return (
         <div className="w-full backdrop-blur-3xl bg-white/10 border-3 border-white rounded-xl p-8 shadow-xl shadow-black/25">

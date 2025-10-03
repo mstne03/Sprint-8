@@ -21,7 +21,7 @@ const PicksContent = () => {
                 >
                     <div className="flex md:flex-row flex-col-reverse gap-6 min-h-screen">
                         <section className="flex flex-col gap-5 md:w-[65%]">
-                            <h1 className="text-center font-bold text-5xl text-white">
+                            <h1 className="text-center font-bold text-4xl text-white">
                                 YOUR PICKS
                             </h1>
                             <HomeTab

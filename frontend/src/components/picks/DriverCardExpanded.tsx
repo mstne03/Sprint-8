@@ -96,7 +96,6 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                 {d.driver_number}
             </span>
 
-            {/* Price Badge */}
             <div className="absolute top-4 right-4 bg-green-600/90 text-white px-5 py-3 rounded-full text-lg md:text-xl font-bold border-2 border-green-400/50 backdrop-blur-sm shadow-xl">
                 ${(d.fantasy_stats.price / 1_000_000).toFixed(1)}M
             </div>

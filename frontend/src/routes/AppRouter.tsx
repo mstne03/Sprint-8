@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from '@/context/AuthContext';
-import { ProtectedRoute, PublicRoute } from '@/components/auth/ProtectedRoute';
+import { ProtectedRoute, PublicRoute } from '@/components/auth/PublicProtectedRoute';
 import DataServiceProvider from '@/providers/ServiceProvider'
 import DriversServiceProvider from '@/providers/TableProvider'
 import { PicksProvider } from '@/context/PicksContext'
