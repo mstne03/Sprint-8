@@ -1,4 +1,4 @@
-
+import { BarChart, Bar, XAxis, YAxis } from 'recharts'
 
 const Chart = () => {
 

@@ -42,7 +42,7 @@ const ConstructorSection = () => {
     
     return (
         <section>
-            <div className="mx-15 grid md:grid-cols-1 grid-cols-1 gap-10 overflow-hidden">
+            <div className="mx-5 grid md:grid-cols-1 grid-cols-1 gap-7 overflow-hidden">
                 {teams
                     ?.sort((a, b) => {
                         const pointsA = drivers

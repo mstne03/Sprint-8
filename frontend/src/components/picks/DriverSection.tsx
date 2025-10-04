@@ -42,7 +42,7 @@ const DriverSection = () => {
     }
 
     return (
-        <div className="text-white mx-7 grid md:grid-cols-1 grid-cols-1 gap-10 overflow-hidden">
+        <div className="text-white mx-5 grid md:grid-cols-1 grid-cols-1 gap-7 overflow-hidden">
             {drivers.map((d) => (
                 <div key={d.id}>
                     <DriverCard

@@ -5,6 +5,7 @@ import type { Driver } from '@/types/driverTypes'
 import { usePicks } from '@/context/PicksContext'
 import PickButton from '@/components/ui/PickButton/PickButton'
 import ExpandButton from '@/components/ui/ExpandButton/ExpandButton'
+import StatsTable from '../ui/StatsTable/StatsTable'
 
 type DriverCardProps = {
     d:Driver;
@@ -70,9 +71,6 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
             </div>
             
             <div className="space-y-3 absolute left-[8%] md:left-[5%] md:top-[5%] -top-3">
-                {(() => {
-                    
-                    return (
                         <div className="md:text-3xl text-[170%] flex flex-col gap-3">
                             <div className="flex gap-5 items-center">
                                 <div className="flex flex-col md:gap-3 gap-1">
@@ -92,62 +90,27 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
                                     src={logoSrc} 
                                     alt={d.team_name}
                                 />
-                            </div>
-                            <div className="text-[15px] space-y-2">
-                                <p>CHAMPIONSHIP</p>
-                                <p className="font-bold">{d.season_results.points} pts.</p>
+                                <span>|</span>
+                                <div className="text-[15px] space-y-2">
+                                    <p>CHAMPIONSHIP</p>
+                                    <p className="font-bold">{d.season_results.points} pts.</p>
+                                </div>
                             </div>
                         </div>
-                    );
-                })()}
                 <div className="
-                            flex gap-5 text-[10px] md:text-[70%] left-[-4%] md:left-0
+                            flex gap-5 text-[10px] md:text-[70%] left-[-4%] md:-left-5
                             absolute min-w-[43vw] min-h-[17vh] 
                             top-[97%] md:min-w-[23vw] md:top-[98%]
                 ">
-                    <div className="
-                            grid grid-cols-3 gap-5
-                            rounded-3xl bg-black/50 border-white/30 
-                            border-2 md:p-5 p-4
-                    ">
-                        <span>
-                            <p className="">VICTORIES</p>
-                            <p className="font-bold ">{d.season_results.victories}</p>
-                        </span>
-                        <span>
-                            <p className="">POLES</p>
-                            <p className="font-bold ">{d.season_results.poles}</p>
-                        </span>
-                        <span>
-                            <p className="">PODIUMS</p>
-                            <p className="font-bold ">{d.season_results.podiums}</p>
-                        </span>
-                        <span>
-                            <p className="">AVERAGE <br /> FINISH</p>
-                            <p className="font-bold ">{d.fantasy_stats.avg_finish}</p>
-                        </span>
-                        <span>
-                            <p className="">AVERAGE <br /> GRID POS</p>
-                            <p className="font-bold ">{d.fantasy_stats.avg_grid_position}</p>
-                        </span>
-                        <span className="space-y-1">
-                            <p className="">POLE TO WIN <br /> CONVERSION</p>
-                            <span className="block w-full mb-2">
-                                <div className="relative h-4 rounded bg-white/50 overflow-hidden">
-                                    <div
-                                    className="absolute left-0 top-0 h-4 bg-green-500"
-                                    style={{ width: `${d.fantasy_stats.pole_win_conversion}%` }}
-                                    />
-                                    <span className="absolute left-1 top-0 text-xs text-black">{d.fantasy_stats.pole_win_conversion}%</span>
-                                </div>
-                            </span>
-                        </span>
-                    </div>
+                    <StatsTable 
+                        season_results={d.season_results}
+                        fantasy_stats={d.fantasy_stats}
+                    />
                 </div>
             </div>
-            <div className="md:max-h-[70vh] max-h-[60vh] top-[4%] md:top-[3%] md:right-[5%] right-[-5%] overflow-hidden absolute">
+            <div className="md:max-h-[70vh] max-h-[60vh] top-[4%] md:top-[10%] md:right-[-5%] right-[-5%] overflow-hidden absolute">
                 <img
-                    className="md:w-[20vw] w-[35vw] left-[-20%] md:left-[-15%] relative"
+                    className="md:w-[19vw] w-[35vw] left-[-20%] md:left-[-15%] relative"
                     src={`${d.headshot_url}`}
                     alt={`${d.full_name} headshot`}
                     style={{

@@ -9,7 +9,7 @@ const PicksContent = () => {
     const [seeDrivers, setSeeDrivers] = useState(true);
 
     return (
-        <main className="py-10">
+        <main className="py-5">
             <AnimatePresence>
                 <motion.div
                     key="main"
@@ -19,7 +19,7 @@ const PicksContent = () => {
                     transition={{ duration: 1, ease: "easeInOut" }}
                     className="-mt-5 text-white"
                 >
-                    <div className="flex md:flex-row flex-col-reverse gap-6 min-h-screen">
+                    <div className="flex md:flex-row flex-col-reverse gap-6">
                         <section className="flex flex-col gap-5 md:w-[65%]">
                             <h1 className="text-center font-bold text-4xl text-white">
                                 YOUR PICKS
