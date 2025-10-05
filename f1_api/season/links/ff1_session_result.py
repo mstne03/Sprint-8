@@ -6,7 +6,11 @@ from f1_api.models.f1_models import SessionResult, Events
 
 def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_map, sql_session):
     session_results = []
-    existing_results = existing_results = set(sql_session.exec(select(SessionResult.round_number, SessionResult.session_number, SessionResult.driver_id)).all())
+    # Fix: Get existing results as a set of tuples for proper comparison
+    existing_results_query = sql_session.exec(
+        select(SessionResult.round_number, SessionResult.session_number, SessionResult.driver_id)
+    ).all()
+    existing_results = set((result.round_number, result.session_number, result.driver_id) for result in existing_results_query)
 
     for _, event in schedule.iloc[1:].iterrows():
         event_name = event["EventName"]

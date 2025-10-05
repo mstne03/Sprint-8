@@ -11,8 +11,6 @@ from .drivers.ff1_drivers_data import get_driver_data
 from .links.ff1_driver_team_link import get_all_driver_team_links
 from .links.ff1_session_result import get_session_results
 
-
-
 logging.basicConfig(level=logging.INFO)
 
 async def update_db(engine):
@@ -24,7 +22,9 @@ async def update_db(engine):
 
         with Session(engine) as session:
             season_exists = session.exec(select(Seasons).where(Seasons.year == year)).first()
-            existing_rounds = set(session.exec(select(SessionResult.round_number)).all())
+            # Fix: Get existing rounds properly as a set of round numbers
+            existing_rounds_query = session.exec(select(SessionResult.round_number)).all()
+            existing_rounds = set(existing_rounds_query)
 
             if not season_exists:
                 session.add(Seasons(year=year))
@@ -100,8 +100,14 @@ async def update_db(engine):
             all_session_results = get_session_results(year, schedule, session_map, driver_id_map, team_id_map, session)
             logging.info(f"✅ Session results processed: {len(all_session_results)} results")
             
-            session.add_all(all_session_results)
-            session.commit()
+            # Only add new results if there are any
+            if all_session_results:
+                session.add_all(all_session_results)
+                session.commit()
+                logging.info(f"✅ Added {len(all_session_results)} new session results to database")
+            else:
+                logging.info("ℹ️ No new session results to add")
+                
             session.close()
             logging.info("🎉 Database update completed successfully!")
     except Exception as e:

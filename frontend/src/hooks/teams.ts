@@ -7,6 +7,7 @@ export const useTeams = () => {
 
     return useQuery<Team[]>({
         queryKey: ["teams"],
-        queryFn: () => dataService.getAllTeams()
+        queryFn: () => dataService.getAllTeams(),
+        staleTime: 5 * 24 * 60 * 60 * 1000,
     })
 }

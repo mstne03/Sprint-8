@@ -1,7 +1,7 @@
 import logging
 from sqlalchemy import select
 from fastf1 import plotting
-from f1_api.models.f1_models import DriverTeamLink, Events
+from f1_api.models.f1_models import DriverTeamLink
 
 def get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map, session):
     """

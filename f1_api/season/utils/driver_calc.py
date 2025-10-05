@@ -153,41 +153,55 @@ def get_drivers_mapped(max_round,stats,points_map,available_points,drivers_sorte
         drivers.append(driver_dict)
     return drivers
 
-def get_teams_mapped(max_round, points_map, session):
+def get_teams_mapped(session):
     """
-    Maps teams with accumulated points from their drivers
+    Maps teams with accumulated points from their drivers - OPTIMIZED VERSION
     """
     teams = []
     
     # Get all teams
     all_teams = session.exec(select(Teams)).all()
     
+    # OPTIMIZACIÓN: Una sola query para obtener TODOS los datos necesarios
+    # En lugar de hacer N queries individuales por cada driver-round
+    team_points_data = session.exec(
+        select(
+            DriverTeamLink.team_id,
+            DriverTeamLink.driver_id,
+            DriverTeamLink.round_number,
+            func.sum(SessionResult.points).label("round_points")
+        )
+        .join(SessionResult, 
+              (SessionResult.driver_id == DriverTeamLink.driver_id) & 
+              (SessionResult.round_number == DriverTeamLink.round_number))
+        .group_by(
+            DriverTeamLink.team_id,
+            DriverTeamLink.driver_id, 
+            DriverTeamLink.round_number
+        )
+    ).all()
+    
+    # Procesar datos en memoria (mucho más rápido que queries individuales)
+    team_stats = {}
+    
+    for team_id, driver_id, round_number, round_points in team_points_data:
+        if team_id not in team_stats:
+            team_stats[team_id] = {
+                "total_points": 0,
+                "drivers": set()
+            }
+        
+        team_stats[team_id]["total_points"] += round_points or 0
+        team_stats[team_id]["drivers"].add(driver_id)
+    
+    # Construir resultado final
     for team in all_teams:
         team_dict = team.model_dump()
+        stats = team_stats.get(team.id, {"total_points": 0, "drivers": set()})
         
-        # Get all drivers that belong to this team in the most recent round
-        team_drivers = session.exec(
-            select(DriverTeamLink.driver_id)
-            .where((DriverTeamLink.team_id == team.id) & (DriverTeamLink.round_number == max_round))
-        ).all()
-        
-        # If no drivers found for max_round, get any drivers for this team
-        if not team_drivers:
-            team_drivers = session.exec(
-                select(DriverTeamLink.driver_id)
-                .where(DriverTeamLink.team_id == team.id)
-            ).all()
-        
-        # Calculate total points for this team
-        total_team_points = 0
-        for driver_id in team_drivers:
-            driver_points = points_map.get(driver_id, 0)
-            total_team_points += driver_points
-        
-        # Add team points to the team dictionary
         team_dict["season_results"] = {
-            "points": total_team_points,
-            "driver_count": len(team_drivers)
+            "points": stats["total_points"],
+            "driver_count": len(stats["drivers"])
         }
         
         teams.append(team_dict)
