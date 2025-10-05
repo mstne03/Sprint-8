@@ -52,10 +52,10 @@ const DriverSection = () => {
                     />
                     <AnimatePresence>
                         {expanded === d.full_name && (
-                            <>
+                            <div key={d.id}>
                                 <motion.div
                                     key={d.full_name}
-                                    className="fixed inset-0 w-screen h-screen bg-black/95 z-40"
+                                    className="fixed inset-0 w-screen h-screen bg-black/70 backdrop-blur-xl z-40"
                                     style={{ pointerEvents: 'auto' }}
                                     onClick={() => setExpanded(null)}
                                     initial={{ opacity: 0 }}
@@ -67,7 +67,7 @@ const DriverSection = () => {
                                     d={d}
                                     setExpanded={() => setExpanded(null)}
                                 />
-                            </>
+                            </div>
                         )}
                     </AnimatePresence>
                 </div>

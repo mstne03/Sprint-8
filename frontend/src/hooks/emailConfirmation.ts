@@ -107,12 +107,12 @@ const useEmailConfirmation = () => {
                         
                         if (profileCreated) {
                             setTimeout(() => {
-                                navigate('/picks', { replace: true })
+                                navigate('/leagues', { replace: true })
                             }, 1000)
                             return
                         } else {
                             setTimeout(() => {
-                                navigate('/picks', { replace: true })
+                                navigate('/leagues', { replace: true })
                             }, 1000)
                             return
                         }
@@ -197,7 +197,7 @@ const useEmailConfirmation = () => {
         try {
             const { data: { user } } = await supabase.auth.getUser()
             if (user) {
-                navigate('/picks')
+                navigate('/leagues')
             } else {
                 navigate('/')
             }

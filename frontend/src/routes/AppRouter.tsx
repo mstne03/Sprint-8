@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import { AuthProvider } from '@/context/AuthContext';
+import { LeaguesProvider } from '@/context/LeaguesContext';
 import { ProtectedRoute, PublicRoute } from '@/components/auth/PublicProtectedRoute';
 import DataServiceProvider from '@/providers/ServiceProvider'
 import DriversServiceProvider from '@/providers/TableProvider'
@@ -16,19 +17,19 @@ import EmailConfirmation from '@/pages/EmailConfirmation/EmailConfirmation'
 import CheckEmail from '@/pages/CheckEmail/CheckEmail'
 import Header from "@/components/layout/Header"
 import Home from "@/pages/Home/Home";
+import Leagues from "@/pages/Leagues/Leagues";
+import LeagueDetail from "@/pages/LeagueDetail/LeagueDetail";
+import TeamBuilder from "@/pages/TeamBuilder/TeamBuilder";
 
 function AppRouter() {
   return (
     <AuthProvider>
-      <PicksProvider>
-        <DriversServiceProvider>
-          <DataServiceProvider>
+      <LeaguesProvider>
+        <PicksProvider>
+          <DriversServiceProvider>
+            <DataServiceProvider>
             <Routes>
-              <Route path="/" element={
-                <PublicRoute>
-                  <Home/>
-                </PublicRoute>
-              }/>
+              <Route path="/" element={<Home/>}/>
               <Route path="/login" element={
                 <PublicRoute>
                   <Login />
@@ -45,6 +46,9 @@ function AppRouter() {
                 <ProtectedRoute>
                   <Header />
                   <Routes>
+                    <Route path="/leagues/:leagueId/team-builder" element={<TeamBuilder/>}/>
+                    <Route path="/leagues/:leagueId" element={<LeagueDetail/>}/>
+                    <Route path="/leagues" element={<Leagues/>}/>
                     <Route path="/picks" element={<Picks/>}/>
                     <Route path="/my-teams" element={<Teams/>}/>
                     <Route path="/charts" element={<Charts/>}/>
@@ -58,6 +62,7 @@ function AppRouter() {
           </DataServiceProvider>
         </DriversServiceProvider>
       </PicksProvider>
+      </LeaguesProvider>
     </AuthProvider>
   )
 }

@@ -38,7 +38,7 @@ const useLoginForm = () => {
 
         try {
             await signIn(email, password)
-            navigate('/picks')
+            navigate('/leagues')
         } catch (err: any) {
             setError(mapAuthError(err))
         }

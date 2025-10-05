@@ -41,7 +41,7 @@ export const PublicRoute = ({ children }: ProtectedRouteProps) => {
     }
 
     if (user) {
-        return <Navigate to="/picks" replace />
+        return <Navigate to="/leagues" replace />
     }
 
     return <>{children}</>

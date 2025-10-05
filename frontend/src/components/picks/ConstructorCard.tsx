@@ -1,8 +1,8 @@
 import type { Team } from "@/types/teamsTypes"
 import type { Driver } from "@/types/driverTypes"
-import { motion } from 'framer-motion'
 import { usePicks } from '@/context/PicksContext'
 import PickButton from "../ui/PickButton/PickButton"
+import GlassCard from "@/components/ui/GlassCard/GlassCard"
 
 type ConstructorCardProps = {
     t: Team;
@@ -26,17 +26,7 @@ const ConstructorCard = ({ t, d }: ConstructorCardProps) => {
     };
 
     return (
-        <motion.div className={`
-                flex items-center relative md:min-h-[60vh]
-                min-h-[55vh] min-w-[50vw] md:min-w-[20vw]
-                overflow-hidden rounded-4xl border-4 p-2
-            `}
-            key={t.team_name}
-            style={{ 
-                background: `linear-gradient(135deg, ${t.team_color}75 30%, #00000050 100%)`,
-                borderColor: `${t.team_color}50`
-            }}
-        >
+        <GlassCard color={t.team_color} motionKey={t.team_name}>
             <div className="mt-10 space-y-3 absolute left-[45%] md:left-[8%] md:top-0 top-0">
                 <div className="md:text-4xl text-[170%] flex gap-5">
                     <div className="flex flex-col md:gap-3 gap-1 md:max-w-[55%]">
@@ -67,7 +57,7 @@ const ConstructorCard = ({ t, d }: ConstructorCardProps) => {
                     disabled={false}
                 />
             </div>
-        </motion.div>
+        </GlassCard>
     )
 }
 
