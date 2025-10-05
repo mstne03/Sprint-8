@@ -2,7 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useLeagueDetail } from '@/hooks/useLeagueDetail';
 import { useLeagueParticipants } from '@/hooks/useLeagueParticipants';
-import { useLeagues } from '@/context/LeaguesContext';
+import { useLeagues } from '@/contexts/LeaguesContext';
 
 const LeagueDetail = () => {
     const { leagueId } = useParams<{ leagueId: string }>();

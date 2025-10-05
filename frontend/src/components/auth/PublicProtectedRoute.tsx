@@ -1,6 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import React from 'react'
-import { useAuth } from '@/context/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 import LoadingSpinner from '../ui/LoadingSpinner/LoadingSpinner'
 
 interface ProtectedRouteProps {

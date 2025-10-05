@@ -3,7 +3,7 @@ import { useBackendUser } from "./auth";
 import { useDrivers } from "./drivers";
 import { useTeams } from "./teams";
 import { backendUserService } from "@/services";
-import { usePicks } from "@/context/PicksContext";
+import { usePicks } from "@/contexts/PicksContext";
 
 const usePicksSubmission = () => {
     const { selectedDrivers, selectedConstructor, removeDriver, canContinue } = usePicks();

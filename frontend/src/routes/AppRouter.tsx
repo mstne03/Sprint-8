@@ -1,25 +1,25 @@
 import { Route, Routes } from "react-router-dom";
-import { AuthProvider } from '@/context/AuthContext';
-import { LeaguesProvider } from '@/context/LeaguesContext';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { LeaguesProvider } from '@/contexts/LeaguesContext';
 import { ProtectedRoute, PublicRoute } from '@/components/auth/PublicProtectedRoute';
 import DataServiceProvider from '@/providers/ServiceProvider'
 import DriversServiceProvider from '@/providers/TableProvider'
-import { PicksProvider } from '@/context/PicksContext'
-import Picks from '@/pages/Picks/Picks'
-import Teams from '@/pages/Teams/Teams'
-import Charts from '@/pages/ChartPage/ChartPage'
-import Map from '@/pages/Map/Map'
-import FullCalendar from '@/pages/FullCalendar/FullCalendar'
-import NotFound from '@/pages/NotFound/NotFound'
-import Login from '@/pages/Login/Login'
-import Register from '@/pages/Register/Register'
-import EmailConfirmation from '@/pages/EmailConfirmation/EmailConfirmation'
-import CheckEmail from '@/pages/CheckEmail/CheckEmail'
+import { PicksProvider } from '@/contexts/PicksContext'
+import Picks from '@/pages/Picks'
+import Teams from '@/pages/Teams'
+import Charts from '@/pages/ChartPage'
+import Map from '@/pages/Map'
+import FullCalendar from '@/pages/FullCalendar'
+import NotFound from '@/pages/NotFound'
+import Login from '@/pages/Login'
+import Register from '@/pages/Register'
+import EmailConfirmation from '@/pages/EmailConfirmation'
+import CheckEmail from '@/pages/CheckEmail'
 import Header from "@/components/layout/Header"
-import Home from "@/pages/Home/Home";
-import Leagues from "@/pages/Leagues/Leagues";
-import LeagueDetail from "@/pages/LeagueDetail/LeagueDetail";
-import TeamBuilder from "@/pages/TeamBuilder/TeamBuilder";
+import Home from "@/pages/Home";
+import Leagues from "@/pages/Leagues";
+import LeagueDetail from "@/pages/LeagueDetail";
+import TeamBuilder from "@/pages/TeamBuilder";
 
 function AppRouter() {
   return (
@@ -28,40 +28,40 @@ function AppRouter() {
         <PicksProvider>
           <DriversServiceProvider>
             <DataServiceProvider>
-            <Routes>
-              <Route path="/" element={<Home/>}/>
-              <Route path="/login" element={
-                <PublicRoute>
-                  <Login />
-                </PublicRoute>
-              } />
-              <Route path="/register" element={
-                <PublicRoute>
-                  <Register />
-                </PublicRoute>
-              } />
-              <Route path="/check-email" element={<CheckEmail />} />
-              <Route path="/auth/confirm" element={<EmailConfirmation />} />
-              <Route path="/*" element={
-                <ProtectedRoute>
-                  <Header />
-                  <Routes>
-                    <Route path="/leagues/:leagueId/team-builder" element={<TeamBuilder/>}/>
-                    <Route path="/leagues/:leagueId" element={<LeagueDetail/>}/>
-                    <Route path="/leagues" element={<Leagues/>}/>
-                    <Route path="/picks" element={<Picks/>}/>
-                    <Route path="/my-teams" element={<Teams/>}/>
-                    <Route path="/charts" element={<Charts/>}/>
-                    <Route path="/map" element={<Map/>}/>
-                    <Route path="/calendar" element={<FullCalendar/>}/>
-                    <Route path="*" element={<NotFound/>}/>
-                  </Routes>
-                </ProtectedRoute>
-              }/>
-            </Routes>
-          </DataServiceProvider>
-        </DriversServiceProvider>
-      </PicksProvider>
+              <Routes>
+                <Route path="/" element={<Home/>}/>
+                <Route path="/login" element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                } />
+                <Route path="/register" element={
+                  <PublicRoute>
+                    <Register />
+                  </PublicRoute>
+                } />
+                <Route path="/check-email" element={<CheckEmail />} />
+                <Route path="/auth/confirm" element={<EmailConfirmation />} />
+                <Route path="/*" element={
+                  <ProtectedRoute>
+                    <Header />
+                    <Routes>
+                      <Route path="/leagues/:leagueId/team-builder" element={<TeamBuilder/>}/>
+                      <Route path="/leagues/:leagueId" element={<LeagueDetail/>}/>
+                      <Route path="/leagues" element={<Leagues/>}/>
+                      <Route path="/picks" element={<Picks/>}/>
+                      <Route path="/my-teams" element={<Teams/>}/>
+                      <Route path="/charts" element={<Charts/>}/>
+                      <Route path="/map" element={<Map/>}/>
+                      <Route path="/calendar" element={<FullCalendar/>}/>
+                      <Route path="*" element={<NotFound/>}/>
+                    </Routes>
+                  </ProtectedRoute>
+                }/>
+              </Routes>
+            </DataServiceProvider>
+          </DriversServiceProvider>
+        </PicksProvider>
       </LeaguesProvider>
     </AuthProvider>
   )

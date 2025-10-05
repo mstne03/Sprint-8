@@ -1,5 +1,5 @@
 import type { Driver } from '@/types/driverTypes'
-import { usePicks } from '@/context/PicksContext'
+import { usePicks } from '@/contexts/PicksContext'
 import PickButton from '@/components/ui/PickButton/PickButton'
 import ExpandButton from '@/components/ui/ExpandButton/ExpandButton'
 import StatsTable from '../ui/StatsTable/StatsTable'

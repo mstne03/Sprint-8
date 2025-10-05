@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { userTeamService } from '@/services/userTeamService';
 import type { CreateUserTeamRequest } from '@/services/userTeamService';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 export const useUserTeam = (leagueId: number) => {
     const { user } = useAuth();

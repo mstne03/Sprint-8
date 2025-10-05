@@ -1,5 +1,5 @@
 import { supabase } from "@/config/supabase"
-import { useAuth } from "@/context/AuthContext"
+import { useAuth } from "@/contexts/AuthContext"
 import { backendUserService } from "@/services"
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"

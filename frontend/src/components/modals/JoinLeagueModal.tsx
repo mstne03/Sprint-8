@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLeagues } from '../../context/LeaguesContext';
+import { useLeagues } from '../../contexts/LeaguesContext';
 import { useNavigate } from 'react-router-dom'
 
 interface JoinLeagueModalProps {

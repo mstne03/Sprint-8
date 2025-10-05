@@ -5,14 +5,15 @@ import string
 from typing import List
 from datetime import datetime
 from sqlmodel import select, Session
+from sqlalchemy.orm import aliased
 import fastf1 as ff1
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import HTTPException
-from f1_api.season.utils.driver_calc import get_database_data, get_driver_stats, get_drivers_mapped
+from f1_api.season.utils.driver_calc import get_database_data, get_driver_stats, get_drivers_mapped, get_teams_mapped
 from .config.sql_init import engine
 from .season.update_db import update_db
 from .app import app
-from .models.f1_models import Teams
+from .models.f1_models import Teams, Drivers
 from .models.app_models import (
     UserTeamsCreate, Users, UserCreate, UserResponse, UserTeams,
     Leagues, LeagueCreate, LeagueResponse, LeagueJoin, UserLeagueLink,
@@ -45,15 +46,20 @@ async def update_season():
 @app.get("/teams/")
 async def get_teams():
     """
-    This endpoint gets all of the teams for the current season from the DB
+    This endpoint gets all of the teams for the current season from the DB with accumulated points
     """
     try:
         with Session(engine) as session:
-            teams = session.exec(select(Teams)).all()
-            teams_mapped = [
-                {**team.model_dump(), "points": 0} 
-                for team in teams
-            ]
+            # Get database data including points calculation
+            database_data = get_database_data(session)
+            max_round = database_data["max_round"]
+            results = database_data["results"]
+            
+            # Create points mapping from driver results
+            points_map = {result.driver_id: result.total_points for result in results}
+            
+            # Get teams with calculated points
+            teams_mapped = get_teams_mapped(max_round, points_map, session)
             
             return teams_mapped
     except Exception as e:
@@ -664,4 +670,91 @@ async def get_my_team(league_id: int, user_id: str):
         raise
     except Exception as e:
         logging.error(f"Error fetching user team: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@app.get("/users/my-teams")
+async def get_my_teams(user_id: str):
+    """
+    Get all teams belonging to the current user across all leagues
+    """
+    try:
+        with Session(engine) as session:
+            # Verify user exists
+            user = session.exec(
+                select(Users).where(Users.supabase_user_id == user_id)
+            ).first()
+            
+            if not user:
+                raise HTTPException(status_code=404, detail="User not found")
+            
+            # Get all user's teams
+            user_teams = session.exec(
+                select(UserTeams).where(
+                    UserTeams.user_id == user.id,
+                    UserTeams.is_active == True
+                )
+            ).all()
+            
+            # Format the response with basic information
+            teams_data = []
+            for team in user_teams:
+                # Get league name
+                league = session.exec(
+                    select(Leagues).where(Leagues.id == team.league_id)
+                ).first()
+                
+                # Get drivers and constructor info
+                driver1 = session.exec(
+                    select(Drivers).where(Drivers.id == team.driver_1_id)
+                ).first()
+                driver2 = session.exec(
+                    select(Drivers).where(Drivers.id == team.driver_2_id)
+                ).first()
+                driver3 = session.exec(
+                    select(Drivers).where(Drivers.id == team.driver_3_id)
+                ).first()
+                constructor = session.exec(
+                    select(Teams).where(Teams.id == team.constructor_id)
+                ).first()
+                
+                team_data = {
+                    "id": team.id,
+                    "team_name": team.team_name,
+                    "league_id": team.league_id,
+                    "league_name": league.name if league else "Unknown League",
+                    "total_points": team.total_points,
+                    "budget_remaining": team.budget_remaining,
+                    "created_at": team.created_at,
+                    "updated_at": team.updated_at,
+                    "drivers": [
+                        {
+                            "id": driver1.id if driver1 else None,
+                            "name": driver1.full_name if driver1 else "Unknown Driver",
+                            "headshot": driver1.headshot_url if driver1 else None
+                        },
+                        {
+                            "id": driver2.id if driver2 else None,
+                            "name": driver2.full_name if driver2 else "Unknown Driver",
+                            "headshot": driver2.headshot_url if driver2 else None
+                        },
+                        {
+                            "id": driver3.id if driver3 else None,
+                            "name": driver3.full_name if driver3 else "Unknown Driver",
+                            "headshot": driver3.headshot_url if driver3 else None
+                        }
+                    ],
+                    "constructor": {
+                        "id": constructor.id if constructor else None,
+                        "name": constructor.team_name if constructor else "Unknown Constructor",
+                        "logo": f"/teams/{constructor.team_name.lower().replace(' ', '')}.svg" if constructor else None
+                    }
+                }
+                teams_data.append(team_data)
+            
+            return teams_data
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error(f"Error fetching user teams: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")

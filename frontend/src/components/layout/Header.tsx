@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 import F1Logo from '@/assets/gridfans_logo.svg'
 import CustomButton from '../ui/CustomButton/CustomButton'
 

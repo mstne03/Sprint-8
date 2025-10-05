@@ -152,3 +152,47 @@ def get_drivers_mapped(max_round,stats,points_map,available_points,drivers_sorte
         }
         drivers.append(driver_dict)
     return drivers
+
+def get_teams_mapped(max_round, points_map, session):
+    """
+    Maps teams with accumulated points from their drivers
+    """
+    teams = []
+    
+    # Get all teams
+    all_teams = session.exec(select(Teams)).all()
+    
+    for team in all_teams:
+        team_dict = team.model_dump()
+        
+        # Get all drivers that belong to this team in the most recent round
+        team_drivers = session.exec(
+            select(DriverTeamLink.driver_id)
+            .where((DriverTeamLink.team_id == team.id) & (DriverTeamLink.round_number == max_round))
+        ).all()
+        
+        # If no drivers found for max_round, get any drivers for this team
+        if not team_drivers:
+            team_drivers = session.exec(
+                select(DriverTeamLink.driver_id)
+                .where(DriverTeamLink.team_id == team.id)
+            ).all()
+        
+        # Calculate total points for this team
+        total_team_points = 0
+        for driver_id in team_drivers:
+            driver_points = points_map.get(driver_id, 0)
+            total_team_points += driver_points
+        
+        # Add team points to the team dictionary
+        team_dict["season_results"] = {
+            "points": total_team_points,
+            "driver_count": len(team_drivers)
+        }
+        
+        teams.append(team_dict)
+    
+    # Sort teams by points (highest to lowest)
+    teams.sort(key=lambda team: team["season_results"]["points"], reverse=True)
+    
+    return teams

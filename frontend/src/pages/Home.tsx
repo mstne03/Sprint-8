@@ -1,6 +1,6 @@
 import { PerspectiveCamera, Preload } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import MclarenModel from "../../components/ui/Models/mclaren";
+import MclarenModel from "../components/ui/Models/mclaren";
 import { motion } from 'framer-motion';
 import { Link } from "react-router-dom";
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useLeagues } from '@/context/LeaguesContext'
+import { useLeagues } from '@/contexts/LeaguesContext'
 import { CreateLeagueModal } from '@/components/modals/CreateLeagueModal'
 import { JoinLeagueModal } from '@/components/modals/JoinLeagueModal'
 

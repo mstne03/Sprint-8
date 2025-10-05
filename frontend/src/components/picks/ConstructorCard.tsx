@@ -1,6 +1,6 @@
 import type { Team } from "@/types/teamsTypes"
 import type { Driver } from "@/types/driverTypes"
-import { usePicks } from '@/context/PicksContext'
+import { usePicks } from '@/contexts/PicksContext'
 import PickButton from "../ui/PickButton/PickButton"
 import GlassCard from "@/components/ui/GlassCard/GlassCard"
 

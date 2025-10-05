@@ -1,7 +1,7 @@
 import { createContext, useContext, type ReactNode } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { leagueService, type League, type CreateLeagueRequest, type JoinLeagueRequest, type JoinLeagueResponse } from '@/services'
-import { useAuth } from '@/context/AuthContext'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface LeaguesContextType {
   // Queries
