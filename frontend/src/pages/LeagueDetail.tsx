@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { useLeagueDetail } from '@/hooks/useLeagueDetail';
 import { useLeagueParticipants } from '@/hooks/useLeagueParticipants';
 import { useLeagues } from '@/contexts/LeaguesContext';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import LoadingError from '../components/ui/LoadingError';
 
 const LeagueDetail = () => {
     const { leagueId } = useParams<{ leagueId: string }>();
@@ -37,13 +39,8 @@ const LeagueDetail = () => {
 
     if (isLoading) {
         return (
-            <div className="p-6">
-                <div className="max-w-6xl mx-auto">
-                    <div className="text-center py-12">
-                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-500 mx-auto mb-4"></div>
-                        <p className="text-gray-400 text-lg">Loading league details...</p>
-                    </div>
-                </div>
+            <div className="max-w-6xl mx-auto">
+                <LoadingSpinner message={"Loading league details"}/>
             </div>
         );
     }
@@ -52,13 +49,7 @@ const LeagueDetail = () => {
         return (
             <div className="p-6">
                 <div className="max-w-6xl mx-auto">
-                    <div className="text-center py-12">
-                        <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p className="text-red-400 text-lg">Error loading league</p>
-                        <p className="text-gray-500 mt-2">League not found or access denied</p>
-                    </div>
+                    <LoadingError error={"Error loading league"} errorMessage={"League not found or access denied"}/>
                 </div>
             </div>
         );
@@ -67,7 +58,6 @@ const LeagueDetail = () => {
     return (
         <div className="p-6">
             <div className="max-w-6xl mx-auto">
-                {/* League Header */}
                 <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 border border-gray-700/50 backdrop-blur-sm rounded-2xl p-8 mb-8">
                     <div className="flex justify-between items-start mb-6">
                         <div>

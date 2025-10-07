@@ -1,52 +1,52 @@
 import { http } from '@/services/axios'
 
 export interface UserTeam {
-    id: number
-    user_id: number
-    league_id: number
-    team_name: string
-    driver_1_id: number
-    driver_2_id: number
-    driver_3_id: number
-    constructor_id: number
-    total_points: number
-    budget_remaining: number
-    is_active: boolean
-    created_at: string
-    updated_at: string
+    id: number;
+    user_id: number;
+    league_id: number;
+    team_name: string;
+    driver_1_id: number;
+    driver_2_id: number;
+    driver_3_id: number;
+    constructor_id: number;
+    total_points: number;
+    budget_remaining: number;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface CreateUserTeamRequest {
-    team_name: string
-    driver_1_id: number
-    driver_2_id: number
-    driver_3_id: number
-    constructor_id: number
+    team_name: string;
+    driver_1_id: number;
+    driver_2_id: number;
+    driver_3_id: number;
+    constructor_id: number;
 }
 
 export interface UserTeamDriver {
-    id: number
-    name: string
-    headshot: string | null
+    id: number;
+    name: string;
+    headshot: string | null;
 }
 
 export interface UserTeamConstructor {
-    id: number
-    name: string
-    logo: string | null
+    id: number;
+    name: string;
+    logo: string | null;
 }
 
 export interface UserTeamWithDetails {
-    id: number
-    team_name: string
-    league_id: number
-    league_name: string
-    total_points: number
-    budget_remaining: number
-    created_at: string
-    updated_at: string
-    drivers: UserTeamDriver[]
-    constructor: UserTeamConstructor
+    id: number;
+    team_name: string;
+    league_id: number;
+    league_name: string;
+    total_points: number;
+    budget_remaining: number;
+    created_at: string;
+    updated_at: string;
+    drivers: UserTeamDriver[];
+    constructor: UserTeamConstructor;
 }
 
 export interface UserTeamServiceType {
@@ -66,7 +66,6 @@ export const userTeamService: UserTeamServiceType = {
             const { data } = await http.get(`/leagues/${leagueId}/teams/me?user_id=${userId}`)
             return data
         } catch (error: any) {
-            // Si no hay equipo (404), devolver null
             if (error.response?.status === 404) {
                 return null
             }

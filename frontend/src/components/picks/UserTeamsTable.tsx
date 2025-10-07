@@ -7,6 +7,8 @@ import type { MyTeamsRow } from '@/types/tableTypes';
 import { useMyTeamsTable } from '@/hooks/useMyTeamsTable';
 import { userTeamService } from '@/services/userTeamService';
 import { useAuth } from '@/contexts/AuthContext';
+import LoadingSpinner from '../ui/LoadingSpinner';
+import LoadingError from '../ui/LoadingError';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -63,11 +65,8 @@ export default function UserTeamsTable() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-full min-h-[400px]">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-red-600 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-white font-formula1 text-lg">Loading your teams...</p>
-                </div>
+            <div className="max-w-6xl mx-auto">
+                <LoadingSpinner message={"Loading your teams..."}/>
             </div>
         );
     }
@@ -75,15 +74,7 @@ export default function UserTeamsTable() {
     if (error) {
         return (
             <div className="flex items-center justify-center h-full min-h-[400px]">
-                <div className="bg-red-900/20 border border-red-600/50 rounded-lg p-6 max-w-md">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                            <span className="text-white font-bold">!</span>
-                        </div>
-                        <h3 className="text-white font-formula1 text-lg">Error Loading Teams</h3>
-                    </div>
-                    <p className="text-gray-300">Unable to load your teams. Please try again later.</p>
-                </div>
+                <LoadingError error={"Error loading Teams"} errorMessage={"Unable to load your teams, please try again later"}/>
             </div>
         );
     }

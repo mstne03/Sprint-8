@@ -8,9 +8,9 @@ const LoadingSpinner = ({
     className = "" 
 }: LoadingSpinnerProps) => {
     return (
-        <div className={`flex flex-col items-center justify-center w-full py-16 ${className}`}>
-            <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-red-600 border-solid"></div>
-            <p className="mt-4 text-white text-lg font-medium">{message}</p>
+        <div className="text-center py-12">
+            <div className={`animate-spin rounded-full h-16 w-16 border-b-2 border-red-500 mx-auto mb-4 ${className}`}></div>
+            <p className="text-gray-400 text-lg">{message}</p>
         </div>
     );
 };
