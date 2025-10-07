@@ -42,7 +42,7 @@ const DriverInfo = ({ name, country, team, points, expanded = false }: DriverInf
                 />
                 <span className="text-gray-400">|</span>
                 <div className="text-[15px] space-y-2 text-gray-300">
-                    <p className="text-gray-400">CHAMPIONSHIP</p>
+                    <p className="text-gray-100">CHAMPIONSHIP</p>
                     <p className="font-bold text-white">{points} pts.</p>
                 </div>
             </div>

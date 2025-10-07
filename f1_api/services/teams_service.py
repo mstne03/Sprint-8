@@ -2,7 +2,7 @@
 import logging
 from sqlmodel import Session, select, func
 from f1_api.models.f1_models import DriverTeamLink, SessionResult, Teams
-from f1_api.season.utils.driver_calc import get_teams_mapped
+from f1_api.season.utils.ingest import get_teams_mapped
 
 
 def get_teams_service(session: Session) -> list:

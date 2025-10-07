@@ -90,7 +90,7 @@ const StatsTable = memo(({ season_results, fantasy_stats }: StatsTableProps) => 
                                     fill="#ffffff" 
                                     fontSize={12} 
                                     fontWeight="bold"
-                                    formatter={(value: number) => value.toFixed(1)}
+                                    formatter={(value: any) => value.toFixed(1)}
                                 />
                                 {averageData.map((entry, index) => (
                                     <Cell key={`cell-${index}`} fill={entry.color} />

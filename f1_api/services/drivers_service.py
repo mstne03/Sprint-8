@@ -1,7 +1,7 @@
 """Drivers service module for drivers-related operations"""
 import logging
 from sqlmodel import Session
-from ..season.utils.driver_calc import get_database_data, get_driver_stats, get_drivers_mapped
+from ..season.utils.ingest import get_database_data, get_driver_stats, get_drivers_mapped
 
 
 def get_drivers_service(session: Session) -> list:

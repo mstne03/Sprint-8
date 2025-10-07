@@ -14,14 +14,10 @@ interface EventModalProps {
 }
 
 const EventModal = ({ 
-  isOpen, 
-  mode, 
-  event, 
-  onClose, 
-  onCreate, 
-  onUpdate, 
-  onDelete,
-  onEdit
+  isOpen, mode, 
+  event, onClose, 
+  onCreate, onUpdate, 
+  onDelete, onEdit
 }: EventModalProps) => {
   const [formData, setFormData] = useState({
     title: '',

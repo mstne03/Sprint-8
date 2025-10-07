@@ -55,7 +55,7 @@ const BuilderDriversDisplay = ({ driver }: BuilderDriversDisplayProps) => {
                 />
                 <div className="text-[70%] flex-1">
                     <p className="text-white font-medium">{driver.full_name}</p>
-                    <p className="text-gray-400 text-sm">{driver.team_name}</p>
+                    <p className="text-gray-100 text-sm">{driver.team_name}</p>
                 </div>
                 <div 
                     onClick={(e) => {
@@ -75,17 +75,17 @@ const BuilderDriversDisplay = ({ driver }: BuilderDriversDisplayProps) => {
             </div>
             
             <div className="grid grid-cols-3 gap-2 text-xs">
-                <div className="text-center p-2 bg-gray-600/30 rounded">
-                    <p className="text-gray-400">Points</p>
-                    <p className="text-white font-semibold">{driver.season_results.points}</p>
+                <div className="text-center p-2 bg-gray-100/30 rounded">
+                    <p className="text-gray-100">Points</p>
+                    <p className="text-white font-bold">{driver.season_results.points}</p>
                 </div>
-                <div className="text-center p-2 bg-gray-600/30 rounded">
-                    <p className="text-gray-400">Avg Finish</p>
-                    <p className="text-white font-semibold">{driver.fantasy_stats.avg_finish.toFixed(1)}</p>
+                <div className="text-center p-2 bg-gray-100/30 rounded">
+                    <p className="text-gray-100">Avg Finish</p>
+                    <p className="text-white font-bold">{driver.fantasy_stats.avg_finish.toFixed(1)}</p>
                 </div>
                 <div className="text-center p-2 bg-green-500/70 rounded border border-green-200/50">
                     <p className="text-purple-200">Price</p>
-                    <p className="text-purple-50 font-semibold">${(driver.fantasy_stats.price / 1_000_000).toFixed(1)}M</p>
+                    <p className="text-purple-50 font-bold">${(driver.fantasy_stats.price / 1_000_000).toFixed(1)}M</p>
                 </div>
             </div>
         </motion.div>

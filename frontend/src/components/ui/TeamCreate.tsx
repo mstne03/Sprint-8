@@ -18,7 +18,11 @@ const TeamCreate = () => {
                     {selectedDrivers.map((driver) => (
                         <div 
                             key={driver.id}
-                            className="flex items-center gap-3 p-3 bg-gray-700/30 rounded-lg group"
+                            className="flex items-center border gap-3 p-3 rounded-lg group"
+                            style={{
+                                backgroundColor: `${driver.driver_color}70`,
+                                borderColor: `${driver.driver_color}90`
+                            }}
                         >
                             <img 
                                 src={driver.headshot_url} 
@@ -27,7 +31,7 @@ const TeamCreate = () => {
                             />
                             <div className="flex-1">
                                 <p className="text-white font-medium">{driver.full_name}</p>
-                                <p className="text-gray-400 text-sm">{driver.team_name}</p>
+                                <p className="text-gray-100 text-sm">{driver.team_name}</p>
                             </div>
                             <div className="text-right mr-3">
                                 <p className="text-green-300 text-sm font-medium">
@@ -70,7 +74,13 @@ const TeamCreate = () => {
                     Team ({selectedConstructor ? 1 : 0}/1)
                 </h3>
                 {selectedConstructor ? (
-                    <div className="p-4 bg-gray-700/30 rounded-lg group">
+                    <div 
+                        className="p-4 border rounded-lg group"
+                        style={{
+                            backgroundColor: `${selectedConstructor.team_color}70`,
+                            borderColor: `${selectedConstructor.team_color}90`
+                        }}
+                    >
                         <div className="flex items-center justify-between mb-2">
                             <img 
                                 src={`/teams/${selectedConstructor.team_name.toLowerCase().replace(/\s/g, "")}.svg`}
@@ -98,7 +108,7 @@ const TeamCreate = () => {
                             </button>
                         </div>
                         <p className="text-white font-medium">{selectedConstructor.team_name}</p>
-                        <p className="text-gray-400 text-sm">
+                        <p className="text-gray-100 text-sm">
                             {selectedConstructor.season_results?.points || 0} points
                         </p>
                     </div>
