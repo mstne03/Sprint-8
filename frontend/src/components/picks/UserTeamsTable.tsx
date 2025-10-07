@@ -112,7 +112,9 @@ export default function UserTeamsTable() {
 
     return (
         <div className="h-full">
-            <div className="mb-4">
+            
+            <div className="bg-black/20 rounded-lg border border-red-600/30 p-4 shadow-2xl">
+            <div className="mb-6 bg-black/30 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
                 <h1 className="text-3xl font-formula1 text-white mb-2">My Fantasy Teams</h1>
                 <p className="text-gray-400">Manage your fantasy F1 teams across all leagues</p>
                 <div className="flex items-center gap-4 mt-3">
@@ -122,8 +124,6 @@ export default function UserTeamsTable() {
                     </div>
                 </div>
             </div>
-            
-            <div className="bg-black/20 rounded-lg border border-red-600/30 p-4 shadow-2xl">
                 <AgGridReact<MyTeamsRow>
                     ref={gridRef}
                     rowHeight={80}

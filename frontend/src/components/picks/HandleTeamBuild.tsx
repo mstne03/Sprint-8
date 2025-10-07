@@ -1,5 +1,5 @@
 import { useTeamBuilderContext } from "@/contexts/TeamBuilderContext";
-import TeamCreate from "../ui/TeamCreate/TeamCreate"
+import TeamCreate from "../ui/TeamCreate"
 
 const HandleTeamBuild = () => {
     const { 

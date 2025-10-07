@@ -110,7 +110,7 @@ const DriverStatsCharts = memo(({ season_results, fantasy_stats }: DriverStatsCh
                                         fill="#ffffff" 
                                         fontSize={14} 
                                         fontWeight="bold"
-                                        formatter={(value: number) => value.toFixed(1)}
+                                        formatter={(value: any) => typeof value === 'number' ? value.toFixed(1) : value}
                                     />
                                     {avgFinishData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -141,7 +141,7 @@ const DriverStatsCharts = memo(({ season_results, fantasy_stats }: DriverStatsCh
                                         fill="#ffffff" 
                                         fontSize={20} 
                                         fontWeight="bold"
-                                        formatter={(value: number) => value.toFixed(2)}
+                                        formatter={(value: any) => typeof value === 'number' ? value.toFixed(2) : value}
                                     />
                                     {overtakeData.map((entry, index) => (
                                         <Cell key={`cell-${index}`} fill={entry.color} />

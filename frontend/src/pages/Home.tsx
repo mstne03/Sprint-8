@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const Home = () => {
     return (
-        <div className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
+        <main className="h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
             {/* Background decorative elements */}
             <div className="absolute inset-0 bg-gradient-to-br from-amber-600/5 to-red-600/5" />
             <div className="absolute top-0 left-0 w-full h-full">
@@ -52,7 +52,7 @@ const Home = () => {
                         {/* McLaren model - Direct canvas without glassmorphism container */}
                         <div className="relative w-full h-full rounded-3xl overflow-hidden">
                             <Canvas
-                                className="w-full h-full rounded-3xl"
+                                className="w-full h-full rounded-3xl absolute md:left-[10%]"
                                 style={{ width: "100%", height: "100%" }}
                             >
                                 <PerspectiveCamera 
@@ -104,7 +104,7 @@ const Home = () => {
                                         <div className="relative bg-gradient-to-r from-amber-600 to-red-600 rounded-xl p-[2px]">
                                             <div className="bg-gray-900/90 backdrop-blur-sm rounded-xl px-6 py-3 group-hover:bg-gray-900/80 transition-all duration-300">
                                                 <span className="flex items-center font-bold text-base text-white">
-                                                    BEGIN YOUR JOURNEY
+                                                    COMPETE
                                                     <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                                                     </svg>
@@ -118,7 +118,7 @@ const Home = () => {
                     </motion.div>
                 </div>
             </motion.div>
-        </div>
+        </main>
     )
 }
 

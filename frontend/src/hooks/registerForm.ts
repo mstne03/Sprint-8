@@ -48,18 +48,13 @@ const useRegisterForm = () => {
 
     return {
         handleSubmit,
-        fullName,
-        setFullName,
-        username,
-        setUsername,
-        email,
-        setEmail,
-        password,
-        setPassword,
-        confirmPassword,
+        fullName, setFullName,
+        username, setUsername,
+        email, setEmail,
+        password, setPassword,
+        confirmPassword, 
         setConfirmPassword,
-        error,
-        loading,
+        error, loading,
     }
 }
 

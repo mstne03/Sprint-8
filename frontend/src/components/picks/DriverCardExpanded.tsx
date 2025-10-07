@@ -1,8 +1,8 @@
 import type { Driver } from '@/types/driverTypes'
-import GlassCard from '@/components/ui/GlassCard/GlassCard'
-import DriverInfo from '../ui/DriverInfo/DriverInfo'
-import DriverImage from '../ui/DriverImage/DriverImage'
-import DriverStatsCharts from '../ui/DriverStatsCharts/DriverStatsCharts'
+import GlassCard from '@/components/ui/GlassCard'
+import DriverInfo from '../ui/DriverInfo'
+import DriverImage from '../ui/DriverImage'
+import DriverStatsCharts from '../ui/DriverStatsCharts'
 
 type DriverCardProps = {
     d:Driver;
