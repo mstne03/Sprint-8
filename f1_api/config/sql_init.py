@@ -4,8 +4,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 from urllib.parse import quote_plus
-from f1_api.models.f1_models import *
-from f1_api.models.app_models import *
+# These imports are required for SQLModel to register the tables in metadata
+# Even though they appear unused, they are necessary for create_all() to work
+from f1_api.models.f1_models import (
+    Seasons, Events, Sessions, Teams, Drivers, DriverTeamLink, SessionResult
+)
+from f1_api.models.app_models import (
+    Leagues, UserTeams, Users, UserLeagueLink
+)
 
 # Load environment variables first
 load_dotenv(r'C:/Users/Marc/Documents/ITA/Sprint 8/f1_api/.env')
@@ -26,7 +32,7 @@ engine = create_engine(DATABASE_URL, poolclass=NullPool)
 try:
     with engine.connect() as connection:
         print("Connection successful!")
-except Exception as e:
+except (ConnectionError, ValueError) as e:
     print(f"Failed to connect: {e}")
 
 def create_models():
@@ -36,7 +42,7 @@ def create_models():
     try:
         SQLModel.metadata.create_all(engine)
         print("Database tables created successfully!")
-    except Exception as e:
+    except (ConnectionError, ValueError) as e:
         print(f"Failed to create tables: {e}")
         print("Please check your database connection and try again.")
 

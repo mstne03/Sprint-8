@@ -2,7 +2,6 @@
 import logging
 from sqlmodel import Session, select, func
 from f1_api.models.f1_models import DriverTeamLink, SessionResult, Teams
-from f1_api.season.utils.ingest import get_teams_mapped
 
 
 def get_teams_service(session: Session) -> list:
@@ -43,7 +42,7 @@ def get_teams_service(session: Session) -> list:
         # Procesar datos en memoria (mucho más rápido que queries individuales)
         team_stats = {}
         
-        for team_id, driver_id, round_number, round_points in team_points_data:
+        for team_id, driver_id, _, round_points in team_points_data:
             if team_id not in team_stats:
                 team_stats[team_id] = {
                     "total_points": 0,

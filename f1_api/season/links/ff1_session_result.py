@@ -49,8 +49,8 @@ def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_
 
                     try:
                         team_name = plotting.get_team_name_by_driver(identifier=driver_name,session=f1_session)
-                    except Exception as e:
-                        logging.warning(f"Skipping driver {driver_name} with id {driver_id_map.get(int(driver_num))}: {e}")
+                    except (ConnectionError, ValueError) as e:
+                        logging.warning("Skipping driver %s with id %s: %s", driver_name, driver_id_map.get(int(driver_num)), e)
                         continue
 
                     team_id = team_id_map.get(team_name)
@@ -111,6 +111,6 @@ def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_
                         fastest_lap=fastest_lap
                     ))
             except Exception as e:
-                logging.warning(f"Skipping session {session_type} for event {event["EventName"]} in year {year}: {e}")
+                logging.warning("Skipping session %s for event %s in year %d: %s", session_type, event["EventName"], year, e)
                 return session_results
     return session_results

@@ -33,7 +33,7 @@ def get_driver_data(schedule,session_map,session,year):
             for t in teams:
                 accept_drivers.update(plotting.get_driver_names_by_team(identifier=t,session=race))
         else:
-            logging.warning(f"No race data available for round {round_number}, skipping driver processing for this round")
+            logging.warning("No race data available for round %d, skipping driver processing for this round", round_number)
             continue
 
         for session_type in sessions:
@@ -79,7 +79,7 @@ def get_driver_data(schedule,session_map,session,year):
                         country_code = country,
                         headshot_url=headshot_url
                     ))
-            except Exception as e:
-                logging.warning(f"Round {event["RoundNumber"]} not availavle yet: {e}")
+            except (ConnectionError, ValueError) as e:
+                logging.warning("Round %d not available yet: %s", event["RoundNumber"], e)
                 return drivers_list
     return drivers_list

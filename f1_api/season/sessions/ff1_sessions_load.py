@@ -17,7 +17,7 @@ def load_sessions(year,schedule,existing_rounds):
         for _,event in schedule.iloc[1:].iterrows():
             rn = event["RoundNumber"]
             if rn in existing_rounds:
-                logging.info(f"{event["EventName"]} already in DB")
+                logging.info("%s already in DB", event["EventName"])
                 continue
             if event["EventFormat"] == "testing":
                 continue
@@ -36,12 +36,12 @@ def load_sessions(year,schedule,existing_rounds):
                     f1_session.load(laps=True, telemetry=False, weather=False, messages=False)
                     
                     if f1_session.results.empty:
-                        logging.warning(f"No data for session {session_type} at {name}, skipping.")
-                        raise Exception("No more sessions to load")
+                        logging.warning("No data for session %s at %s, skipping.", session_type, name)
+                        raise ValueError("No more sessions to load")
                     
                     session_map[(rn, session_type)] = f1_session
                 except Exception as e:
-                    logging.warning(f"Failed to load session {session_type} at {name}")
+                    logging.warning("Failed to load session %s at %s", session_type, name)
                     raise SessionLoadError from e
         return session_map
     except SessionLoadError:
