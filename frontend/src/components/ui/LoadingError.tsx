@@ -3,7 +3,7 @@ interface LoadingErrorProps {
     errorMessage?: string;
 }
 
-const LoadingError = ({ error="Loading error", errorMessage="There has been an error" }: LoadingErrorProps) => {
+export const LoadingError = ({ error="Loading error", errorMessage="There has been an error" }: LoadingErrorProps) => {
     return (
         <div className="text-center py-12">
             <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -14,5 +14,3 @@ const LoadingError = ({ error="Loading error", errorMessage="There has been an e
         </div>
     )
 }
-
-export default LoadingError

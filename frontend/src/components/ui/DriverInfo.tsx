@@ -8,7 +8,7 @@ interface DriverInfoProps {
     expanded?: boolean;
 }
 
-const DriverInfo = ({ name, country, team, points, expanded = false }: DriverInfoProps) => {
+export const DriverInfo = ({ name, country, team, points, expanded = false }: DriverInfoProps) => {
     const nameParts = name.split(" ");
     const firstName = nameParts.slice(0, -1).join(" ");
     const lastName = nameParts[nameParts.length - 1];
@@ -49,5 +49,3 @@ const DriverInfo = ({ name, country, team, points, expanded = false }: DriverInf
         </div>
     )
 }
-
-export default DriverInfo

@@ -1,11 +1,11 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { useAuth as useAuthHooks } from '@/hooks/auth/auth'
+import { useAuth as useAuthHooks } from '@/hooks/auth'
 import { supabase } from '@/config/supabase'
 import { useQueryClient } from '@tanstack/react-query'
-import { authKeys } from '@/hooks/auth/auth'
+import { authKeys } from '@/hooks/auth'
 
-interface AuthContextType {
+type AuthContextType = {
     user: any | null
     session: any | null
     signUp: (email: string, password: string, userData?: any) => Promise<any>
@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [isInitialized, setIsInitialized] = useState(false)
 
     useEffect(() => {
-        // Initial session check to set initialized state
         const checkInitialSession = async () => {
             try {
                 await supabase.auth.getSession()
@@ -51,7 +50,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
             async (event, session) => {
-                
                 if (!isInitialized) {
                     setIsInitialized(true)
                 }

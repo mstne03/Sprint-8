@@ -1,10 +1,10 @@
-type EmptyStateProps = {
+interface EmptyStateProps {
     title: string;
     description: string;
     className?: string;
 }
 
-const EmptyState = ({ 
+export const EmptyState = ({ 
     title, 
     description,
     className = ""
@@ -18,5 +18,3 @@ const EmptyState = ({
         </div>
     );
 };
-
-export default EmptyState;

@@ -1,10 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import DriverCardExpanded from '@/components/picks/DriverCardExpanded';
-import BuilderDriversDisplay from '@/components/picks/BuilderDriversDisplay';
-import BuilderConstructorsDisplay from '@/components/picks/BuilderConstructorsDisplay';
-import BuilderSearch from '@/components/picks/BuilderSearch';
-import { TeamBuilderProvider, useTeamBuilderContext } from '@/contexts/TeamBuilderContext';
-import HandleTeamBuild from '@/components/picks/HandleTeamBuild';
+import { DriverCardExpanded } from '@/components/picks';
+import { BuilderDriversDisplay } from '@/components/picks';
+import { BuilderConstructorsDisplay } from '@/components/picks';
+import { BuilderSearch } from '@/components/picks';
+import { TeamBuilderProvider, useTeamBuilderContext } from '@/context/TeamBuilderContext';
+import { HandleTeamBuild } from '@/components/picks';
 
 const TeamBuilderContent = () => {
     const {

@@ -1,9 +1,9 @@
-import { useAuth } from "@/contexts/AuthContext"
+import { useAuth } from "@/context/AuthContext"
 import { mapAuthError } from "@/utils/authErrors"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 
-const useLoginForm = () => {
+export const useLoginForm = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
@@ -65,5 +65,3 @@ const useLoginForm = () => {
         handleGoogleSignIn,
     }
 }
-
-export default useLoginForm

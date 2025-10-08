@@ -1,4 +1,4 @@
-import { http } from '@/services/axios'
+import { http } from '@/services'
 import type { F1DataService } from '@/types/f1DataService'
 import type { Driver } from '@/types/driverTypes'
 import type { Team } from '@/types/teamsTypes'

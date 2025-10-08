@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLeagues } from '../../contexts/LeaguesContext';
+import { useLeagues } from '../../context/LeaguesContext';
 import { useNavigate } from 'react-router-dom'
 
 interface JoinLeagueModalProps {
@@ -112,7 +112,6 @@ export const JoinLeagueModal: React.FC<JoinLeagueModalProps> = ({ isOpen, onClos
                         <button 
                             onClick={() => {
                                 onClose();
-                                // This could trigger opening the create modal instead
                             }}
                             className="text-blue-400 hover:text-blue-300 transition-colors"
                         >

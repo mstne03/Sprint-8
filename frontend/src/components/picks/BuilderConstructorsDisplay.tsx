@@ -1,12 +1,12 @@
 import type { Team } from '@/types/teamsTypes';
 import { motion } from 'framer-motion'
-import { useTeamBuilderContext } from "@/contexts/TeamBuilderContext";
+import { useTeamBuilderContext } from "@/context/TeamBuilderContext";
 
 interface BuilderConstructorsDisplayProps {
     constructor: Team;
 }
 
-const BuilderConstructorsDisplay = ({ constructor }: BuilderConstructorsDisplayProps) => {
+export const BuilderConstructorsDisplay = ({ constructor }: BuilderConstructorsDisplayProps) => {
     const { selectedConstructor, handleConstructorSelect } = useTeamBuilderContext();
     
     const isSelected = selectedConstructor?.id === constructor.id;
@@ -54,5 +54,3 @@ const BuilderConstructorsDisplay = ({ constructor }: BuilderConstructorsDisplayP
         </motion.div>
     )
 }
-
-export default BuilderConstructorsDisplay;

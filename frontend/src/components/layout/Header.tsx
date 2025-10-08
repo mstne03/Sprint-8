@@ -1,10 +1,20 @@
 import { Link } from 'react-router-dom'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/context/AuthContext'
 import F1Logo from '@/assets/gridfans_logo.svg'
-import CustomButton from '../ui/CustomButton'
+import { CustomButton } from '@/components/ui'
+import { useLocation } from 'react-router-dom'
 
-export default function Header () {
+export const Header = () => {
     const { user, signOut } = useAuth()
+    const location = useLocation()
+
+    const isActiveRoute = (path: string) => {
+        return location.pathname === path;
+    }
+
+    const leaguesActive = isActiveRoute('/leagues') ? 'text-red-500' : ''
+    const teamsActive = isActiveRoute('/my-teams') ? 'text-red-500' : ''
+    const calendarActive = isActiveRoute('/calendar') ? 'text-red-500' : ''
 
     const handleLogout = async () => {
         try {
@@ -27,17 +37,29 @@ export default function Header () {
             </span>
             <nav className="flex items-center text-[90%] gap-10">
                 <ul className="flex gap-10">
-                    <Link className="hover:text-red-600 active:backdrop-opacity-5 transition-all ease-in-out" to={`/leagues`}>
+                    <Link className={`
+                        hover:text-red-600 active:backdrop-opacity-5 
+                        transition-all ease-in-out
+                        ${leaguesActive}
+                        `
+                    } to={`/leagues`}>
                         <h2>Leagues</h2>
                     </Link>
-                    <Link className="hover:text-red-600 active:backdrop-opacity-5 transition-all ease-in-out" to={`/my-teams`}>
+                    <Link className={`
+                        hover:text-red-600 active:backdrop-opacity-5 
+                        transition-all ease-in-out
+                        ${teamsActive}
+                        `
+                    } to={`/my-teams`}>
                         <h2>Teams</h2>
                     </Link>
-                    <Link className="hover:text-red-600 active:backdrop-opacity-5 transition-all ease-in-out" to={`/calendar`}>
+                    <Link className={`
+                        hover:text-red-600 active:backdrop-opacity-5 
+                        transition-all ease-in-out
+                        ${calendarActive}
+                        `
+                    } to={`/calendar`}>
                         <h2>Calendar</h2>
-                    </Link>
-                    <Link className="hover:text-red-600 active:backdrop-opacity-5 transition-all ease-in-out" to={`/charts`}>
-                        <h2>Charts</h2>
                     </Link>
                 </ul>
                 <div className="flex text-[80%] items-center gap-4 ml-6 pl-6 border-l border-gray-600">

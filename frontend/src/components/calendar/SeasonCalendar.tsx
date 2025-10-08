@@ -3,9 +3,9 @@ import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
-import EventModal from '@/components/ui/EventModal';
+import { EventModal } from '@/components/ui';
 import './calendar-theme.css';
-import useSeasonCalendar from '@/hooks/useSeasonCalendar';
+import { useSeasonCalendar } from '@/hooks/calendar';
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<CalendarEvent>(Calendar);
@@ -22,7 +22,7 @@ export interface CalendarEvent {
   };
 }
 
-const SeasonCalendar = () => {
+export const SeasonCalendar = () => {
   const {
     setSelectedEvent, setModalMode,
     setIsModalOpen, events, currentView,
@@ -112,5 +112,3 @@ const SeasonCalendar = () => {
     </div>
   );
 };
-
-export default SeasonCalendar;

@@ -1,10 +1,10 @@
 import { supabase } from "@/config/supabase"
-import { useAuth } from "@/contexts/AuthContext"
+import { useAuth } from "@/context/AuthContext"
 import { backendUserService } from "@/services"
 import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 
-const useEmailConfirmation = () => {
+export const useEmailConfirmation = () => {
     const [status, setStatus] = useState<'loading' | 'creating-profile' | 'success' | 'error'>('loading')
     const [message, setMessage] = useState('Confirming your email...')
     const navigate = useNavigate()
@@ -212,5 +212,3 @@ const useEmailConfirmation = () => {
         continueToApp,
     }
 }
-
-export default useEmailConfirmation

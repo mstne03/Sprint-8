@@ -1,15 +1,15 @@
 import type { Driver } from '@/types/driverTypes'
-import GlassCard from '@/components/ui/GlassCard'
-import DriverInfo from '../ui/DriverInfo'
-import DriverImage from '../ui/DriverImage'
-import DriverStatsCharts from '../ui/DriverStatsCharts'
+import { GlassCard } from '@/components/ui'
+import { DriverInfo } from '@/components/ui'
+import { DriverImage } from '@/components/ui'
+import { DriverStatsCharts } from '@/components/ui'
 
 type DriverCardProps = {
     d:Driver;
     setExpanded: (name: string) => void;
 }
 
-const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
+export const DriverCardExpanded = ({ d, setExpanded }: DriverCardProps) =>  {
     
     return (
         <GlassCard
@@ -121,5 +121,3 @@ const DriverCard = ({ d, setExpanded }: DriverCardProps) =>  {
         </GlassCard>
     )
 }
-
-export default DriverCard

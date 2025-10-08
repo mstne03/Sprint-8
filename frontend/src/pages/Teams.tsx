@@ -1,4 +1,4 @@
-import UserTeamsTable from '@/components/picks/UserTeamsTable'
+import { UserTeamsTable } from '@/components/picks'
 
 const Teams = () => {
 

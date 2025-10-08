@@ -9,7 +9,7 @@ type CustomButtonProps = {
     type?: 'button' | 'submit' | 'reset';
 }
 
-const CustomButton = ({ children, setState, onClick, disabled = false, type = 'button' }: CustomButtonProps) => {
+export const CustomButton = ({ children, setState, onClick, disabled = false, type = 'button' }: CustomButtonProps) => {
     const handleClick = () => {
         if (disabled) return;
         
@@ -42,5 +42,3 @@ const CustomButton = ({ children, setState, onClick, disabled = false, type = 'b
         </motion.button>
     )
 }
-
-export default CustomButton

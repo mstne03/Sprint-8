@@ -1,4 +1,3 @@
-// EventModal.tsx
 import { useState, useEffect } from 'react';
 import type { CalendarEvent } from '../calendar/SeasonCalendar';
 
@@ -13,7 +12,7 @@ interface EventModalProps {
   onEdit: () => void;
 }
 
-const EventModal = ({ 
+export const EventModal = ({ 
   isOpen, mode, 
   event, onClose, 
   onCreate, onUpdate, 
@@ -223,5 +222,3 @@ const EventModal = ({
     </div>
   );
 };
-
-export default EventModal;

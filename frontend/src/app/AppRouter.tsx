@@ -1,18 +1,16 @@
 import { Route, Routes } from "react-router-dom";
-import { AuthProvider } from '@/contexts/AuthContext';
-import { LeaguesProvider } from '@/contexts/LeaguesContext';
-import { ProtectedRoute, PublicRoute } from '@/components/auth/PublicProtectedRoute';
-import DataServiceProvider from '@/providers/ServiceProvider'
-import DriversServiceProvider from '@/providers/TableProvider'
+import { AuthProvider } from '@/context/AuthContext';
+import { LeaguesProvider } from '@/context/LeaguesContext';
+import { ProtectedRoute, PublicRoute } from '@/components/auth';
+import DataServiceProvider from '@/context/ServiceProvider'
 import Teams from '@/pages/Teams'
-import Charts from '@/pages/ChartPage'
 import Map from '@/pages/Map'
 import NotFound from '@/pages/NotFound'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
 import EmailConfirmation from '@/pages/EmailConfirmation'
 import CheckEmail from '@/pages/CheckEmail'
-import Header from "@/components/layout/Header"
+import { Header } from "@/components/layout"
 import Home from "@/pages/Home";
 import Leagues from "@/pages/Leagues";
 import LeagueDetail from "@/pages/LeagueDetail";
@@ -23,7 +21,6 @@ function AppRouter() {
   return (
     <AuthProvider>
       <LeaguesProvider>
-        <DriversServiceProvider>
           <DataServiceProvider>
             <Routes>
               <Route path="/" element={<Home/>}/>
@@ -47,7 +44,6 @@ function AppRouter() {
                     <Route path="/leagues/:leagueId" element={<LeagueDetail/>}/>
                     <Route path="/leagues" element={<Leagues/>}/>
                     <Route path="/my-teams" element={<Teams/>}/>
-                    <Route path="/charts" element={<Charts/>}/>
                     <Route path="/map" element={<Map/>}/>
                     <Route path="/calendar" element={<CalendarPage/>}/>
                     <Route path="*" element={<NotFound/>}/>
@@ -56,7 +52,6 @@ function AppRouter() {
               }/>
             </Routes>
           </DataServiceProvider>
-        </DriversServiceProvider>
       </LeaguesProvider>
     </AuthProvider>
   )

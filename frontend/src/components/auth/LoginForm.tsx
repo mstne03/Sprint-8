@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
-import CustomButton from '../ui/CustomButton'
-import useLoginForm from '@/hooks/auth/loginForm'
+import { CustomButton } from '@/components/ui'
+import { useLoginForm } from '@/hooks/auth'
 
-const LoginForm = () => {
+export const LoginForm = () => {
     const {
         handleSubmit,
         email,
@@ -102,5 +102,3 @@ const LoginForm = () => {
         </form>
     )
 }
-
-export default LoginForm

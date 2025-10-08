@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
-import useTeamBuilder from '@/hooks/useTeamBuilder';
+import { useTeamBuilder } from '@/hooks/teams';
 
 type TeamBuilderContextType = ReturnType<typeof useTeamBuilder>;
 

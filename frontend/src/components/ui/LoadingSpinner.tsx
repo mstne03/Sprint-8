@@ -3,7 +3,7 @@ type LoadingSpinnerProps = {
     className?: string;
 }
 
-const LoadingSpinner = ({ 
+export const LoadingSpinner = ({ 
     message = "Loading...", 
     className = "" 
 }: LoadingSpinnerProps) => {
@@ -14,5 +14,3 @@ const LoadingSpinner = ({
         </div>
     );
 };
-
-export default LoadingSpinner;

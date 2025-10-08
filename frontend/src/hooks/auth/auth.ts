@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { authService } from '@/services/authService'
-import { backendUserService } from '@/services/backendUserService'
+import { authService } from '@/services'
 
 export const authKeys = {
     all: ['auth'] as const,
@@ -33,18 +32,6 @@ export const useCurrentUser = () => {
             user: data.data.user,
             error: data.error
         })
-    })
-}
-
-export const useBackendUser = () => {
-    const { data } = useCurrentUser()
-    const supabaseUser = data?.user
-
-    return useQuery({
-        queryKey: ['backend-user', supabaseUser?.id],
-        queryFn: () => backendUserService.getUserBySupabaseId(supabaseUser?.id || ''),
-        enabled: !!supabaseUser?.id,
-        select: (data) => data
     })
 }
 
@@ -138,9 +125,8 @@ export const useSignOut = () => {
         mutationFn: authService.signOut,
         onSuccess: (data) => {
             if (!data.error) {
-                // Limpiar todo el cache de auth
                 queryClient.removeQueries({ queryKey: authKeys.all })
-                queryClient.clear() // Opcional: limpiar todo el cache
+                queryClient.clear()
             }
         },
         onError: (error) => {
@@ -156,7 +142,6 @@ export const useRefreshSession = () => {
         mutationFn: authService.refreshSession,
         onSuccess: (data) => {
             if (data.data.session && !data.error) {
-                // Actualizar cache con nueva sesión
                 queryClient.setQueryData(authKeys.session(), data)
                 queryClient.invalidateQueries({ queryKey: authKeys.user() })
             }

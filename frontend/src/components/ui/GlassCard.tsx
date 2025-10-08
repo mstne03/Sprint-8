@@ -12,7 +12,7 @@ interface GlassCardProps {
     transition?: any;
 }
 
-const GlassCard = ({ 
+export const GlassCard = ({ 
     children, 
     color, 
     className = "", 
@@ -52,5 +52,3 @@ const GlassCard = ({
         </motion.div>
     )
 }
-
-export default GlassCard

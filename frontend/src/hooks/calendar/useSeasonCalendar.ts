@@ -2,7 +2,7 @@ import type { CalendarEvent } from "@/components/calendar/SeasonCalendar";
 import { useState } from "react";
 import type { View } from "react-big-calendar";
 
-const useSeasonCalendar = () => {
+export const useSeasonCalendar = () => {
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -104,5 +104,3 @@ const useSeasonCalendar = () => {
         createEvent, updateEvent, deleteEvent,
     }
 }
-
-export default useSeasonCalendar

@@ -1,10 +1,10 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { useLeagueDetail } from '@/hooks/useLeagueDetail';
-import { useLeagueParticipants } from '@/hooks/useLeagueParticipants';
-import { useLeagues } from '@/contexts/LeaguesContext';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import LoadingError from '../components/ui/LoadingError';
+import { useLeagueDetail } from '@/hooks/leagues/useLeagueDetail';
+import { useLeagueParticipants } from '@/hooks/leagues';
+import { useLeagues } from '@/context/LeaguesContext';
+import { LoadingSpinner } from '@/components/ui';
+import { LoadingError } from '@/components/ui';
 
 const LeagueDetail = () => {
     const { leagueId } = useParams<{ leagueId: string }>();

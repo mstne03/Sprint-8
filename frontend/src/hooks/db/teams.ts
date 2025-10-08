@@ -1,6 +1,6 @@
-import { useDataService } from "@/providers/ServiceProvider";
+import { useDataService } from "@/context/ServiceProvider";
 import { useQuery } from "@tanstack/react-query";
-import type { Team } from '../types/teamsTypes'
+import type { Team } from '../../types/teamsTypes'
 
 export const useTeams = () => {
     const dataService = useDataService();

@@ -1,4 +1,4 @@
-import { http } from '@/services/axios'
+import { http } from '@/services'
 
 export interface CreateBackendUserRequest {
     user_name: string;

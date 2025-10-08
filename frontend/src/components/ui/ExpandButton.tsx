@@ -6,7 +6,7 @@ type ExpandButtonProps = {
     text?: string;
 }
 
-const ExpandButton = ({ onClick, className = "", text="insights" }: ExpandButtonProps) => {
+export const ExpandButton = ({ onClick, className = "", text="insights" }: ExpandButtonProps) => {
     return (
         <motion.button
             onClick={onClick}
@@ -22,5 +22,3 @@ const ExpandButton = ({ onClick, className = "", text="insights" }: ExpandButton
         </motion.button>
     );
 };
-
-export default ExpandButton;

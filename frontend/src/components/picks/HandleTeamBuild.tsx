@@ -1,7 +1,7 @@
-import { useTeamBuilderContext } from "@/contexts/TeamBuilderContext";
-import TeamCreate from "../ui/TeamCreate"
+import { useTeamBuilderContext } from "@/context/TeamBuilderContext";
+import { TeamCreate } from "@/components/ui"
 
-const HandleTeamBuild = () => {
+export const HandleTeamBuild = () => {
     const { 
         teamName, setTeamName, 
         selectedDrivers, budgetBarWidth,
@@ -53,5 +53,3 @@ const HandleTeamBuild = () => {
         </div>
     )
 }
-
-export default HandleTeamBuild

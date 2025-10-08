@@ -1,13 +1,13 @@
 import { useNavigate, useParams } from "react-router-dom";
-import { useLeagueDetail } from "./useLeagueDetail";
-import { useCreateOrUpdateTeam, useUserTeam } from "./useUserTeam";
+import { useLeagueDetail } from "@/hooks/leagues";
+import { useCreateOrUpdateTeam, useUserTeam } from "@/hooks/teams";
 import { useEffect, useState } from "react";
 import type { Driver } from "@/types/driverTypes";
 import type { Team } from "@/types/teamsTypes";
 import { useQuery } from "@tanstack/react-query";
 import { f1DataService } from "@/services";
 
-const useTeamBuilder = () => {
+export const useTeamBuilder = () => {
     const { leagueId } = useParams<{ leagueId: string }>();
     const navigate = useNavigate();
     
@@ -154,5 +154,3 @@ const useTeamBuilder = () => {
         expandedDriver
     }
 }
-
-export default useTeamBuilder;

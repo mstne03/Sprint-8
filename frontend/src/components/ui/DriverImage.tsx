@@ -7,7 +7,7 @@ interface DriverImageProps {
     expanded?: boolean;
 }
 
-const DriverImage = ({ url, name, color, expanded=false }: DriverImageProps) => {
+export const DriverImage = ({ url, name, color, expanded=false }: DriverImageProps) => {
     const isDesktop = useMediaQuery({ minWidth: 768 });
     const maskSize = expanded ? "100% 35%" : isDesktop ? "100% 48%" : "100% 41%";
     const width = expanded ? "md:max-w-[100px] -z-1 absolute" : "md:w-[17vw]"
@@ -28,5 +28,3 @@ const DriverImage = ({ url, name, color, expanded=false }: DriverImageProps) => 
         />
     )
 }
-
-export default DriverImage

@@ -1,6 +1,6 @@
-import { useTeamBuilderContext } from "@/contexts/TeamBuilderContext";
+import { useTeamBuilderContext } from "@/context/TeamBuilderContext";
 
-const TeamCreate = () => {
+export const TeamCreate = () => {
     const { 
         selectedDrivers, 
         selectedConstructor,
@@ -34,7 +34,7 @@ const TeamCreate = () => {
                                 <p className="text-gray-100 text-sm">{driver.team_name}</p>
                             </div>
                             <div className="text-right mr-3">
-                                <p className="text-green-300 text-sm font-medium">
+                                <p className="text-gray-100 text-sm font-medium">
                                     ${(driver.fantasy_stats.price / 1_000_000).toFixed(1)}M
                                 </p>
                             </div>
@@ -121,5 +121,3 @@ const TeamCreate = () => {
         </div>
     )
 }
-
-export default TeamCreate;

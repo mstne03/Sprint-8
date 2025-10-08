@@ -4,11 +4,11 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { themeQuartz } from 'ag-grid-community';
 import type { MyTeamsRow } from '@/types/tableTypes';
-import { useMyTeamsTable } from '@/hooks/useMyTeamsTable';
-import { userTeamService } from '@/services/userTeamService';
-import { useAuth } from '@/contexts/AuthContext';
-import LoadingSpinner from '../ui/LoadingSpinner';
-import LoadingError from '../ui/LoadingError';
+import { useMyTeamsTable } from '@/hooks/teams';
+import { userTeamService } from '@/services';
+import { useAuth } from '@/context/AuthContext';
+import { LoadingSpinner } from '@/components/ui';
+import { LoadingError } from '@/components/ui';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -32,7 +32,7 @@ const myTheme = themeQuartz.withParams({
     headerBackgroundColor: 'rgba(225,6,0,.15)',
 });
 
-export default function UserTeamsTable() {
+export const UserTeamsTable = () => {
     const { user } = useAuth();
     
     const {
@@ -127,7 +127,6 @@ export default function UserTeamsTable() {
                     enableCellTextSelection={true}
                     domLayout="autoHeight"
                     getRowStyle={(params) => {
-                        // Alternate row colors
                         if (params.node.rowIndex! % 2 === 0) {
                             return { 
                                 backgroundColor: 'rgba(0,0,0,.05)',

@@ -1,7 +1,7 @@
-import useRegisterForm from "@/hooks/auth/registerForm"
-import CustomButton from "../ui/CustomButton"
+import { useRegisterForm } from "@/hooks/auth"
+import { CustomButton } from "@/components/ui"
 
-const RegisterForm = () => {
+export const RegisterForm = () => {
     const {
         handleSubmit,
         fullName,
@@ -116,5 +116,3 @@ const RegisterForm = () => {
         </form>
     )
 }
-
-export default RegisterForm

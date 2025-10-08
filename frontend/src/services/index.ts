@@ -4,6 +4,7 @@ export { authService } from './authService'
 export { userService } from './userService'
 export { leagueService } from './leagueService'
 export { http } from './axios'
+export { userTeamService } from './userTeamService'
 
 export type { CreateBackendUserRequest, BackendUserResponse } from './backendUserService'
 export type { 
@@ -13,5 +14,6 @@ export type {
     LeagueParticipant, 
     LeagueParticipantsResponse,
     JoinLeagueResponse,
-    LeagueServiceType
+    LeagueServiceType,
 } from './leagueService'
+export type { CreateUserTeamRequest, } from './userTeamService'

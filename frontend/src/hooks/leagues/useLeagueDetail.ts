@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { leagueService } from '@/services/leagueService';
-import { useAuth } from '@/contexts/AuthContext';
+import { leagueService } from '@/services';
+import { useAuth } from '@/context/AuthContext';
 
 export const useLeagueDetail = (leagueId: string) => {
     const { user } = useAuth();

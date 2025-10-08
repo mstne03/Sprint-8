@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import RegisterForm from '@/components/auth/RegisterForm'
+import { RegisterForm } from '@/components/auth'
 
 const Register = () => {
     return (

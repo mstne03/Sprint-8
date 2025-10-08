@@ -25,7 +25,7 @@ interface DriverStatsChartsProps {
     };
 }
 
-const DriverStatsCharts = memo(({ season_results, fantasy_stats }: DriverStatsChartsProps) => {
+export const DriverStatsCharts = memo(({ season_results, fantasy_stats }: DriverStatsChartsProps) => {
     const achievementsData = [
         { name: 'VICTORIES', value: season_results.victories, color: '#ffd700' },
         { name: 'POLES', value: season_results.poles, color: '#c0c0c0' },
@@ -236,5 +236,3 @@ const DriverStatsCharts = memo(({ season_results, fantasy_stats }: DriverStatsCh
 });
 
 DriverStatsCharts.displayName = 'DriverStatsCharts';
-
-export default DriverStatsCharts;

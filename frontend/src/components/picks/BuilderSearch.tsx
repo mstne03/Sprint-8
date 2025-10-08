@@ -1,7 +1,7 @@
 
-import { useTeamBuilderContext } from "@/contexts/TeamBuilderContext";
+import { useTeamBuilderContext } from "@/context/TeamBuilderContext";
 
-const BuilderSearch = () => {
+export const BuilderSearch = () => {
     const { searchFilter, setSearchFilter } = useTeamBuilderContext();
     return (
         <div className="max-w-md mx-auto">
@@ -48,5 +48,3 @@ const BuilderSearch = () => {
         </div>
     )
 }
-
-export default BuilderSearch;

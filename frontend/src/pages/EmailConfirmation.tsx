@@ -1,4 +1,4 @@
-import useEmailConfirmation from '@/hooks/auth/emailConfirmation';
+import { useEmailConfirmation } from '@/hooks/auth';
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 

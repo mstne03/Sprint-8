@@ -1,12 +1,12 @@
 import type { Driver } from '@/types/driverTypes';
 import { motion } from 'framer-motion'
-import { useTeamBuilderContext } from "@/contexts/TeamBuilderContext";
+import { useTeamBuilderContext } from "@/context/TeamBuilderContext";
 
 interface BuilderDriversDisplayProps {
     driver: Driver;
 }
 
-const BuilderDriversDisplay = ({ driver }: BuilderDriversDisplayProps) => {
+export const BuilderDriversDisplay = ({ driver }: BuilderDriversDisplayProps) => {
     const { selectedDrivers, handleDriverSelect, setExpandedDriver } = useTeamBuilderContext();
     
     const isSelected = selectedDrivers.find(d => d.id === driver.id);
@@ -91,5 +91,3 @@ const BuilderDriversDisplay = ({ driver }: BuilderDriversDisplayProps) => {
         </motion.div>
     )
 }
-
-export default BuilderDriversDisplay;

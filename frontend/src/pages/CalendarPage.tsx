@@ -1,4 +1,4 @@
-import SeasonCalendar from "@/components/calendar/SeasonCalendar"
+import { SeasonCalendar } from "@/components/calendar"
 
 
 const CalendarPage = () =>{

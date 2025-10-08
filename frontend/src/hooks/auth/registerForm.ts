@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { mapAuthError } from "@/utils/authErrors"
-import { useAuth } from "@/contexts/AuthContext"
+import { useAuth } from "@/context/AuthContext"
 
-const useRegisterForm = () => {
+export const useRegisterForm = () => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
@@ -57,5 +57,3 @@ const useRegisterForm = () => {
         error, loading,
     }
 }
-
-export default useRegisterForm

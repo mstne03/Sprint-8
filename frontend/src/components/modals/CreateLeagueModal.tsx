@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLeagues } from '../../contexts/LeaguesContext';
+import { useLeagues } from '../../context/LeaguesContext';
 
 interface CreateLeagueModalProps {
     isOpen: boolean;
