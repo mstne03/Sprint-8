@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import CustomButton from '../ui/CustomButton'
-import useLoginForm from '@/hooks/loginForm'
+import useLoginForm from '@/hooks/auth/loginForm'
 
 const LoginForm = () => {
     const {

@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { useAuth as useAuthHooks } from '@/hooks/auth'
+import { useAuth as useAuthHooks } from '@/hooks/auth/auth'
 import { supabase } from '@/config/supabase'
 import { useQueryClient } from '@tanstack/react-query'
-import { authKeys } from '@/hooks/auth'
+import { authKeys } from '@/hooks/auth/auth'
 
 interface AuthContextType {
     user: any | null

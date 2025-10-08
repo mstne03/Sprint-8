@@ -1,4 +1,4 @@
-import useRegisterForm from "@/hooks/registerForm"
+import useRegisterForm from "@/hooks/auth/registerForm"
 import CustomButton from "../ui/CustomButton"
 
 const RegisterForm = () => {

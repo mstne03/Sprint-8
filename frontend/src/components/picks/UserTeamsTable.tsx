@@ -105,16 +105,16 @@ export default function UserTeamsTable() {
         <div className="h-full">
             
             <div className="bg-black/20 rounded-lg border border-red-600/30 p-4 shadow-2xl">
-            <div className="mb-6 bg-black/30 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
-                <h1 className="text-3xl font-formula1 text-white mb-2">My Fantasy Teams</h1>
-                <p className="text-gray-400">Manage your fantasy F1 teams across all leagues</p>
-                <div className="flex items-center gap-4 mt-3">
-                    <div className="bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-600/50">
-                        <span className="text-gray-400 text-sm">Total Teams: </span>
-                        <span className="text-white font-bold">{myTeams.length}</span>
+                <div className="mb-6 bg-black/30 backdrop-blur-sm border border-white/20 rounded-2xl p-6">
+                    <h1 className="text-3xl font-formula1 text-white mb-2">My Fantasy Teams</h1>
+                    <p className="text-gray-400">Manage your fantasy F1 teams across all leagues</p>
+                    <div className="flex items-center gap-4 mt-3">
+                        <div className="bg-gray-800/50 px-4 py-2 rounded-lg border border-gray-600/50">
+                            <span className="text-gray-400 text-sm">Total Teams: </span>
+                            <span className="text-white font-bold">{myTeams.length}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
                 <AgGridReact<MyTeamsRow>
                     ref={gridRef}
                     rowHeight={80}
@@ -124,7 +124,6 @@ export default function UserTeamsTable() {
                     suppressHorizontalScroll={true}
                     animateRows={true}
                     rowSelection="multiple"
-                    suppressRowClickSelection={true}
                     enableCellTextSelection={true}
                     domLayout="autoHeight"
                     getRowStyle={(params) => {
