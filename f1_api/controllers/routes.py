@@ -1,3 +1,4 @@
+"""Routes"""
 import logging
 from typing import List
 from fastapi import APIRouter
@@ -35,7 +36,7 @@ async def update_season():
     return {"status": "updated"}
 
 @router.get("/teams/")
-async def get_teams():
+def get_teams():
     """
     This endpoint gets all of the teams for the current season from the DB with accumulated points
     """
@@ -43,7 +44,7 @@ async def get_teams():
         return get_teams_service(session)
 
 @router.get("/drivers/")
-async def get_drivers():
+def get_drivers():
     """
     Returns all drivers sorted by championship points up to the last round
     """
@@ -51,7 +52,7 @@ async def get_drivers():
         return get_drivers_service(session)
 
 @router.post("/users/", response_model=UserResponse)
-async def create_user(user: UserCreate):
+def create_user(user: UserCreate):
     """
     Create a new user with Supabase integration
     """
@@ -59,7 +60,7 @@ async def create_user(user: UserCreate):
         return create_user_service(user, session)
 
 @router.post("/user-team/")
-async def create_user_team(user_team: UserTeamsCreate):
+def create_user_team(user_team: UserTeamsCreate):
     """
     Post a new user team into the database
     """
@@ -82,7 +83,7 @@ async def create_user_team(user_team: UserTeamsCreate):
         raise HTTPException(status_code=500, detail="Internal server error")
     
 @router.get("/users/by-id/{supabase_user_id}")
-async def get_user_by_id(supabase_user_id: str):
+def get_user_by_id(supabase_user_id: str):
     """
     Get the user from the DB
     """
@@ -96,7 +97,7 @@ async def get_user_by_id(supabase_user_id: str):
         return { "data": user }
 
 @router.post("/leagues/", response_model=LeagueResponse)
-async def create_league(league: LeagueCreate, admin_user_id: str):
+def create_league(league: LeagueCreate, admin_user_id: str):
     """
     Create a new league and automatically add the creator as admin
     """
@@ -104,7 +105,7 @@ async def create_league(league: LeagueCreate, admin_user_id: str):
         return create_league_service(league, admin_user_id, session)
 
 @router.get("/leagues/{league_id}", response_model=LeagueResponse)
-async def get_league_by_id(league_id: int, user_id: str):
+def get_league_by_id(league_id: int, user_id: str):
     """
     Get details of a specific league by ID - only for league participants
     """
@@ -112,7 +113,7 @@ async def get_league_by_id(league_id: int, user_id: str):
         return get_league_by_id_service(league_id, user_id, session)
 
 @router.delete("/leagues/{league_id}/leave")
-async def leave_league(league_id: int, user_id: str):
+def leave_league(league_id: int, user_id: str):
     """
     Remove user from a league (leave league)
     """
@@ -120,7 +121,7 @@ async def leave_league(league_id: int, user_id: str):
         return leave_league_service(league_id, user_id, session)
 
 @router.get("/leagues/user/{user_id}", response_model=List[LeagueResponse])
-async def get_user_leagues(user_id: str):
+def get_user_leagues(user_id: str):
     """
     Get all leagues where the user is a participant
     """
@@ -128,7 +129,7 @@ async def get_user_leagues(user_id: str):
         return get_user_leagues_service(user_id, session)
 
 @router.post("/leagues/join/")
-async def join_league(league_join: LeagueJoin, user_id: str):
+def join_league(league_join: LeagueJoin, user_id: str):
     """
     Join a league using join code
     """
@@ -136,7 +137,7 @@ async def join_league(league_join: LeagueJoin, user_id: str):
         return join_league_service(league_join, user_id, session)
 
 @router.get("/leagues/{league_id}/participants")
-async def get_league_participants(league_id: int):
+def get_league_participants(league_id: int):
     """
     Get all participants of a specific league
     """
@@ -144,7 +145,7 @@ async def get_league_participants(league_id: int):
         return get_league_participants_service(league_id, session)
 
 @router.post("/leagues/{league_id}/teams", response_model=UserTeamResponse)
-async def create_or_update_user_team(
+def create_or_update_user_team(
     league_id: int, 
     team_data: UserTeamUpdate, 
     user_id: str
@@ -156,7 +157,7 @@ async def create_or_update_user_team(
         return create_or_update_user_team_service(league_id, team_data, user_id, session)
 
 @router.get("/leagues/{league_id}/teams/me", response_model=UserTeamResponse | None)
-async def get_my_team(league_id: int, user_id: str):
+def get_my_team(league_id: int, user_id: str):
     """
     Get the current user's team in a specific league
     """
@@ -164,7 +165,7 @@ async def get_my_team(league_id: int, user_id: str):
         return get_my_team_service(league_id, user_id, session)
 
 @router.get("/users/my-teams")
-async def get_my_teams(user_id: str):
+def get_my_teams(user_id: str):
     """
     Get all teams belonging to the current user across all leagues
     """
