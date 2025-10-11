@@ -2,7 +2,7 @@
 Drivers complex operations
 """
 from sqlmodel import select, func
-from f1_api.models.f1_models import DriverTeamLink, Sessions, SessionResult, Drivers, Teams
+from f1_api.models.f1_schemas import DriverTeamLink, Sessions, SessionResult, Drivers, Teams
 
 def get_database_data(session):
     """

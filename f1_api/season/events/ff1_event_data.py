@@ -1,6 +1,6 @@
 import logging
 from sqlmodel import select
-from f1_api.models.f1_models import Events
+from f1_api.models.f1_schemas import Events
 
 def get_event_data(year:int, schedule, session):
     events = []

@@ -1,7 +1,6 @@
 """Gets calculation results over teams DB data"""
 from typing import Dict
-
-from f1_api.models.f1_models import Teams
+from f1_api.models.f1_schemas import Teams
 
 class TeamsBusinessLogic:
     """Encapsulates teams calculations"""

@@ -2,7 +2,7 @@ import logging
 import math
 from sqlmodel import select
 from fastf1 import plotting
-from f1_api.models.f1_models import SessionResult, Events
+from f1_api.models.f1_schemas import SessionResult, Events
 
 def get_session_results(year:int, schedule, session_map, driver_id_map, team_id_map, sql_session):
     session_results = []

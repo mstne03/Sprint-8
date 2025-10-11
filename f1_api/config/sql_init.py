@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import NullPool
 from sqlmodel import SQLModel
 from urllib.parse import quote_plus
-from f1_api.models.f1_models import *
+from f1_api.models.f1_schemas import *
 from f1_api.models.app_models import *
 
 # Load environment variables first

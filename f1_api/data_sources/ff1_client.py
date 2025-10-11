@@ -3,7 +3,7 @@ from typing import Optional
 import logging
 import fastf1 as ff1
 from fastf1.events import EventSchedule
-from f1_api.models.f1_models import Events
+from f1_api.models.f1_schemas import Events
 
 class SessionLoadError(Exception):
     """
@@ -23,7 +23,7 @@ class FastF1Client:
             return None
 
     @staticmethod
-    def get_session_map(year: int, existing_rounds: list[Events]):
+    def get_session_map(year: int, existing_rounds: list[Events]) -> dict:
         """Get session map data"""
         session_map = {}
 

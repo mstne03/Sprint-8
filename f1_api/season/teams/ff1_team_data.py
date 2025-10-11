@@ -1,7 +1,7 @@
 import logging
 from sqlmodel import select
 from fastf1 import plotting
-from f1_api.models.f1_models import Teams
+from f1_api.models.f1_schemas import Teams
 
 def get_team_data(schedule,session_map,session):
     

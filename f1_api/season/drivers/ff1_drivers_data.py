@@ -1,7 +1,7 @@
 import logging
 from sqlmodel import select
 from fastf1 import plotting
-from f1_api.models.f1_models import Drivers
+from f1_api.models.f1_schemas import Drivers
 from ..utils.create_driver_id import create_driver_id
 from ..utils.driver_headshot_url import get_driver_headshot_url
 

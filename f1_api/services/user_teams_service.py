@@ -176,7 +176,7 @@ def get_my_teams_service(user_id: str, session: Session) -> list[dict]:
     """
     try:
         # Import here to avoid circular imports
-        from ..models.f1_models import Teams, Drivers
+        from ..models.f1_schemas import Teams, Drivers
         from ..models.app_models import Leagues
         
         # Verify user exists

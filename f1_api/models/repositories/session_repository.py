@@ -1,15 +1,20 @@
-import logging
-from sqlmodel import select
+from sqlmodel import Session, select
+
 from f1_api.models.f1_schemas import Sessions
 
-def get_session_data(year, schedule, session):
-    """
-    Creates session models returning them in an array
-    """
-    try:
+
+class SessionRepository:
+    def __init__(self, session: Session, year: int, schedule):
+        self.session = session
+        self.season = year
+        self.schedule = schedule
+    
+    def get_session_data(self) -> list[Sessions]:
         sessions = []
-        existing_sessions = set(session.exec(select(Sessions.round_number, Sessions.session_number)).all())
-        for _,event in schedule.iloc[1:].iterrows():
+        existing_sessions = set(self.session.exec(
+            select(Sessions.round_number, Sessions.session_number)
+        ).all())
+        for _,event in self.schedule.iloc[1:].iterrows():
             session_names = [
                 event["Session1"],
                 event["Session2"],
@@ -27,12 +32,12 @@ def get_session_data(year, schedule, session):
 
                 sessions.append(Sessions(
                     round_number = rn,
-                    season_id = year,
+                    season_id = self.season,
                     session_number = i+1,
                     session_type = str(s)
                 ))
         return sessions
-    except Exception as e:
-        logging.warning(f'An exception occured while executing get_session_data: {e}')
-        return []
-        
+
+def get_session_data(session, year, schedule):
+    session_repo = SessionRepository(session,year,schedule)
+    return session_repo.get_session_data()
