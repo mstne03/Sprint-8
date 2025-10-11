@@ -3,7 +3,8 @@ from datetime import datetime
 import fastf1 as ff1
 from sqlmodel import Session, select
 from f1_api.models.f1_models import Events, Seasons, SessionResult, Sessions, Teams, Drivers, DriverTeamLink
-from .sessions.ff1_sessions_load import load_sessions
+#from .sessions.ff1_sessions_load import load_sessions
+from f1_api.data_sources.ff1_client import load_sessions
 from .teams.ff1_team_data import get_team_data
 from .events.ff1_event_data import get_event_data
 from .sessions.ff1_sessions_data import get_session_data
@@ -33,7 +34,7 @@ async def update_db(engine):
             schedule = ff1.get_event_schedule(year)
             logging.info("✅ Schedule loaded successfully")
 
-            session_map = load_sessions(year,schedule,existing_rounds)
+            session_map = load_sessions(year,existing_rounds)
             logging.info(f"✅ Sessions loaded. Session map has {len(session_map)} entries")
 
             events: list[Events] = get_event_data(year,schedule,session)
