@@ -64,4 +64,4 @@ class FastF1Client:
             return session_map
 
 def load_sessions(year,existing):
-    return FastF1Client.get_session_map(year=year,existing_rounds=existing)            
+    return FastF1Client.get_session_map(year=year,existing_rounds=existing)

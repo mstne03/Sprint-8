@@ -5,6 +5,7 @@ from sqlmodel import Session, select
 from f1_api.models.f1_models import Events, Seasons, SessionResult, Sessions, Teams, Drivers, DriverTeamLink
 #from .sessions.ff1_sessions_load import load_sessions
 from f1_api.data_sources.ff1_client import load_sessions
+from f1_api.models.repositories.sessions_results_repository import get_all_registered_rounds
 from .teams.ff1_team_data import get_team_data
 from .events.ff1_event_data import get_event_data
 from .sessions.ff1_sessions_data import get_session_data
@@ -24,8 +25,7 @@ async def update_db(engine):
         with Session(engine) as session:
             season_exists = session.exec(select(Seasons).where(Seasons.year == year)).first()
             # Fix: Get existing rounds properly as a set of round numbers
-            existing_rounds_query = session.exec(select(SessionResult.round_number)).all()
-            existing_rounds = set(existing_rounds_query)
+            existing_rounds = get_all_registered_rounds()
 
             if not season_exists:
                 session.add(Seasons(year=year))
