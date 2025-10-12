@@ -11,6 +11,10 @@ class TeamsRepository:
         self.session_map = session_map
         self.schedule = schedule
     
+    def get_all_teams(self) -> list[Teams]:
+        teams = list(self.session.exec(select(Teams)))
+        return teams
+
     def get_team_id_map(self) -> dict:
         """Get all of the teams from the DB"""
         all_teams = list(self.session.exec(select(Teams)))

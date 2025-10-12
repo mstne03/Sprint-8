@@ -3,11 +3,14 @@ import logging
 from sqlmodel import Session
 from f1_api.models.business.teams_business import TeamsBusinessLogic
 from f1_api.models.repositories.teams_repository import TeamsRepository
+from f1_api.services.season_context_service import get_season_context_service
 
 class TeamsService:
     """Provides teams response"""
-    def __init__(self, session: Session):
-        self.repository = TeamsRepository(session)
+    def __init__(self, session: Session, year: int = None):
+        self.session = session
+        self.context_service = get_season_context_service(session, year)
+        self.repository = TeamsRepository(session, self.context_service.session_map, self.context_service.schedule)
         self.business_logic = TeamsBusinessLogic()
     
     def get_teams_with_season_stats(self):
@@ -29,7 +32,7 @@ class TeamsService:
             logging.warning("Teams service execution interrupted: %s", e)
             return []
 
-def get_teams_service(session: Session) -> list:
-    """Legacy function wrapper"""
-    service = TeamsService(session)
+def get_teams_service(session: Session, year: int = None) -> list:
+    """Simplified function wrapper"""
+    service = TeamsService(session, year)
     return service.get_teams_with_season_stats()

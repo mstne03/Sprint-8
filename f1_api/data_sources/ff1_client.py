@@ -23,7 +23,7 @@ class FastF1Client:
             return None
 
     @staticmethod
-    def get_session_map(year: int, existing_rounds: list[Events]) -> dict:
+    def get_session_map(year: int, existing_rounds: list[int]) -> dict:
         """Get session map data"""
         session_map = {}
 
