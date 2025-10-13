@@ -10,7 +10,7 @@ class TeamsService:
     def __init__(self, session: Session, year: int = None):
         self.session = session
         self.context_service = get_season_context_service(session, year)
-        self.repository = TeamsRepository(session, self.context_service.session_map, self.context_service.schedule)
+        self.repository = TeamsRepository(self.session, self.context_service.session_map, self.context_service.schedule)
         self.business_logic = TeamsBusinessLogic()
     
     def get_teams_with_season_stats(self):

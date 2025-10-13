@@ -3,10 +3,7 @@ import logging
 import math
 from sqlmodel import Session, select
 from fastf1 import plotting
-from f1_api.data_sources.ff1_client import load_sessions
 from f1_api.models.f1_schemas import Events, SessionResult
-from f1_api.models.repositories.drivers_repository import get_drivers_id_map
-from f1_api.models.repositories.teams_repository import get_team_id_map
 
 class SessionResultsRepository:
     def __init__(self, year: int, session:Session, schedule):

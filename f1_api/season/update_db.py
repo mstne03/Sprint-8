@@ -42,7 +42,7 @@ async def update_db(engine):
             session.add_all(drivers)   
             session.commit()
 
-            driver_id_map = get_drivers_id_map(session,year,session_map,schedule)
+            driver_id_map = get_drivers_id_map(session)
             team_id_map = get_team_id_map(session,session_map,schedule)
             
             all_driver_team_links = get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map, session)
