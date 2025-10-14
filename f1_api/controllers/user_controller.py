@@ -1,10 +1,10 @@
-"""User service module for user-related operations"""
+"""User controller module for user-related operations"""
 from sqlmodel import Session
 from fastapi import HTTPException
 from f1_api.models.app_models import UserCreate, UserResponse
 from f1_api.models.repositories.users_repository import UserRepository
 
-class UserService:
+class UserController:
     def __init__(self, session: Session, user: UserCreate):
         self.repository = UserRepository(session)
         self.user = user
@@ -40,5 +40,5 @@ class UserService:
         )
 
 def create_user_service(user: UserCreate, session: Session) -> UserResponse:
-    service = UserService(session, user)
-    return service.new_user
+    controller = UserController(session, user)
+    return controller.new_user

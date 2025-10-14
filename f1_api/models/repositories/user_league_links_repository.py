@@ -24,16 +24,17 @@ class UserLeagueLinksRepository:
             session: SQLModel database session for executing queries
         """
         self.session = session
-    def create_membership(self, user_id: int, league: Leagues):
+    def create_membership(self, user_id: int, league: Leagues, is_admin: bool = False):
         """
         Create a new membership relationship between a user and league.
         
-        Creates an active admin membership for the specified user in the given league.
-        This is typically used when a user creates a new league.
+        Creates an active membership for the specified user in the given league.
+        Can be used for both admin (when creating a league) and regular member creation.
         
         Args:
             user_id: Numeric ID of the user to add as member
             league: League entity object to create membership for
+            is_admin: Whether the user should be an admin (True for league creator, False for joiners)
             
         Raises:
             SQLAlchemyError: If database operation fails
@@ -41,10 +42,12 @@ class UserLeagueLinksRepository:
         league_link = UserLeagueLink(
             user_id=user_id,
             league_id=league.id,
-            is_admin=True,
+            is_admin=is_admin,
             is_active=True
         )
+        
         self.session.add(league_link)
+        self.session.commit()
     def reactivate_membership(self, existing_membership: UserLeagueLink):
         """
         Reactivate an existing inactive membership.
@@ -75,13 +78,34 @@ class UserLeagueLinksRepository:
         Returns:
             UserLeagueLink or None: Active membership entity if found
         """
-        return self.session.exec(
+        import logging
+        
+        # Debug: Let's check what's actually in the database
+        logging.info(f"Repository: Querying for league_id={league_id} (type: {type(league_id)}), user_id={user_id} (type: {type(user_id)})")
+        
+        # Check all records for this user
+        all_user_records = self.session.exec(
+            select(UserLeagueLink).where(UserLeagueLink.user_id == user_id)
+        ).all()
+        logging.info(f"Repository: All records for user {user_id}: {[(r.league_id, r.is_active, type(r.league_id), type(r.is_active)) for r in all_user_records]}")
+        
+        # Check all records for this league
+        all_league_records = self.session.exec(
+            select(UserLeagueLink).where(UserLeagueLink.league_id == league_id)
+        ).all()
+        logging.info(f"Repository: All records for league {league_id}: {[(r.user_id, r.is_active, type(r.user_id), type(r.is_active)) for r in all_league_records]}")
+        
+        # Try the original query
+        result = self.session.exec(
             select(UserLeagueLink).where(
                 UserLeagueLink.league_id == league_id,
                 UserLeagueLink.user_id == user_id,
                 UserLeagueLink.is_active == True
             )
         ).first()
+        
+        logging.info(f"Repository: Query result: {result}")
+        return result
     def get_membership(self, league_id: int, user_id: int):
         """
         Retrieve any membership (active or inactive) for a user in a league.

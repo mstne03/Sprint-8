@@ -5,7 +5,7 @@ from f1_api.models.f1_schemas import Events, Seasons, Sessions, Teams, Drivers
 from f1_api.data_sources.ff1_client import FastF1Client
 from f1_api.data_sources.ff1_client import load_sessions
 from f1_api.models.repositories.sessions_results_repository import get_all_registered_rounds, get_session_results
-from f1_api.services.teams_service import get_team_data, get_team_id_map
+from f1_api.controllers.teams_controller import get_team_data, get_team_id_map
 from f1_api.models.repositories.events_repository import get_event_data
 from f1_api.models.repositories.session_repository import get_session_data
 from f1_api.models.repositories.drivers_repository import get_driver_data, get_drivers_id_map

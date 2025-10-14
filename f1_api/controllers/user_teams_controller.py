@@ -1,4 +1,4 @@
-"""User teams service module for team-related operations"""
+"""User teams controller module for team-related operations"""
 import logging
 from datetime import datetime
 from sqlmodel import select, Session

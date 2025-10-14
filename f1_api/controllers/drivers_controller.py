@@ -1,9 +1,9 @@
-"""Drivers service module for drivers-related operations"""
+"""Drivers controller module for drivers-related operations"""
 import logging
 from sqlmodel import Session
 from f1_api.models.business.drivers_business import DriversBusiness
 from f1_api.models.repositories.drivers_repository import DriversQueryRepository
-class DriversService:
+class DriversController:
     """Provides drivers response"""
     def __init__(self, session: Session):
         self.session = session
@@ -45,7 +45,7 @@ class DriversService:
             return drivers
             
         except Exception as e:  # pylint: disable=broad-except
-            logging.warning("Drivers service execution interrupted by the following exception: %s", e)
+            logging.warning("Drivers controller execution interrupted by the following exception: %s", e)
             return []
         
 
@@ -53,5 +53,5 @@ def get_drivers_service(session: Session) -> list:
     """
     Legacy function for getting drivers
     """
-    service = DriversService(session)
-    return service.get_drivers_service()
+    controller = DriversController(session)
+    return controller.get_drivers_service()

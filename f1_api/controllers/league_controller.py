@@ -1,6 +1,5 @@
 """
-League service module for league-related business operations.
-
+League controller module for league-related business operations.
 This module provides the business logic layer for league management operations,
 including league creation, user membership management, participant tracking,
 and league discovery. It orchestrates multiple repositories to handle complex
@@ -17,16 +16,16 @@ from f1_api.models.app_models import (
     LeagueJoin, LeagueCreate, LeagueResponse
 )
 
-class LeagueService:
+class LeagueController:
     """
-    Service class for managing league business operations.
+    Controller class for managing league business operations.
     
-    This service orchestrates multiple repositories to handle complex league operations
+    This controller orchestrates multiple repositories to handle complex league operations
     including creation, membership management, user participation tracking, and team
     management. It enforces business rules, manages transactional operations across
     multiple entities, and provides a clean API for league-related functionality.
     
-    The service handles:
+    The controller handles:
     - League creation with automatic admin membership
     - User membership validation and access control
     - Join code based league discovery and joining
@@ -35,7 +34,7 @@ class LeagueService:
     """
     def __init__(self, session: Session):
         """
-        Initialize the LeagueService with required repository dependencies.
+        Initialize the LeagueController with required repository dependencies.
         
         Sets up all necessary repositories for league operations including
         user management, league data access, membership tracking, and team management.
@@ -67,17 +66,7 @@ class LeagueService:
         try:
             join_code = self.repository.create_join_code()
             new_league = self.repository.create_league(user.id, league, join_code)
-            
-            # Flush para obtener el ID sin commit completo
-            self.session.flush()
-            self.session.refresh(new_league)
-            
-            # Ahora crear membership con league.id disponible
-            self.user_league_links_repository.create_membership(user.id, new_league)
-            
-            # Commit final para ambas operaciones
-            self.session.commit()
-            
+            self.user_league_links_repository.create_membership(user.id, new_league, is_admin=True)
             return LeagueResponse(
                 id=new_league.id,
                 name=new_league.name,
@@ -123,6 +112,7 @@ class LeagueService:
         logging.info(f"Found league: {league.name}")
         
         user_membership = self.user_league_links_repository.get_active_membership(league_id, user.id)
+        
         if not user_membership:
             logging.warning(f"User {user.id} is not a member of league {league_id}")
             raise HTTPException(status_code=403, detail="Access denied: You are not a member of this league")
@@ -211,7 +201,9 @@ class LeagueService:
                 raise HTTPException(status_code=409, detail="User is already a member of this league")
             self.user_league_links_repository.reactivate_membership(user_membership)
             return {"message": "Successfully rejoined league", "league_id": league.id}
-        self.user_league_links_repository.create_membership(user.id,league)
+        
+        # Create membership as regular member (not admin)
+        self.user_league_links_repository.create_membership(user.id, league, is_admin=False)
         return {"message": "Successfully joined league", "league_id": league.id}
     def get_league_participants(self, league_id: int) -> dict:
         """
@@ -293,30 +285,30 @@ def create_league_service(
         session: Session
     ) -> LeagueResponse:
     """Create league wrapper function"""
-    service = LeagueService(session)
-    return service.create_league(admin_user_id, league)
+    controller = LeagueController(session)
+    return controller.create_league(admin_user_id, league)
 
 def get_league_by_id_service(league_id: int, user_id: str, session: Session) -> LeagueResponse:
     """Get league by id wrapper function"""
-    service = LeagueService(session)
-    return service.get_league_by_id(league_id, user_id)
+    controller = LeagueController(session)
+    return controller.get_league_by_id(league_id, user_id)
 
 def leave_league_service(league_id: int, user_id: str, session: Session) -> dict:
     """Leave league wrapper function"""
-    service = LeagueService(session)
-    return service.leave_league(league_id,user_id)
+    controller = LeagueController(session)
+    return controller.leave_league(league_id,user_id)
 
 def get_user_leagues_service(user_id: str, session: Session) -> list[LeagueResponse]:
     """Get all leagues for a particular user wrapper function"""
-    service = LeagueService(session)
-    return service.get_user_leagues(user_id)
+    controller = LeagueController(session)
+    return controller.get_user_leagues(user_id)
 
 def join_league_service(league_join: LeagueJoin, user_id: str, session: Session) -> dict:
     """Join league with join code wrapper function"""
-    service = LeagueService(session)
-    return service.join_league(league_join,user_id)
+    controller = LeagueController(session)
+    return controller.join_league(league_join,user_id)
 
 def get_league_participants_service(league_id: int, session: Session) -> dict:
     """Get all league participants wrapper function"""
-    service = LeagueService(session)
-    return service.get_league_participants(league_id)
+    controller = LeagueController(session)
+    return controller.get_league_participants(league_id)

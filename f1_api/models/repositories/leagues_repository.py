@@ -26,6 +26,8 @@ class LeaguesRepository:
             is_active=True
         )
         self.session.add(new_league)
+        self.session.commit()
+        self.session.refresh(new_league)
         return new_league
     
     def get_league_by_id(self, league_id: int):

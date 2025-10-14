@@ -1,12 +1,12 @@
-"""Season Context Service - Encapsulates season data loading logic"""
+"""Season Context Controller - Encapsulates season data loading logic"""
 from datetime import datetime
 from sqlmodel import Session
 from f1_api.data_sources.ff1_client import FastF1Client
 from f1_api.models.repositories.sessions_results_repository import get_all_registered_rounds
 
 
-class SeasonContextService:
-    """Service to manage season context (schedule, session_map, registered rounds)"""
+class SeasonContextController:
+    """Controller to manage season context (schedule, session_map, registered rounds)"""
     def __init__(self, session: Session, ff1_client = FastF1Client):
         self.session = session
         self.ff1_client = ff1_client
@@ -58,6 +58,6 @@ class SeasonContextService:
         """Get all context data as a tuple"""
         return self.schedule, self.registered_rounds, self.session_map, self.session_types_by_rn
 
-def get_season_context_service(session: Session) -> SeasonContextService:
-    """Factory function for creating SeasonContextService"""
-    return SeasonContextService(session)
+def get_season_context_service(session: Session) -> SeasonContextController:
+    """Factory function for creating SeasonContextController"""
+    return SeasonContextController(session)

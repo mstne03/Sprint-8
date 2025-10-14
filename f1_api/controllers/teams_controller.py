@@ -1,5 +1,5 @@
 """
-Teams service module for teams-related business operations.
+Teams controller module for teams-related business operations.
 
 This module provides the business logic layer for team management operations,
 including team statistics calculation, season performance analysis, and team
@@ -12,18 +12,18 @@ from fastf1 import plotting
 from sqlmodel import Session
 from fastapi import HTTPException
 from f1_api.models.repositories.teams_repository import TeamsRepository
-from f1_api.services.season_context_service import get_season_context_service
+from f1_api.controllers.season_context_controller import get_season_context_service
 from f1_api.models.f1_schemas import Teams
 
-class TeamsService:
+class TeamsController:
     """
-    Service class for managing team business operations.
+    Controller class for managing team business operations.
     
-    This service handles team-related business logic including statistics calculation,
+    This controller handles team-related business logic including statistics calculation,
     season performance analysis, and data aggregation. It coordinates with the
     TeamsRepository to provide enriched team data with computed metrics.
     
-    The service handles:
+    The controller handles:
     - Team statistics calculation from raw data
     - Season performance metrics and rankings
     - Team data enrichment with calculated fields
@@ -329,14 +329,14 @@ class TeamsService:
 
 def get_teams_service(session: Session) -> list:
     """Simplified function wrapper"""
-    service = TeamsService(session)
-    return service.get_teams_with_season_stats
+    controller = TeamsController(session)
+    return controller.get_teams_with_season_stats
 
 def get_team_data(session: Session) -> list[Teams]:
     """Function wrapper for getting a list of teams for the DB"""
-    service = TeamsService(session)
-    return service.all_teams
+    controller = TeamsController(session)
+    return controller.all_teams
 
 def get_team_id_map(session: Session) -> dict:
-    service = TeamsService(session)
-    return service.team_id_map
+    controller = TeamsController(session)
+    return controller.team_id_map

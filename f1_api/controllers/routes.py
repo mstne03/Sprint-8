@@ -4,15 +4,15 @@ from typing import List
 from fastapi import APIRouter
 from fastapi import HTTPException
 from sqlmodel import select, Session
-from f1_api.services.user_service import create_user_service
-from f1_api.services.teams_service import get_teams_service
-from f1_api.services.drivers_service import get_drivers_service
-from f1_api.services.league_service import (
+from f1_api.controllers.user_controller import create_user_service
+from f1_api.controllers.teams_controller import get_teams_service
+from f1_api.controllers.drivers_controller import get_drivers_service
+from f1_api.controllers.league_controller import (
     create_league_service, get_league_by_id_service,
     leave_league_service, get_user_leagues_service,
     join_league_service, get_league_participants_service
 )
-from f1_api.services.user_teams_service import (
+from f1_api.controllers.user_teams_controller import (
     create_or_update_user_team_service, get_my_team_service,
     get_my_teams_service
 )
