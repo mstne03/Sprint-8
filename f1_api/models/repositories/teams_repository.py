@@ -21,6 +21,11 @@ class TeamsRepository:
         team_id_map = {team.team_name: team.id for team in all_teams}
         return team_id_map
     
+    def get_existing_teams(self) -> list[Teams]:
+        return set(self.session.exec(
+            select(Teams.team_name)
+        ).all())
+    
     def get_team_data(self) -> list[Teams]:
         teams = []
         added_team_names = set()

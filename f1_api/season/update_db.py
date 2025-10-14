@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime
-import fastf1 as ff1
 from sqlmodel import Session, select
 from f1_api.models.f1_schemas import Events, Seasons, Sessions, Teams, Drivers
 from f1_api.data_sources.ff1_client import FastF1Client

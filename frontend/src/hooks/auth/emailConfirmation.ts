@@ -5,7 +5,7 @@ import { useEffect, useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
 
 export const useEmailConfirmation = () => {
-    const [status, setStatus] = useState<'loading' | 'creating-profile' | 'success' | 'error'>('loading')
+    const [status, setStatus] = useState<'loading' | 'creating-profile' | 'success' | 'error' | 'duplicate error'>('loading')
     const [message, setMessage] = useState('Confirming your email...')
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
@@ -49,15 +49,25 @@ export const useEmailConfirmation = () => {
             await backendUserService.createUser(userData)
             
             return true
-        } catch (error) {
+        } catch (error: any) {
             console.error('❌ Error creating user in FastAPI:', error)
-            console.error('❌ Error details:', {
-                name: (error as any)?.name,
-                message: (error as any)?.message,
-                status: (error as any)?.status,
-                response: (error as any)?.response?.data
-            })
-            return false
+            
+            if (error?.response?.status === 400) {
+                const errorMessage = error.response?.data?.detail || ''
+                if (errorMessage.includes('already registered')) {
+                    return {
+                        success: false,
+                        error: 'This account is already registered in our system. You can proceed to the app.',
+                        errorType: 'duplicate'
+                    }
+                }
+            }
+            
+            return {
+                success: false,
+                error: 'Failed to create your profile. Please try again or contact support.',
+                errorType: 'network'
+            }
         }
     }
 

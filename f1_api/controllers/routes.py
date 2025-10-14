@@ -146,8 +146,8 @@ def get_league_participants(league_id: int):
 
 @router.post("/leagues/{league_id}/teams", response_model=UserTeamResponse)
 def create_or_update_user_team(
-    league_id: int, 
-    team_data: UserTeamUpdate, 
+    league_id: int,
+    team_data: UserTeamUpdate,
     user_id: str
 ):
     """
