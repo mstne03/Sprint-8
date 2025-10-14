@@ -126,7 +126,10 @@ def get_user_leagues(user_id: str):
     Get all leagues where the user is a participant
     """
     with Session(engine) as session:
-        return get_user_leagues_service(user_id, session)
+        try:
+            return get_user_leagues_service(user_id, session)
+        except Exception as e:
+            logging.exception(f"An exception occured in get_user_leagues method: {e}")
 
 @router.post("/leagues/join/")
 def join_league(league_join: LeagueJoin, user_id: str):

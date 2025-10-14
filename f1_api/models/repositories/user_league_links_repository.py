@@ -45,7 +45,6 @@ class UserLeagueLinksRepository:
             is_active=True
         )
         self.session.add(league_link)
-        self.session.commit()
     def reactivate_membership(self, existing_membership: UserLeagueLink):
         """
         Reactivate an existing inactive membership.
@@ -80,7 +79,7 @@ class UserLeagueLinksRepository:
             select(UserLeagueLink).where(
                 UserLeagueLink.league_id == league_id,
                 UserLeagueLink.user_id == user_id,
-                UserLeagueLink.is_active is True
+                UserLeagueLink.is_active == True
             )
         ).first()
     def get_membership(self, league_id: int, user_id: int):
@@ -119,7 +118,7 @@ class UserLeagueLinksRepository:
         return self.session.exec(
             select(UserLeagueLink).where(
                 UserLeagueLink.league_id == league_id,
-                UserLeagueLink.is_active is True
+                UserLeagueLink.is_active == True
             )
         ).fetchall()
     def get_user_active_leagues(self, user_id: int):
@@ -140,11 +139,14 @@ class UserLeagueLinksRepository:
             .join(UserLeagueLink, Leagues.id == UserLeagueLink.league_id)
             .where(
                 UserLeagueLink.user_id == user_id,
-                UserLeagueLink.is_active is True,
-                Leagues.is_active is True
+                UserLeagueLink.is_active == True,
+                Leagues.is_active == True
             )
         )
-        return self.session.exec(leagues_query).all()
+        
+        result = self.session.exec(leagues_query).all()
+        
+        return result
     def get_league_participants(self, league_id: int):
         """
         Get all active participants in a league with user details.
@@ -163,7 +165,7 @@ class UserLeagueLinksRepository:
             .join(UserLeagueLink, Users.id == UserLeagueLink.user_id)
             .where(
                 UserLeagueLink.league_id == league_id,
-                UserLeagueLink.is_active is True
+                UserLeagueLink.is_active == True
             )
         )
         return self.session.exec(participants_query).all()

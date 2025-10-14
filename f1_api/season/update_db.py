@@ -5,7 +5,7 @@ from f1_api.models.f1_schemas import Events, Seasons, Sessions, Teams, Drivers
 from f1_api.data_sources.ff1_client import FastF1Client
 from f1_api.data_sources.ff1_client import load_sessions
 from f1_api.models.repositories.sessions_results_repository import get_all_registered_rounds, get_session_results
-from f1_api.models.repositories.teams_repository import get_team_data, get_team_id_map
+from f1_api.services.teams_service import get_team_data, get_team_id_map
 from f1_api.models.repositories.events_repository import get_event_data
 from f1_api.models.repositories.session_repository import get_session_data
 from f1_api.models.repositories.drivers_repository import get_driver_data, get_drivers_id_map
@@ -32,7 +32,7 @@ async def update_db(engine):
 
             events: list[Events] = get_event_data(session,year,schedule)
             sessions: list[Sessions] = get_session_data(session,year,schedule)
-            teams: list[Teams] = get_team_data(session,session_map,schedule)
+            teams: list[Teams] = get_team_data(session)
 
             session.add_all([*events,*sessions,*teams])
 
@@ -42,7 +42,7 @@ async def update_db(engine):
             session.commit()
 
             driver_id_map = get_drivers_id_map(session)
-            team_id_map = get_team_id_map(session,session_map,schedule)
+            team_id_map = get_team_id_map(session)
             
             all_driver_team_links = get_all_driver_team_links(year, schedule, session_map, driver_id_map, team_id_map, session)
             session.add_all(all_driver_team_links)

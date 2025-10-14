@@ -1,8 +1,7 @@
 import secrets
 import string
 from sqlmodel import Session, select
-
-from f1_api.models.app_models import LeagueCreate, LeagueJoin, Leagues, UserLeagueLink, Users
+from f1_api.models.app_models import LeagueCreate, LeagueJoin, Leagues
 
 class LeaguesRepository:
     def __init__(self,  session: Session):
@@ -27,8 +26,6 @@ class LeaguesRepository:
             is_active=True
         )
         self.session.add(new_league)
-        self.session.commit()
-        self.session.refresh(new_league)
         return new_league
     
     def get_league_by_id(self, league_id: int):
@@ -40,7 +37,7 @@ class LeaguesRepository:
         return self.session.exec(
             select(Leagues).where(
                 Leagues.id == league_id,
-                Leagues.is_active is True
+                Leagues.is_active == True
             )
         ).first()
 
@@ -48,6 +45,6 @@ class LeaguesRepository:
         return self.session.exec(
             select(Leagues).where(
                 Leagues.join_code == league_join.join_code,
-                Leagues.is_active is True
+                Leagues.is_active == True
             )
         ).first()

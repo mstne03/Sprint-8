@@ -6,6 +6,7 @@ including league creation, user membership management, participant tracking,
 and league discovery. It orchestrates multiple repositories to handle complex
 league-related workflows while maintaining data consistency and business rules.
 """
+import logging
 from sqlmodel import Session
 from fastapi import HTTPException
 from f1_api.models.repositories.leagues_repository import LeaguesRepository
@@ -62,19 +63,35 @@ class LeagueService:
         user = self.user_repository.check_user_by_id(user_id)
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        join_code = self.repository.create_join_code()
-        new_league = self.repository.create_league(user.id, league, join_code)
-        self.user_league_links_repository.create_membership(user.id, new_league)
-        return LeagueResponse(
-            id=new_league.id,
-            name=new_league.name,
-            description=new_league.description,
-            admin_user_id=new_league.admin_user_id,
-            is_active=new_league.is_active,
-            join_code=new_league.join_code,
-            current_participants=1,
-            created_at=new_league.created_at
-        )
+        
+        try:
+            join_code = self.repository.create_join_code()
+            new_league = self.repository.create_league(user.id, league, join_code)
+            
+            # Flush para obtener el ID sin commit completo
+            self.session.flush()
+            self.session.refresh(new_league)
+            
+            # Ahora crear membership con league.id disponible
+            self.user_league_links_repository.create_membership(user.id, new_league)
+            
+            # Commit final para ambas operaciones
+            self.session.commit()
+            
+            return LeagueResponse(
+                id=new_league.id,
+                name=new_league.name,
+                description=new_league.description,
+                admin_user_id=new_league.admin_user_id,
+                is_active=new_league.is_active,
+                join_code=new_league.join_code,
+                current_participants=1,
+                created_at=new_league.created_at
+            )
+        except Exception as e:
+            self.session.rollback()
+            logging.error(f"Failed to create league for user {user_id}: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to create league: {str(e)}")
     def get_league_by_id(self, league_id: int, user_id: str) -> LeagueResponse:
         """
         Get details of a specific league by ID - only for league participants
@@ -89,15 +106,29 @@ class LeagueService:
         Raises:
             HTTPException: If user not found, league not found, or access denied
         """
+        logging.info(f"Getting league {league_id} for user {user_id}")
+        
         user = self.user_repository.check_user_by_id(user_id)
         if not user:
+            logging.error(f"User not found: {user_id}")
             raise HTTPException(status_code=404, detail="User not found")
+        
+        logging.info(f"Found user with internal ID: {user.id}")
+        
         league = self.repository.get_league_by_id(league_id)
         if not league:
+            logging.error(f"League not found: {league_id}")
             raise HTTPException(status_code=404, detail="League not found")
+            
+        logging.info(f"Found league: {league.name}")
+        
         user_membership = self.user_league_links_repository.get_active_membership(league_id, user.id)
         if not user_membership:
+            logging.warning(f"User {user.id} is not a member of league {league_id}")
             raise HTTPException(status_code=403, detail="Access denied: You are not a member of this league")
+            
+        logging.info(f"User {user.id} has active membership in league {league_id}")
+        
         participants_count = self.user_league_links_repository.get_current_participants(league_id)
         return LeagueResponse(
             id=league.id,
@@ -122,14 +153,24 @@ class LeagueService:
         Raises:
             HTTPException: If user not found or other errors occur
         """
+        logging.info(f"Getting leagues for user: {user_id}")
         response_leagues = []
+        
         user = self.user_repository.check_user_by_id(user_id)
         if not user:
+            logging.error(f"User not found: {user_id}")
             raise HTTPException(status_code=404, detail="User not found")
+        
+        logging.info(f"Found user with internal ID: {user.id}")
         user_active_leagues = self.user_league_links_repository.get_user_active_leagues(user.id)
+        logging.info(f"Found {len(user_active_leagues) if user_active_leagues else 0} active leagues for user {user.id}")
+        
         if not user_active_leagues:
+            logging.warning(f"No active leagues found for user {user_id} (internal ID: {user.id})")
             return []
+            
         for league, _ in user_active_leagues:
+            logging.info(f"Processing league {league.id}: {league.name}")
             participants_count = self.user_league_links_repository.get_current_participants(league.id)
             response_leagues.append(LeagueResponse(
                 id=league.id,
@@ -141,6 +182,8 @@ class LeagueService:
                 current_participants=len(participants_count),
                 created_at=league.created_at
             ))
+        
+        logging.info(f"Returning {len(response_leagues)} leagues for user {user_id}")
         return response_leagues
     def join_league(self, league_join: LeagueJoin, user_id: str) -> dict:
         """
@@ -183,11 +226,19 @@ class LeagueService:
         Raises:
             HTTPException: If league not found or other errors occur
         """
+        logging.info(f"Getting participants for league {league_id}")
         participants = []
+        
         league = self.repository.get_active_league(league_id)
         if not league:
+            logging.error(f"League {league_id} not found or inactive")
             raise HTTPException(status_code=404, detail="League not found or inactive")
+            
+        logging.info(f"Found league: {league.name}")
+        
         participants_data = self.user_league_links_repository.get_league_participants(league_id)
+        logging.info(f"Found {len(participants_data)} participants for league {league_id}")
+        
         for user, link in participants_data:
             participants.append({
                 "user_id": user.id,
@@ -196,6 +247,8 @@ class LeagueService:
                 "is_admin": link.is_admin,
                 "joined_at": link.joined_at
             })
+            
+        logging.info(f"Returning {len(participants)} participants for league {league_id}")
         return {
             "league_id": league_id,
             "league_name": league.name,
