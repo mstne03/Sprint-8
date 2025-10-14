@@ -1,11 +1,9 @@
 import os
 import unicodedata
-
 from sqlmodel import select
-
 from f1_api.models.f1_schemas import DriverTeamLink, Teams
 
-class DriversBusiness:
+class DriversUtility:
     @staticmethod
     def create_driver_id(full_name) -> str:
         full_name = unicodedata.normalize("NFKD", full_name).encode("ascii", "ignore").decode("utf-8")
@@ -15,7 +13,6 @@ class DriversBusiness:
             raise ValueError("Error in create_driver_id, name and surname needed")
         first, last = parts[0], parts[-1]
         driver_id = first[:3] + last[:3] + "01"
-
         return driver_id
 
     @staticmethod
@@ -23,7 +20,6 @@ class DriversBusiness:
         base = os.environ.get("HEADSHOT_URL_BASE")
         path = f"/common/f1/{year}/{team_name}/{driver_id}/{year}{team_name}{driver_id}right.webp"
         final_url = f"{base}{path}"
-        
         return final_url
     
     @staticmethod
@@ -32,7 +28,6 @@ class DriversBusiness:
         Maps stats for all drivers
         """
         stats = {}
-
         for r in all_results:
             driver_id = r.driver_id
             if driver_id not in stats:
@@ -49,7 +44,6 @@ class DriversBusiness:
                     "pole_victories": 0,
                     "overtakes": [],
                 }
-            
             if r.session_number == 5:
                 if r.grid_position == 1:
                     stats[driver_id]["poles"] += 1

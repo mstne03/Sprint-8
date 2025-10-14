@@ -41,7 +41,7 @@ class TeamsController:
         """
         self.session = session
         self.context_service = get_season_context_service(session)
-        self.repository = TeamsRepository(self.session, self.context_service.session_map, self.context_service.schedule)
+        self.repository = TeamsRepository(self.session)
 
     def _validate_dependencies(self) -> None:
         """
@@ -127,7 +127,7 @@ class TeamsController:
             str: Team color hex code, defaults to white if unavailable
         """
         try:
-            return plotting.get_team_color(team_name, f1_session)
+            return self.context_service.team_color(team_name, f1_session)
         except ValueError as e:
             logging.warning(f'Invalid team color data for team {team_name}: {e}')
             return "#FFFFFF"

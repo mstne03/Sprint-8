@@ -1,15 +1,13 @@
 """Gets Teams data from the DB"""
-import logging
-from fastf1 import plotting
 from sqlmodel import Session, select, func
+from f1_api.controllers.season_context_controller import SeasonContextController
+from f1_api.data_sources.ff1_client import FastF1Client
 from f1_api.models.f1_schemas import DriverTeamLink, SessionResult, Teams
 
 class TeamsRepository:
     """Encapsulates DB logic for the Teams entity"""
-    def __init__(self, session: Session, session_map, schedule):
+    def __init__(self, session: Session):
         self.session = session
-        self.session_map = session_map
-        self.schedule = schedule
     
     def get_all_teams(self) -> list[Teams]:
         teams = list(self.session.exec(select(Teams)))
@@ -45,6 +43,6 @@ class TeamsRepository:
             )
         ).all()
 
-def get_team_id_map(session,session_map,schedule):
-    teams_repo = TeamsRepository(session,session_map,schedule)
+def get_team_id_map(session):
+    teams_repo = TeamsRepository(session)
     return teams_repo.get_team_id_map()

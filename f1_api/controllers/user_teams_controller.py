@@ -4,7 +4,7 @@ from datetime import datetime
 from sqlmodel import select, Session
 from fastapi import HTTPException
 from ..models.app_models import (
-    Users, UserTeams, UserLeagueLink, UserTeamUpdate, UserTeamResponse
+    Users, UserTeams, UserLeagueLink, UserTeamUpdate
 )
 
 
