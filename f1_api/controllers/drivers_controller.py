@@ -2,6 +2,7 @@
 from datetime import datetime
 import logging
 from sqlmodel import Session
+from f1_api.controllers.base_controller import BaseController
 from f1_api.controllers.season_context_controller import SeasonContextController
 from f1_api.data_sources.ff1_client import FastF1Client
 from f1_api.models.f1_schemas import Drivers
@@ -9,10 +10,10 @@ from f1_api.models.lib.drivers_utility import DriversUtility
 from f1_api.models.repositories.drivers_repository import DriversRepository
 from f1_api.models.repositories.sessions_results_repository import SessionResultsRepository
 
-class DriversController:
+class DriversController(BaseController):
     """Provides drivers response"""
     def __init__(self, session: Session):
-        self.session = session
+        super().__init__(session)
         self.season = datetime.now().year
         self.repository = DriversRepository(session,self.season)
         self.results = SessionResultsRepository(self.season, session)

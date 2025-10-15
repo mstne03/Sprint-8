@@ -11,11 +11,12 @@ from typing import Dict
 from fastf1 import plotting
 from sqlmodel import Session
 from fastapi import HTTPException
+from f1_api.controllers.base_controller import BaseController
 from f1_api.models.repositories.teams_repository import TeamsRepository
 from f1_api.controllers.season_context_controller import get_season_context_service
 from f1_api.models.f1_schemas import Teams
 
-class TeamsController:
+class TeamsController(BaseController):
     """
     Controller class for managing team business operations.
     
@@ -39,7 +40,7 @@ class TeamsController:
             session: SQLModel database session for repository operations
             year: Optional year for season-specific data filtering
         """
-        self.session = session
+        super().__init__(session)
         self.context_service = get_season_context_service(session)
         self.repository = TeamsRepository(self.session)
 

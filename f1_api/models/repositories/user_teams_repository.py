@@ -10,15 +10,15 @@ class UserTeamsRepository:
             select(UserTeams).where(
                 UserTeams.user_id == user_id,
                 UserTeams.league_id == league_id,
-                UserTeams.is_active is True
+                UserTeams.is_active == True
             )
         ).first()
     
     def soft_delete_team(self, team: UserTeams):
         team.is_active = False
         self.session.add(team)
-        self.session.commit()
+        # Note: Commit is handled by the calling controller's context manager
     
     def hard_delete_team(self, team: UserTeams):
         self.session.delete(team)
-        self.session.commit()
+        # Note: Commit is handled by the calling controller's context manager

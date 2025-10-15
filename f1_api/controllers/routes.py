@@ -4,6 +4,7 @@ from typing import List
 from fastapi import APIRouter
 from fastapi import HTTPException
 from sqlmodel import select, Session
+from f1_api.controllers.database_controller import update_db
 from f1_api.controllers.user_controller import create_user_service
 from f1_api.controllers.teams_controller import get_teams_service
 from f1_api.controllers.drivers_controller import get_drivers_service
@@ -17,7 +18,6 @@ from f1_api.controllers.user_teams_controller import (
     get_my_teams_service
 )
 from f1_api.config.sql_init import engine
-from f1_api.season.update_db import update_db
 from f1_api.models.app_models import (
     UserTeamsCreate, Users, UserCreate,
     UserResponse, UserTeams, LeagueCreate,
@@ -27,7 +27,7 @@ from f1_api.models.app_models import (
 
 router = APIRouter()
 
-@router.post("/season/")
+@router.post("/legacy/season/")
 async def update_season():
     """
     This endpoint posts all data for the current season into the DB
@@ -35,7 +35,7 @@ async def update_season():
     await update_db(engine)
     return {"status": "updated"}
 
-@router.get("/teams/")
+@router.get("/legacy/teams/")
 def get_teams():
     """
     This endpoint gets all of the teams for the current season from the DB with accumulated points
@@ -43,7 +43,7 @@ def get_teams():
     with Session(engine) as session:
         return get_teams_service(session)
 
-@router.get("/drivers/")
+@router.get("/legacy/drivers/")
 def get_drivers():
     """
     Returns all drivers sorted by championship points up to the last round
@@ -51,7 +51,7 @@ def get_drivers():
     with Session(engine) as session:
         return get_drivers_service(session)
 
-@router.post("/users/", response_model=UserResponse)
+@router.post("/legacy/users/", response_model=UserResponse)
 def create_user(user: UserCreate):
     """
     Create a new user with Supabase integration
@@ -59,7 +59,7 @@ def create_user(user: UserCreate):
     with Session(engine) as session:
         return create_user_service(user, session)
 
-@router.post("/user-team/")
+@router.post("/legacy/user-team/")
 def create_user_team(user_team: UserTeamsCreate):
     """
     Post a new user team into the database
@@ -82,7 +82,7 @@ def create_user_team(user_team: UserTeamsCreate):
         logging.error(f"Error creating user team: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
     
-@router.get("/users/by-id/{supabase_user_id}")
+@router.get("/legacy/users/by-id/{supabase_user_id}")
 def get_user_by_id(supabase_user_id: str):
     """
     Get the user from the DB
@@ -96,7 +96,7 @@ def get_user_by_id(supabase_user_id: str):
             raise HTTPException(status_code=400, detail="User not found")
         return { "data": user }
 
-@router.post("/leagues/", response_model=LeagueResponse)
+@router.post("/legacy/leagues/", response_model=LeagueResponse)
 def create_league(league: LeagueCreate, admin_user_id: str):
     """
     Create a new league and automatically add the creator as admin
@@ -104,7 +104,7 @@ def create_league(league: LeagueCreate, admin_user_id: str):
     with Session(engine) as session:
         return create_league_service(league, admin_user_id, session)
 
-@router.get("/leagues/{league_id}", response_model=LeagueResponse)
+@router.get("/legacy/leagues/{league_id}", response_model=LeagueResponse)
 def get_league_by_id(league_id: int, user_id: str):
     """
     Get details of a specific league by ID - only for league participants
@@ -112,7 +112,7 @@ def get_league_by_id(league_id: int, user_id: str):
     with Session(engine) as session:
         return get_league_by_id_service(league_id, user_id, session)
 
-@router.delete("/leagues/{league_id}/leave")
+@router.delete("/legacy/leagcy/leagues/{league_id}/leave")
 def leave_league(league_id: int, user_id: str):
     """
     Remove user from a league (leave league)
@@ -120,7 +120,7 @@ def leave_league(league_id: int, user_id: str):
     with Session(engine) as session:
         return leave_league_service(league_id, user_id, session)
 
-@router.get("/leagues/user/{user_id}", response_model=List[LeagueResponse])
+@router.get("/legacy/legacy/leagues/user/{user_id}", response_model=List[LeagueResponse])
 def get_user_leagues(user_id: str):
     """
     Get all leagues where the user is a participant
@@ -131,7 +131,7 @@ def get_user_leagues(user_id: str):
         except Exception as e:
             logging.exception(f"An exception occured in get_user_leagues method: {e}")
 
-@router.post("/leagues/join/")
+@router.post("/legacy/leagues/join/")
 def join_league(league_join: LeagueJoin, user_id: str):
     """
     Join a league using join code
@@ -139,7 +139,7 @@ def join_league(league_join: LeagueJoin, user_id: str):
     with Session(engine) as session:
         return join_league_service(league_join, user_id, session)
 
-@router.get("/leagues/{league_id}/participants")
+@router.get("/legacy/leagues/{league_id}/participants")
 def get_league_participants(league_id: int):
     """
     Get all participants of a specific league
@@ -147,7 +147,7 @@ def get_league_participants(league_id: int):
     with Session(engine) as session:
         return get_league_participants_service(league_id, session)
 
-@router.post("/leagues/{league_id}/teams", response_model=UserTeamResponse)
+@router.post("/legacy/leagues/{league_id}/teams", response_model=UserTeamResponse)
 def create_or_update_user_team(
     league_id: int,
     team_data: UserTeamUpdate,
@@ -159,7 +159,7 @@ def create_or_update_user_team(
     with Session(engine) as session:
         return create_or_update_user_team_service(league_id, team_data, user_id, session)
 
-@router.get("/leagues/{league_id}/teams/me", response_model=UserTeamResponse | None)
+@router.get("/legacy/leagues/{league_id}/teams/me", response_model=UserTeamResponse | None)
 def get_my_team(league_id: int, user_id: str):
     """
     Get the current user's team in a specific league
@@ -167,7 +167,7 @@ def get_my_team(league_id: int, user_id: str):
     with Session(engine) as session:
         return get_my_team_service(league_id, user_id, session)
 
-@router.get("/users/my-teams")
+@router.get("/legacy/users/my-teams")
 def get_my_teams(user_id: str):
     """
     Get all teams belonging to the current user across all leagues

@@ -5,6 +5,7 @@ This module provides data access operations for UserLeagueLink entities,
 handling the many-to-many relationship between users and leagues including
 membership status, admin privileges, and participation tracking.
 """
+import logging
 from sqlmodel import Session, select
 from f1_api.models.app_models import Leagues, UserLeagueLink, Users
 
@@ -64,7 +65,7 @@ class UserLeagueLinksRepository:
         existing_membership.is_active = True
         self.session.add(existing_membership)
         self.session.commit()
-    def get_active_membership(self, league_id: int, user_id: int):
+    def get_active_membership(self, league_id: int, user_id: int) -> UserLeagueLink | None:
         """
         Retrieve an active membership for a specific user in a league.
         
@@ -78,7 +79,6 @@ class UserLeagueLinksRepository:
         Returns:
             UserLeagueLink or None: Active membership entity if found
         """
-        import logging
         
         # Debug: Let's check what's actually in the database
         logging.info(f"Repository: Querying for league_id={league_id} (type: {type(league_id)}), user_id={user_id} (type: {type(user_id)})")
@@ -207,5 +207,10 @@ class UserLeagueLinksRepository:
             SQLAlchemyError: If database operation fails
         """
         user_league_link.is_active = False
-        self.session.add(user_league_link)
-        self.session.commit()
+        self.session.merge(user_league_link)
+        self.session.flush()
+        if user_league_link.is_active:
+            logging.exception("Failed to deactivate membership")
+            raise Exception("Failed to deactivate membership")
+        if not user_league_link.is_active:
+            logging.info("Problem is somwhere else")

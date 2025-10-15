@@ -8,6 +8,7 @@ league-related workflows while maintaining data consistency and business rules.
 import logging
 from sqlmodel import Session
 from fastapi import HTTPException
+from f1_api.controllers.base_controller import BaseController
 from f1_api.models.repositories.leagues_repository import LeaguesRepository
 from f1_api.models.repositories.user_league_links_repository import UserLeagueLinksRepository
 from f1_api.models.repositories.user_teams_repository import UserTeamsRepository
@@ -16,7 +17,7 @@ from f1_api.models.app_models import (
     LeagueJoin, LeagueCreate, LeagueResponse
 )
 
-class LeagueController:
+class LeagueController(BaseController):
     """
     Controller class for managing league business operations.
     
@@ -42,7 +43,7 @@ class LeagueController:
         Args:
             session: SQLModel database session for repository operations
         """
-        self.session = session
+        super().__init__(session)
         self.repository = LeaguesRepository(session)
         self.user_repository = UserRepository(session)
         self.user_teams_repository = UserTeamsRepository(session)
