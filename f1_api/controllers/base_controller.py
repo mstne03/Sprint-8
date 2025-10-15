@@ -20,7 +20,6 @@ class BaseController(ABC):
             self.session.rollback()
         else:
             self.session.commit()
-        # Note: Don't close session here as it's managed by FastAPI dependency
     
     def commit(self):
         """Explicitly commit transaction"""

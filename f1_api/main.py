@@ -15,7 +15,7 @@ ff1.Cache.enable_cache(r'C:/Users/Marc/Documents/ITA/Sprint 8/f1_api/ff1_cache')
 app = FastAPI()
 
 # Include legacy routes for backward compatibility
-app.include_router(legacy_router, prefix="/api", tags=["Legacy"])
+#app.include_router(legacy_router, prefix="/api", tags=["Legacy"])
 
 # Include new modular routers
 app.include_router(leagues_router, prefix="/api", tags=["Leagues"])

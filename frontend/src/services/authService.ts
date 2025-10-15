@@ -46,7 +46,6 @@ export const authService: AuthService = {
 
             return { data, error }
         } catch (error) {
-            console.error('Error in authService.signUp:', error)
             return { 
                 data: null, 
                 error: error as AuthError 
@@ -63,7 +62,6 @@ export const authService: AuthService = {
 
             return { data, error }
         } catch (error) {
-            console.error('Error in authService.signIn:', error)
             return { 
                 data: null, 
                 error: error as AuthError 
@@ -82,7 +80,6 @@ export const authService: AuthService = {
 
             return { data, error }
         } catch (error) {
-            console.error('Error in authService.signInWithGoogle:', error)
             return { 
                 data: null, 
                 error: error as AuthError 
@@ -95,7 +92,6 @@ export const authService: AuthService = {
             const { error } = await supabase.auth.signOut()
             return { error }
         } catch (error) {
-            console.error('Error in authService.signOut:', error)
             return { error: error as AuthError }
         }
     },
@@ -105,7 +101,6 @@ export const authService: AuthService = {
             const result = await supabase.auth.getSession()
             return result
         } catch (error) {
-            console.error('Error in authService.getSession:', error)
             return { 
                 data: { session: null }, 
                 error: error as AuthError 
@@ -118,7 +113,6 @@ export const authService: AuthService = {
             const result = await supabase.auth.getUser()
             return result
         } catch (error) {
-            console.error('Error in authService.getCurrentUser:', error)
             return { 
                 data: { user: null }, 
                 error: error as AuthError 
@@ -131,7 +125,6 @@ export const authService: AuthService = {
             const { data, error } = await supabase.auth.refreshSession()
             return { data, error }
         } catch (error) {
-            console.error('Error in authService.refreshSession:', error)
             return { 
                 data: { session: null }, 
                 error: error as AuthError 

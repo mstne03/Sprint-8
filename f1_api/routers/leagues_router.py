@@ -1,7 +1,7 @@
 """League-related routes"""
+from typing import List
 from fastapi import APIRouter, Depends
 from sqlmodel import Session
-from typing import List
 from f1_api.controllers.league_controller import LeagueController
 from f1_api.controllers.user_teams_controller_new import UserTeamsController
 from f1_api.dependencies import get_db_session
@@ -10,7 +10,6 @@ from f1_api.models.app_models import (
 )
 
 router = APIRouter(prefix="/leagues", tags=["leagues"])
-
 
 @router.post("/", response_model=LeagueResponse)
 def create_league(
