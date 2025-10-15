@@ -2,7 +2,7 @@
 import fastf1 as ff1
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
-from f1_api.controllers.routes import router as legacy_router
+#from f1_api.controllers.routes import router as legacy_router
 from f1_api.routers.leagues_router import router as leagues_router
 from f1_api.routers.teams_router import router as teams_router
 from f1_api.routers.admin_router import router as admin_router
