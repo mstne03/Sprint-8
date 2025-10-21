@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useLeagueDetail } from "@/hooks/leagues";
-import { useCreateOrUpdateTeam, useUserTeam } from "@/hooks/teams";
+import { useCreateOrUpdateTeam, useUserTeam } from "@/hooks/userTeams";
 import { useEffect, useState } from "react";
 import type { Driver } from "@/types/driverTypes";
 import type { Team } from "@/types/teamsTypes";
@@ -11,7 +11,7 @@ export const useTeamBuilder = () => {
     const { leagueId } = useParams<{ leagueId: string }>();
     const navigate = useNavigate();
     
-    const { data: league, isLoading: leagueLoading, error: leagueError } = useLeagueDetail(leagueId!);
+    const { league, isLoading: leagueLoading, error: leagueError } = useLeagueDetail(leagueId!);
     
     const { data: existingTeam, isLoading: teamLoading } = useUserTeam(parseInt(leagueId!));
     const createOrUpdateTeamMutation = useCreateOrUpdateTeam();

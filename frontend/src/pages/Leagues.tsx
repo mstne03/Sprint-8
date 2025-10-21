@@ -47,7 +47,7 @@ const Leagues = () => {
                             </h3>
                             
                             <p className="text-gray-300 mb-6 leading-relaxed">
-                                Start your own fantasy league and invite friends to compete. Set custom rules and scoring systems.
+                                Start your own fantasy league and invite friends to compete. Immerse yourself in a realistic driver market.
                             </p>
                             
                             <div className="flex items-center text-red-400 font-medium group-hover:text-red-300 transition-colors duration-300">

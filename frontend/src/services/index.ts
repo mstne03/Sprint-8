@@ -5,6 +5,7 @@ export { userService } from './userService'
 export { leagueService } from './leagueService'
 export { http } from './axios'
 export { userTeamService } from './userTeamService'
+export { marketService } from './marketService'
 
 export type { CreateBackendUserRequest, BackendUserResponse } from './backendUserService'
 export type { 

@@ -20,6 +20,7 @@ class UserTeams(SQLModel, table=True):
     driver_1_id: int = SQLField(foreign_key="drivers.id")
     driver_2_id: int = SQLField(foreign_key="drivers.id")
     driver_3_id: int = SQLField(foreign_key="drivers.id")
+    reserve_driver_id: int | None = SQLField(default=None, foreign_key="drivers.id")
     constructor_id: int = SQLField(foreign_key="teams.id")
     total_points: int = SQLField(default=0)
     budget_remaining: int = SQLField(default=100_000_000)
@@ -106,3 +107,38 @@ class LeagueResponse(BaseModel):
 
 class LeagueJoin(BaseModel):
     join_code: str = Field(min_length=6, max_length=10)
+
+# Market Ownership Models
+class DriverOwnership(SQLModel, table=True):
+    driver_id: int = SQLField(foreign_key="drivers.id", primary_key=True)
+    league_id: int = SQLField(foreign_key="leagues.id", primary_key=True)
+    owner_id: int | None = SQLField(foreign_key="users.id", default=None)  # None = piloto libre
+    is_listed_for_sale: bool = SQLField(default=False)
+    acquisition_price: float  # Precio al que fue adquirido
+    locked_until: datetime | None = SQLField(default=None)  # Fecha de desbloqueo
+    created_at: datetime = SQLField(default_factory=datetime.now)
+    updated_at: datetime = SQLField(default_factory=datetime.now)
+
+    __table_args__ = (
+        UniqueConstraint('driver_id', 'league_id', name='unique_driver_league_ownership'),
+    )
+
+class MarketTransactions(SQLModel, table=True):
+    id: int = SQLField(default=None, primary_key=True)
+    driver_id: int = SQLField(foreign_key="drivers.id")
+    league_id: int = SQLField(foreign_key="leagues.id")
+    seller_id: int | None = SQLField(foreign_key="users.id", default=None)  # None = compra del mercado libre
+    buyer_id: int = SQLField(foreign_key="users.id")
+    transaction_price: float
+    transaction_type: str  # 'buy_from_market', 'buy_from_user', 'sell_to_market', 'buyout_clause', 'emergency_assignment'
+    transaction_date: datetime = SQLField(default_factory=datetime.now)
+
+class BuyoutClauseHistory(SQLModel, table=True):
+    id: int = SQLField(default=None, primary_key=True)
+    league_id: int = SQLField(foreign_key="leagues.id")
+    buyer_id: int = SQLField(foreign_key="users.id")
+    victim_id: int = SQLField(foreign_key="users.id")
+    driver_id: int = SQLField(foreign_key="drivers.id")
+    buyout_price: float
+    buyout_date: datetime = SQLField(default_factory=datetime.now)
+    season_year: int

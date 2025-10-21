@@ -8,6 +8,7 @@ from f1_api.controllers.events_controller import get_event_data
 from f1_api.controllers.sessions_controller import get_session_data
 from f1_api.controllers.drivers_controller import get_driver_data
 from f1_api.controllers.driver_team_link_controller import get_all_driver_team_links
+from f1_api.controllers.driver_team_link_reconciliation import reconcile_driver_team_links
 
 logging.basicConfig(level=logging.INFO)
 
@@ -37,6 +38,13 @@ async def update_db(engine):
             all_driver_team_links = get_all_driver_team_links(session,year)
             session.add_all(all_driver_team_links)
             session.commit()
+            
+            # Reconcile missing DriverTeamLinks
+            missing_links = await reconcile_driver_team_links(session, year)
+            if missing_links:
+                logging.info(f"Reconciliation: adding {len(missing_links)} missing DriverTeamLinks")
+                session.add_all(missing_links)
+                session.commit()
 
             all_session_results = get_session_results(year, session)
             session.add_all(all_session_results)

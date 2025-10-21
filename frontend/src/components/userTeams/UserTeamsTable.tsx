@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { themeQuartz } from 'ag-grid-community';
 import type { MyTeamsRow } from '@/types/tableTypes';
-import { useMyTeamsTable } from '@/hooks/teams';
+import { useMyTeamsTable } from '@/hooks/userTeams';
 import { userTeamService } from '@/services';
 import { useAuth } from '@/context/AuthContext';
 import { LoadingSpinner } from '@/components/ui';

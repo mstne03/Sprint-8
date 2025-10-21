@@ -12,18 +12,35 @@ export const JoinLeagueModal: React.FC<JoinLeagueModalProps> = ({ isOpen, onClos
     const [joinCode, setJoinCode] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const navigate = useNavigate();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setError(null);
+        setSuccessMessage(null);
 
         try {
-            const joinedLeague = await joinLeague({ join_code: joinCode.trim() });
-            onClose();
-            setJoinCode('');
-            navigate(`/leagues/${joinedLeague.league_id}`)
+            const result = await joinLeague({ join_code: joinCode.trim() });
+            
+            // Show success message with team initialization info
+            if (result.team_initialized) {
+                const budget = result.team_details?.budget_remaining 
+                    ? (result.team_details.budget_remaining / 1_000_000).toFixed(1) 
+                    : '100.0';
+                setSuccessMessage(`Welcome! Your starter team has been created with 3 free drivers. Full budget available: $${budget}M`);
+            } else {
+                setSuccessMessage('Successfully joined league!');
+            }
+            
+            // Navigate after showing message briefly
+            setTimeout(() => {
+                onClose();
+                setJoinCode('');
+                setSuccessMessage(null);
+                navigate(`/leagues/${result.league_id}`);
+            }, 2000);
         } catch (err: any) {
             setError(err.message || 'Failed to join league');
         } finally {
@@ -58,6 +75,12 @@ export const JoinLeagueModal: React.FC<JoinLeagueModalProps> = ({ isOpen, onClos
                 {error && (
                     <div className="bg-red-500/20 border border-red-500/30 rounded-lg p-3 mb-4">
                         <p className="text-red-300 text-sm">{error}</p>
+                    </div>
+                )}
+
+                {successMessage && (
+                    <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-3 mb-4">
+                        <p className="text-green-300 text-sm">{successMessage}</p>
                     </div>
                 )}
 

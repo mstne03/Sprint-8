@@ -9,6 +9,7 @@ import logging
 from sqlmodel import Session
 from fastapi import HTTPException
 from f1_api.controllers.base_controller import BaseController
+from f1_api.controllers.driver_ownership_controller import DriverOwnershipController
 from f1_api.models.repositories.leagues_repository import LeaguesRepository
 from f1_api.models.repositories.user_league_links_repository import UserLeagueLinksRepository
 from f1_api.models.repositories.user_teams_repository import UserTeamsRepository
@@ -68,6 +69,27 @@ class LeagueController(BaseController):
             join_code = self.repository.create_join_code()
             new_league = self.repository.create_league(user.id, league, join_code)
             self.user_league_links_repository.create_membership(user.id, new_league, is_admin=True)
+            
+            # Initialize driver ownership for the league
+            # TODO: Get current season year dynamically
+            current_season = 2025  # For now, hardcoded
+            ownership_controller = DriverOwnershipController(self.session)
+            drivers_initialized = ownership_controller.initialize_league_ownership(
+                new_league.id, 
+                current_season
+            )
+            logging.info("Initialized %d drivers for league %d", drivers_initialized, new_league.id)
+            
+            # Initialize team for the league creator automatically
+            try:
+                from f1_api.controllers.market_controller import MarketController
+                market_controller = MarketController(self.session)
+                team_init_result = market_controller.initialize_user_team_on_join(user.id, new_league.id)
+                logging.info("Initialized team for league creator %d in league %d", user.id, new_league.id)
+            except Exception as e:
+                logging.error("Failed to initialize team for league creator %d: %s", user.id, str(e))
+                # Don't fail league creation if team initialization fails
+            
             return LeagueResponse(
                 id=new_league.id,
                 name=new_league.name,
@@ -80,8 +102,8 @@ class LeagueController(BaseController):
             )
         except Exception as e:
             self.session.rollback()
-            logging.error(f"Failed to create league for user {user_id}: {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to create league: {str(e)}")
+            logging.error("Failed to create league for user %s: %s", user_id, str(e))
+            raise HTTPException(status_code=500, detail=f"Failed to create league: {str(e)}") from e
     def get_league_by_id(self, league_id: int, user_id: str) -> LeagueResponse:
         """
         Get details of a specific league by ID - only for league participants
@@ -178,14 +200,15 @@ class LeagueController(BaseController):
         return response_leagues
     def join_league(self, league_join: LeagueJoin, user_id: str) -> dict:
         """
-        Join a league using join code
+        Join a league using join code.
+        Automatically initializes a team with 3 random Tier C drivers.
         
         Args:
             league_join: LeagueJoin object with join code
             user_id: Supabase user ID of the user joining
             
         Returns:
-            dict: Success message with league information
+            dict: Success message with league information and team initialization details
             
         Raises:
             HTTPException: If user not found, league not found, or user already a member
@@ -197,15 +220,36 @@ class LeagueController(BaseController):
         if not league:
             raise HTTPException(status_code=404, detail="League not found or inactive")
         user_membership = self.user_league_links_repository.get_membership(league.id, user.id)
+        
+        is_rejoining = False
         if user_membership:
             if user_membership.is_active:
                 raise HTTPException(status_code=409, detail="User is already a member of this league")
             self.user_league_links_repository.reactivate_membership(user_membership)
-            return {"message": "Successfully rejoined league", "league_id": league.id}
+            is_rejoining = True
+        else:
+            # Create membership as regular member (not admin)
+            self.user_league_links_repository.create_membership(user.id, league, is_admin=False)
         
-        # Create membership as regular member (not admin)
-        self.user_league_links_repository.create_membership(user.id, league, is_admin=False)
-        return {"message": "Successfully joined league", "league_id": league.id}
+        # Initialize team automatically with 3 random Tier C drivers
+        team_init_result = None
+        if not is_rejoining:  # Only initialize team for new members
+            try:
+                from f1_api.controllers.market_controller import MarketController
+                market_controller = MarketController(self.session)
+                team_init_result = market_controller.initialize_user_team_on_join(user.id, league.id)
+                logging.info(f"Initialized team for user {user.id} in league {league.id}")
+            except Exception as e:
+                logging.error(f"Failed to initialize team for user {user.id}: {e}")
+                # Don't fail the join if team initialization fails
+                team_init_result = {"error": str(e)}
+        
+        return {
+            "message": "Successfully rejoined league" if is_rejoining else "Successfully joined league",
+            "league_id": league.id,
+            "team_initialized": team_init_result is not None and "error" not in team_init_result,
+            "team_details": team_init_result
+        }
     def get_league_participants(self, league_id: int) -> dict:
         """
         Get all participants of a specific league

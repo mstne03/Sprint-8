@@ -6,9 +6,131 @@ from f1_api.controllers.base_controller import BaseController
 from f1_api.models.app_models import (
     Users, UserTeams, UserLeagueLink, UserTeamUpdate, UserTeamResponse
 )
+from f1_api.models.f1_schemas import Drivers, Teams, SessionResult
 
 class UserTeamsController(BaseController):
     """Controller for user teams management with proper transaction handling"""
+    
+    INITIAL_BUDGET = 100_000_000  # 100M initial budget
+    
+    def _calculate_driver_price(self, driver_id: int) -> int:
+        """
+        Calculate driver price based on season performance
+        Formula: 1M + (points × 1000) + (podiums × 5000) + (victories × 10000)
+        Same formula as frontend fantasy_stats.price
+        
+        Args:
+            driver_id: ID of the driver
+            
+        Returns:
+            int: Calculated price for the driver
+        """
+        # Get driver's season results
+        results = self.session.exec(
+            select(SessionResult).where(SessionResult.driver_id == driver_id)
+        ).all()
+        
+        # Calculate stats
+        total_points = 0
+        podiums = 0
+        victories = 0
+        
+        for result in results:
+            if result.points:
+                total_points += result.points
+            
+            # Race session (session_number == 5)
+            if result.session_number == 5:
+                if result.position == "1":
+                    victories += 1
+                    podiums += 1
+                elif result.position in ["2", "3"]:
+                    podiums += 1
+        
+        # Calculate price using same formula as frontend
+        price = round(1_000_000 + (total_points * 1000) + (podiums * 5000) + (victories * 10000), 0)
+        
+        return int(price)
+    
+    def _calculate_budget_remaining(
+        self, 
+        driver_1_id: int, 
+        driver_2_id: int, 
+        driver_3_id: int, 
+        constructor_id: int
+    ) -> int:
+        """
+        Calculate remaining budget based on selected drivers and constructor prices
+        
+        Args:
+            driver_1_id: ID of first driver
+            driver_2_id: ID of second driver
+            driver_3_id: ID of third driver
+            constructor_id: ID of constructor
+            
+        Returns:
+            int: Remaining budget after purchasing drivers and constructor
+            
+        Raises:
+            HTTPException: If any driver or constructor not found, or budget exceeded
+        """
+        # Get driver prices
+        # Query each driver individually
+        driver_1 = self.session.exec(select(Drivers).where(Drivers.id == driver_1_id)).first()
+        driver_2 = self.session.exec(select(Drivers).where(Drivers.id == driver_2_id)).first()
+        driver_3 = self.session.exec(select(Drivers).where(Drivers.id == driver_3_id)).first()
+        
+        drivers = [driver_1, driver_2, driver_3]
+        
+        if not all(drivers):
+            missing = []
+            if not driver_1:
+                missing.append(driver_1_id)
+            if not driver_2:
+                missing.append(driver_2_id)
+            if not driver_3:
+                missing.append(driver_3_id)
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Drivers not found with IDs: {missing}"
+            )
+        
+        # Get constructor price
+        constructor = self.session.exec(
+            select(Teams).where(Teams.id == constructor_id)
+        ).first()
+        
+        if not constructor:
+            raise HTTPException(status_code=404, detail="Constructor not found")
+        
+        # Calculate total cost
+        driver_costs = []
+        for driver in drivers:
+            # Calculate price based on performance stats
+            cost = self._calculate_driver_price(driver.id)
+            driver_costs.append(cost)
+            print(f"Driver {driver.full_name}: ${cost / 1_000_000:.1f}M")
+        
+        total_driver_cost = sum(driver_costs)
+        print(f"Total driver cost: ${total_driver_cost / 1_000_000:.1f}M")
+        
+        # Teams don't have price in current schema, default to 0 for now
+        # TODO: Add team pricing when market system is fully implemented
+        constructor_cost = 0
+        
+        total_cost = total_driver_cost + constructor_cost
+        budget_remaining = self.INITIAL_BUDGET - total_cost
+        
+        print(f"Budget calculation: {self.INITIAL_BUDGET / 1_000_000:.1f}M - {total_cost / 1_000_000:.1f}M = {budget_remaining / 1_000_000:.1f}M")
+        
+        # Validate budget
+        if budget_remaining < 0:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Budget exceeded. Total cost: ${total_cost / 1_000_000:.1f}M, Budget: ${self.INITIAL_BUDGET / 1_000_000:.1f}M"
+            )
+        
+        return budget_remaining
     
     def create_or_update_team(
         self, 
@@ -55,6 +177,14 @@ class UserTeamsController(BaseController):
         if len(set(driver_ids)) != 3:
             raise HTTPException(status_code=400, detail="All drivers must be unique")
         
+        # Calculate budget remaining based on driver and constructor prices
+        budget_remaining = self._calculate_budget_remaining(
+            team_data.driver_1_id,
+            team_data.driver_2_id,
+            team_data.driver_3_id,
+            team_data.constructor_id
+        )
+        
         # Check if user already has a team in this league
         existing_team = self.session.exec(
             select(UserTeams).where(
@@ -71,6 +201,7 @@ class UserTeamsController(BaseController):
             existing_team.driver_2_id = team_data.driver_2_id
             existing_team.driver_3_id = team_data.driver_3_id
             existing_team.constructor_id = team_data.constructor_id
+            existing_team.budget_remaining = budget_remaining  # ✅ Update budget
             existing_team.updated_at = datetime.now()
             
             self.session.add(existing_team)
@@ -102,7 +233,7 @@ class UserTeamsController(BaseController):
                 driver_3_id=team_data.driver_3_id,
                 constructor_id=team_data.constructor_id,
                 total_points=0,
-                budget_remaining=100_000_000,
+                budget_remaining=budget_remaining,  # ✅ Use calculated budget
                 is_active=True
             )
             

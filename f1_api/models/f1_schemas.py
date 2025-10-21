@@ -44,6 +44,14 @@ class Drivers(SQLModel, table=True):
     driver_color: str
     country_code: str | None
     headshot_url: str
+    
+    # MARKET PRICING FIELDS
+    purchase_count: int | None = Field(default=0)  # Veces comprado en el mercado
+    sale_count: int | None = Field(default=0)  # Veces vendido en el mercado
+    base_price: float = Field(default=10000000.0)  # Precio base de mercado (10M)
+    current_market_value: float | None = Field(default=10000000.0)  # Precio actual dinámico
+    performance_score: float | None = Field(default=50.0)  # Score de rendimiento (0-100)
+    last_price_update: datetime | None = Field(default=None)  # Última actualización de precio
 
 class DriverTeamLink(SQLModel, table=True):
     driver_id: int = Field(foreign_key="drivers.id", primary_key=True)

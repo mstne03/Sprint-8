@@ -28,9 +28,6 @@ class FastF1Client:
             schedule = FastF1Client.get_event_schedule(year) 
             for _,event in schedule.iloc[1:].iterrows():
                 rn = event["RoundNumber"]
-                if rn in existing_rounds:
-                    logging.info(f"{event["EventName"]} already in DB")
-                    continue
                 if event["EventFormat"] == "testing":
                     continue
                 name = event["EventName"]
@@ -41,8 +38,11 @@ class FastF1Client:
                     event["Session4"],
                     event["Session5"]
                 ]
-                for session_type in sessions:
+                for sn,session_type in enumerate(sessions,start=1):
                     try:
+                        if (rn,sn) in existing_rounds:
+                            logging.info(f"{event["EventName"]} session {sn} already in DB")
+                            continue
                         f1_session = ff1.get_session(year=year,gp=name,identifier=session_type)
                         f1_session.load(laps=True, telemetry=False, weather=False, messages=False)
                         

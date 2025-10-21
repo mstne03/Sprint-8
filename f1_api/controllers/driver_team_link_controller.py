@@ -37,7 +37,7 @@ class DriverTeamLinkController:
                             driver_abb = results.loc[results["DriverNumber"] == driver_num, "Abbreviation"].values[0]
                             team_name = self.season_context.get_session_team_name_by_driver(driver_abb,f1_session)
                             team_id = self.team_repository.get_team_id_map().get(team_name)
-                            if (driver_id, team_id) in existing_links:
+                            if (driver_id, team_id, round_number) in existing_links:
                                 continue
                             if driver_id is None or team_id is None:
                                 continue
@@ -56,7 +56,7 @@ class DriverTeamLinkController:
                             continue
                 except Exception as e:
                     logging.warning(f"Round {round_number} not availavle yet: {e}")
-                    return driver_team_links
+                    continue
         return driver_team_links
 def get_all_driver_team_links(session,year):
     controller = DriverTeamLinkController(session, year)

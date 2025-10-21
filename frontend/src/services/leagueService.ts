@@ -38,6 +38,15 @@ export interface LeagueParticipantsResponse {
 export interface JoinLeagueResponse {
     message: string
     league_id: number
+    team_initialized?: boolean
+    team_details?: {
+        team_id: number
+        assigned_drivers: number[]
+        constructor_id: number
+        total_cost: number
+        budget_remaining: number
+        error?: string
+    }
 }
 
 export interface LeagueServiceType {

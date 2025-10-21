@@ -1,7 +1,6 @@
 """Season Context Controller - Encapsulates season data loading logic"""
 from datetime import datetime
 from sqlmodel import Session, select
-from fastf1 import plotting
 from f1_api.data_sources.ff1_client import FastF1Client
 from f1_api.models.f1_schemas import SessionResult
 
@@ -25,7 +24,7 @@ class SeasonContextController:
     def events_data(self):
         """Lazy load events data by round number"""
         events = []
-        for _,e in self._schedule.iloc[1:].iterrows():
+        for _,e in self.schedule.iloc[1:].iterrows():
             event = {}
             event["round_number"] = e["RoundNumber"]
             event["event_name"] = e["EventName"]
@@ -39,7 +38,7 @@ class SeasonContextController:
     def registered_rounds(self):
         """Lazy load registered rounds"""
         if self._registered_rounds is None:
-            self._registered_rounds = set(self.session.exec(select(SessionResult.round_number)).all())
+            self._registered_rounds = set(self.session.exec(select(SessionResult.round_number, SessionResult.session_number)).all())
         return self._registered_rounds
     @property
     def session_map(self):

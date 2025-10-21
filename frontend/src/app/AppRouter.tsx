@@ -14,8 +14,9 @@ import { Header } from "@/components/layout"
 import Home from "@/pages/Home";
 import Leagues from "@/pages/Leagues";
 import LeagueDetail from "@/pages/LeagueDetail";
-import TeamBuilder from "@/pages/TeamBuilder";
+import Market from "@/pages/Market";
 import CalendarPage from "@/pages/CalendarPage";
+import MarketNew from "@/pages/Market";
 
 function AppRouter() {
   return (
@@ -40,7 +41,7 @@ function AppRouter() {
                 <ProtectedRoute>
                   <Header />
                   <Routes>
-                    <Route path="/leagues/:leagueId/team-builder" element={<TeamBuilder/>}/>
+                    <Route path="/leagues/:leagueId/market" element={<Market/>}/>
                     <Route path="/leagues/:leagueId" element={<LeagueDetail/>}/>
                     <Route path="/leagues" element={<Leagues/>}/>
                     <Route path="/my-teams" element={<Teams/>}/>
