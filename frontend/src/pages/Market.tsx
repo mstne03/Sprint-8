@@ -1,10 +1,16 @@
 import { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DriverCardExpanded } from '@/components/userTeams';
-import { MarketDriverList, BuyDriverModal } from '@/components/market';
+import { 
+    DriverCardExpanded, 
+    MarketDriverList, 
+    BuyDriverModal, 
+    SellDriverModal,
+    DriverSlotsDisplay 
+} from '@/components/market';
+import { SearchInput } from '@/components/ui';
 import { useLeagueDetail } from '@/hooks/leagues';
-import { useFreeDrivers, useDriversForSale, useUserDrivers, useBuyFromMarket } from '@/hooks/market';
+import { useFreeDrivers, useDriversForSale, useUserDrivers, useBuyFromMarket, useSellToMarket } from '@/hooks/market';
 import { useUserTeam } from '@/hooks/userTeams';
 import type { DriverWithOwnership } from '@/types/marketTypes';
 
@@ -15,6 +21,7 @@ const Market = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState<'free' | 'for-sale' | 'my-drivers'>('free');
     const [buyModalDriver, setBuyModalDriver] = useState<DriverWithOwnership | null>(null);
+    const [sellModalDriver, setSellModalDriver] = useState<DriverWithOwnership | null>(null);
 
     // Fetch data
     const { league, isLoading: leagueLoading, error: leagueError } = useLeagueDetail(leagueId || '');
@@ -35,6 +42,7 @@ const Market = () => {
 
     // Mutations
     const { mutate: buyFromMarket, isPending: isBuyingFromMarket } = useBuyFromMarket();
+    const { mutate: sellToMarket, isPending: isSellingToMarket } = useSellToMarket();
 
     // Handlers
     const handleBuyFromMarket = (driverId: number) => {
@@ -74,8 +82,34 @@ const Market = () => {
     };
 
     const handleSell = (driverId: number) => {
-        console.log('Quick sell:', driverId);
-        // TODO: Mostrar modal de confirmación (80% refund)
+        const driver = myDrivers?.find(d => d.id === driverId);
+        if (driver) {
+            setSellModalDriver(driver);
+        }
+    };
+
+    const confirmSell = () => {
+        if (!sellModalDriver || !leagueId) return;
+
+        sellToMarket(
+            {
+                leagueId: Number(leagueId),
+                driverId: sellModalDriver.id,
+                request: {
+                    seller_user_id: internalUserId,
+                },
+            },
+            {
+                onSuccess: () => {
+                    setSellModalDriver(null);
+                    // TODO: Mostrar toast de éxito
+                },
+                onError: (error: any) => {
+                    console.error('Error selling driver:', error);
+                    // TODO: Mostrar toast de error con el mensaje del backend
+                },
+            }
+        );
     };
 
     const handleList = (driverId: number) => {
@@ -191,12 +225,7 @@ const Market = () => {
                                     ${(userBudget / 1_000_000).toFixed(1)}M
                                 </p>
                             </div>
-                            <div className="bg-gradient-to-br from-blue-600/20 to-blue-700/20 border border-blue-500/50 rounded-xl px-6 py-3">
-                                <p className="text-blue-300 text-sm font-medium">Drivers</p>
-                                <p className="text-white text-2xl font-bold">
-                                    {userDriverCount}/4
-                                </p>
-                            </div>
+                            <DriverSlotsDisplay driverCount={userDriverCount} />
                         </div>
                     </div>
                 </div>
@@ -252,48 +281,13 @@ const Market = () => {
                         </button>
                     </div>
                     
-                    <div className="max-w-md mx-auto">
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
-                            Search Drivers
-                        </label>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search by driver name, team, or acronym..."
-                                className="w-full px-4 py-3 pl-10 bg-gray-700/50 border border-gray-600/50 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all duration-200"
-                            />
-                            <svg 
-                                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
-                                fill="none" 
-                                stroke="currentColor" 
-                                viewBox="0 0 24 24"
-                            >
-                                <path 
-                                    strokeLinecap="round" 
-                                    strokeLinejoin="round" 
-                                    strokeWidth={2} 
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
-                                />
-                            </svg>
-                            {searchQuery && (
-                                <button
-                                    onClick={() => setSearchQuery('')}
-                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 rounded-full hover:bg-gray-600/50 transition-colors cursor-pointer"
-                                >
-                                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            )}
-                        </div>
-                        {searchQuery && (
-                            <p className="text-sm text-gray-400 mt-2">
-                                Showing results for "<span className="text-white">{searchQuery}</span>"
-                            </p>
-                        )}
-                    </div>
+                    <SearchInput
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder="Search by driver name, team, or acronym..."
+                        label="Search Drivers"
+                        showResultsText={true}
+                    />
                 </div>
 
                 {/* Driver List */}
@@ -367,6 +361,19 @@ const Market = () => {
                         onConfirm={confirmBuyFromMarket}
                         onCancel={() => setBuyModalDriver(null)}
                         loading={isBuyingFromMarket}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Sell Driver Modal */}
+            <AnimatePresence>
+                {sellModalDriver && (
+                    <SellDriverModal
+                        driver={sellModalDriver}
+                        userDriverCount={userDriverCount}
+                        onConfirm={confirmSell}
+                        onCancel={() => setSellModalDriver(null)}
+                        loading={isSellingToMarket}
                     />
                 )}
             </AnimatePresence>

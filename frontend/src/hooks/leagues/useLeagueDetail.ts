@@ -30,14 +30,15 @@ export const useLeagueDetail = (leagueId: string) => {
     const { data: allDrivers } = useDrivers();
     const { data: allTeams } = useTeams();
     
-    // Computed values - Obtener los drivers completos desde los IDs
+    // Computed values - Obtener los drivers completos desde los IDs (incluyendo reserva)
     const selectedDrivers = useMemo(() => {
         if (!userTeam || !allDrivers) return [];
         return [
             allDrivers.find(d => d.id === userTeam.driver_1_id),
             allDrivers.find(d => d.id === userTeam.driver_2_id),
             allDrivers.find(d => d.id === userTeam.driver_3_id),
-        ].filter(Boolean);
+            allDrivers.find(d => d.id === userTeam.reserve_driver_id),
+        ];
     }, [userTeam, allDrivers]);
     
     // Obtener el constructor completo desde el ID

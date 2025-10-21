@@ -8,6 +8,7 @@ export interface UserTeam {
     driver_1_id: number;
     driver_2_id: number;
     driver_3_id: number;
+    reserve_driver_id: number | null;
     constructor_id: number;
     total_points: number;
     budget_remaining: number;

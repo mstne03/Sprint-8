@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import type { CalendarEvent } from '../calendar/SeasonCalendar';
+import type { CalendarEvent, EventType, EventModalMode } from '@/types/calendarTypes';
 
 interface EventModalProps {
   isOpen: boolean;
-  mode: 'create' | 'edit' | 'view';
+  mode: EventModalMode;
   event?: CalendarEvent | null;
   onClose: () => void;
   onCreate: (eventData: Omit<CalendarEvent, 'id'>) => void;
@@ -23,7 +23,7 @@ export const EventModal = ({
     start: new Date(),
     end: new Date(),
     description: '',
-    type: 'practice' as 'race' | 'qualifying' | 'practice' | 'sprint' | 'shootout',
+    type: 'practice' as EventType,
     color: '#3174ad'
   });
 

@@ -295,6 +295,7 @@ class UserTeamsController(BaseController):
             driver_1_id=team.driver_1_id,
             driver_2_id=team.driver_2_id,
             driver_3_id=team.driver_3_id,
+            reserve_driver_id=team.reserve_driver_id,
             constructor_id=team.constructor_id,
             total_points=team.total_points,
             budget_remaining=team.budget_remaining,

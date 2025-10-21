@@ -50,3 +50,74 @@ export interface JoinLeagueResponse {
         error?: string
     }
 }
+// ============================================
+// Lineup and Team Display Types
+// ============================================
+
+import type { Driver } from './marketTypes';
+
+/**
+ * Simplified driver type for lineup display
+ * Contains only the fields needed for rendering driver cards in league context
+ */
+export type LineupDriver = Pick<
+  Driver, 
+  'id' | 'full_name' | 'driver_color' | 'headshot_url' | 'team_name'
+> & {
+  fantasy_stats?: {
+    price: number;
+  };
+};
+
+/**
+ * Simplified team type for league display
+ */
+export interface LineupTeam {
+  id: number;
+  team_name: string;
+  team_color: string;
+  season_results?: {
+    points: number;
+  };
+}
+
+/**
+ * User team data relevant for lineup tab
+ */
+export interface LineupUserTeam {
+  budget_remaining: number;
+  total_points: number;
+}
+
+/**
+ * Props for LineupTab component
+ */
+export interface LineupTabProps {
+  userTeam: LineupUserTeam | null | undefined;
+  teamLoading: boolean;
+  allDriversLoaded: boolean;
+  allTeamsLoaded: boolean;
+  selectedDrivers: (LineupDriver | undefined)[];
+  selectedConstructor: LineupTeam | null;
+  teamValue: number;
+  onNavigateToMarket: () => void;
+}
+
+/**
+ * Props for StandingsTab component
+ * Uses LeagueParticipant which is already defined above
+ */
+export interface StandingsTabProps {
+  participants: LeagueParticipant[];
+  totalParticipants: number;
+  isLoading: boolean;
+}
+
+/**
+ * Props for TeamDisplay component
+ * Reuses LineupDriver and LineupTeam types
+ */
+export interface TeamDisplayProps {
+  drivers: (LineupDriver | undefined)[];
+  constructor: LineupTeam | null;
+}

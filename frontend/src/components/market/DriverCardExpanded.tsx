@@ -1,11 +1,11 @@
-import type { Driver } from '@/types/driverTypes'
+import type { DriverWithOwnership } from '@/types/marketTypes'
 import { GlassCard } from '@/components/ui'
 import { DriverInfo } from '@/components/ui'
 import { DriverImage } from '@/components/ui'
 import { DriverStatsCharts } from '@/components/ui'
 
-type DriverCardProps = {
-    d:Driver;
+interface DriverCardProps {
+    d:DriverWithOwnership;
     setExpanded: (name: string) => void;
 }
 
@@ -70,7 +70,7 @@ export const DriverCardExpanded = ({ d, setExpanded }: DriverCardProps) =>  {
                 {d.driver_number}
             </span>
             <div className="absolute top-4 right-4 bg-green-600/90 text-white px-5 py-3 rounded-full text-lg md:text-xl font-bold border-2 border-green-400/50 backdrop-blur-sm shadow-xl">
-                ${(d.fantasy_stats.price / 1_000_000).toFixed(1)}M
+                ${(( d.base_price || d.fantasy_stats?.price || 0) / 1_000_000).toFixed(1)}M
             </div>
             <div className="flex gap-10 md:ms-0 mt-5">
                 <DriverImage
@@ -84,19 +84,21 @@ export const DriverCardExpanded = ({ d, setExpanded }: DriverCardProps) =>  {
                     <DriverInfo
                         key={d.id}
                         name={d.full_name}
-                        country={d.country_code}
-                        team={d.team_name}
-                        points={d.season_results.points}
+                        country={d.country_code || ''}
+                        team={d.team_name || ''}
+                        points={d.season_results?.points || 0}
                         expanded={true}
                     />
                 </div>
             </div>
             <div className="w-full">
-                <DriverStatsCharts
-                    key={d.id}
-                    season_results={d.season_results}
-                    fantasy_stats={d.fantasy_stats}
-                />
+                {d.season_results && d.fantasy_stats && (
+                    <DriverStatsCharts
+                        key={d.id}
+                        season_results={d.season_results}
+                        fantasy_stats={d.fantasy_stats}
+                    />
+                )}
             </div>
             <div className="absolute flex items-center gap-5 bottom-3 right-3">
                 <div 

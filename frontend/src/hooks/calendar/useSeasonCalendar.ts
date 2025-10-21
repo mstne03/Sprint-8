@@ -1,4 +1,4 @@
-import type { CalendarEvent } from "@/components/calendar/SeasonCalendar";
+import type { CalendarEvent, EventModalMode } from "@/types/calendarTypes";
 import { useState } from "react";
 import type { View } from "react-big-calendar";
 
@@ -6,7 +6,7 @@ export const useSeasonCalendar = () => {
     const [events, setEvents] = useState<CalendarEvent[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalMode, setModalMode] = useState<'create' | 'edit' | 'view'>('create');
+    const [modalMode, setModalMode] = useState<EventModalMode>('create');
     const [currentView, setCurrentView] = useState<View>('month');
     const [currentDate, setCurrentDate] = useState(new Date());
 

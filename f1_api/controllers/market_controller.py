@@ -349,6 +349,19 @@ class MarketController(BaseController):
         ownership.updated_at = datetime.now()
         self.ownership_repo.update(ownership)
         
+        # Assign driver to appropriate slot in UserTeam
+        if buyer_team.driver_1_id is None:
+            buyer_team.driver_1_id = driver_id
+        elif buyer_team.driver_2_id is None:
+            buyer_team.driver_2_id = driver_id
+        elif buyer_team.driver_3_id is None:
+            buyer_team.driver_3_id = driver_id
+        elif buyer_team.reserve_driver_id is None:
+            buyer_team.reserve_driver_id = driver_id
+        else:
+            # This should not happen due to MAX_DRIVERS_PER_USER check
+            raise HTTPException(500, "All driver slots are full")
+        
         # Update budget
         buyer_team.budget_remaining -= price
         buyer_team.updated_at = datetime.now()
@@ -430,6 +443,29 @@ class MarketController(BaseController):
         ownership.locked_until = datetime.now() + timedelta(days=LOCK_DAYS_AFTER_PURCHASE)
         ownership.updated_at = datetime.now()
         self.ownership_repo.update(ownership)
+        
+        # Remove driver from seller's team slots
+        if seller_team.driver_1_id == driver_id:
+            seller_team.driver_1_id = None
+        elif seller_team.driver_2_id == driver_id:
+            seller_team.driver_2_id = None
+        elif seller_team.driver_3_id == driver_id:
+            seller_team.driver_3_id = None
+        elif seller_team.reserve_driver_id == driver_id:
+            seller_team.reserve_driver_id = None
+        
+        # Assign driver to buyer's appropriate slot
+        if buyer_team.driver_1_id is None:
+            buyer_team.driver_1_id = driver_id
+        elif buyer_team.driver_2_id is None:
+            buyer_team.driver_2_id = driver_id
+        elif buyer_team.driver_3_id is None:
+            buyer_team.driver_3_id = driver_id
+        elif buyer_team.reserve_driver_id is None:
+            buyer_team.reserve_driver_id = driver_id
+        else:
+            # This should not happen due to MAX_DRIVERS_PER_USER check
+            raise HTTPException(500, "All driver slots are full")
         
         # Update budgets
         buyer_team.budget_remaining -= price
@@ -763,6 +799,19 @@ class MarketController(BaseController):
         ownership.locked_until = datetime.now() + timedelta(days=LOCK_DAYS_AFTER_PURCHASE)
         ownership.updated_at = datetime.now()
         self.ownership_repo.update(ownership)
+        
+        # Assign driver to buyer's appropriate slot
+        if buyer_team.driver_1_id is None:
+            buyer_team.driver_1_id = driver_id
+        elif buyer_team.driver_2_id is None:
+            buyer_team.driver_2_id = driver_id
+        elif buyer_team.driver_3_id is None:
+            buyer_team.driver_3_id = driver_id
+        elif buyer_team.reserve_driver_id is None:
+            buyer_team.reserve_driver_id = driver_id
+        else:
+            # This should not happen due to MAX_DRIVERS_PER_USER check
+            raise HTTPException(500, "All driver slots are full")
         
         # Update budgets
         buyer_team.budget_remaining -= buyout_price

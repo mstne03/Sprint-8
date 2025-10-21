@@ -89,7 +89,10 @@ export const useBuyFromMarket = () => {
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['free-drivers', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['user-drivers', variables.leagueId] });
-      queryClient.invalidateQueries({ queryKey: ['user-team', variables.leagueId] });
+      // Invalidate user-team with partial match (includes user.id in the key)
+      queryClient.invalidateQueries({ queryKey: ['user-team', variables.leagueId], exact: false });
+      // Also invalidate league-detail to refresh selectedDrivers
+      queryClient.invalidateQueries({ queryKey: ['league-detail', variables.leagueId], exact: false });
     },
   });
 };
@@ -110,7 +113,10 @@ export const useBuyFromUser = () => {
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['drivers-for-sale', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['user-drivers', variables.leagueId] });
-      queryClient.invalidateQueries({ queryKey: ['user-team', variables.leagueId] });
+      // Invalidate user-team with partial match (includes user.id in the key)
+      queryClient.invalidateQueries({ queryKey: ['user-team', variables.leagueId], exact: false });
+      // Also invalidate league-detail to refresh selectedDrivers
+      queryClient.invalidateQueries({ queryKey: ['league-detail', variables.leagueId], exact: false });
     },
   });
 };
@@ -131,7 +137,10 @@ export const useSellToMarket = () => {
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['free-drivers', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['user-drivers', variables.leagueId] });
-      queryClient.invalidateQueries({ queryKey: ['user-team', variables.leagueId] });
+      // Invalidate user-team with partial match (includes user.id in the key)
+      queryClient.invalidateQueries({ queryKey: ['user-team', variables.leagueId], exact: false });
+      // Also invalidate league-detail to refresh selectedDrivers
+      queryClient.invalidateQueries({ queryKey: ['league-detail', variables.leagueId], exact: false });
     },
   });
 };
@@ -190,7 +199,10 @@ export const useBuyoutClause = () => {
       // Invalidate everything - buyout affects multiple users
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['user-drivers', variables.leagueId] });
-      queryClient.invalidateQueries({ queryKey: ['user-team', variables.leagueId] });
+      // Invalidate user-team with partial match (includes user.id in the key)
+      queryClient.invalidateQueries({ queryKey: ['user-team', variables.leagueId], exact: false });
+      // Also invalidate league-detail to refresh selectedDrivers
+      queryClient.invalidateQueries({ queryKey: ['league-detail', variables.leagueId], exact: false });
     },
   });
 };

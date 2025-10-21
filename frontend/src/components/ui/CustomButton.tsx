@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 import type { ReactNode } from 'react'
 
-type CustomButtonProps = {
+interface CustomButtonProps {
     children: ReactNode;
     setState?: (arg:boolean) => void;
     onClick?: () => void;

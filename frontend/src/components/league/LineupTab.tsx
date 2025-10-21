@@ -1,41 +1,6 @@
 import { LeagueStats } from './LeagueStats';
 import { TeamDisplay } from './TeamDisplay';
-
-interface Driver {
-    id: number;
-    full_name: string;
-    driver_color: string;
-    headshot_url: string;
-    team_name?: string;
-    fantasy_stats?: {
-        price: number;
-    };
-}
-
-interface Team {
-    id: number;
-    team_name: string;
-    team_color: string;
-    season_results?: {
-        points: number;
-    };
-}
-
-interface UserTeam {
-    budget_remaining: number;
-    total_points: number;
-}
-
-interface LineupTabProps {
-    userTeam: UserTeam | null | undefined;
-    teamLoading: boolean;
-    allDriversLoaded: boolean;
-    allTeamsLoaded: boolean;
-    selectedDrivers: (Driver | undefined)[];
-    selectedConstructor: Team | null;
-    teamValue: number;
-    onNavigateToMarket: () => void;
-}
+import type { LineupTabProps } from '@/types/leagueTypes';
 
 export const LineupTab = ({
     userTeam,
@@ -67,13 +32,38 @@ export const LineupTab = ({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                     </div>
-                    <h3 className="text-xl font-semibold text-white mb-2">No Team Yet</h3>
-                    <p className="text-gray-400 text-lg mb-6">You haven't created a team for this league</p>
+                    <h3 className="text-xl font-semibold text-white mb-2">Build Your Team</h3>
+                    <p className="text-gray-400 text-lg mb-2">Start building your fantasy F1 team!</p>
+                    
+                    {/* Team Requirements Info */}
+                    <div className="max-w-md mx-auto mt-6 mb-8 bg-blue-900/20 border border-blue-500/30 rounded-lg p-4 text-left">
+                        <h4 className="text-blue-300 font-medium mb-3 flex items-center gap-2">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            Team Requirements
+                        </h4>
+                        <ul className="space-y-2 text-sm text-gray-300">
+                            <li className="flex items-start gap-2">
+                                <span className="text-green-400 mt-0.5">✓</span>
+                                <span><strong className="text-white">3 Main Drivers</strong> (required)</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-purple-400 mt-0.5">+</span>
+                                <span><strong className="text-white">1 Reserve Driver</strong> (optional, 4th driver)</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                                <span className="text-blue-400 mt-0.5">✓</span>
+                                <span><strong className="text-white">1 Constructor</strong> (team)</span>
+                            </li>
+                        </ul>
+                    </div>
+
                     <button 
                         onClick={onNavigateToMarket}
                         className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-3 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
                     >
-                        Create Your Team
+                        Go to Driver Market
                     </button>
                 </div>
             </div>

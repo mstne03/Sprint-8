@@ -1,24 +1,9 @@
-import type { DriverWithOwnership } from '@/types/marketTypes';
+import type { MarketDriverCardProps } from '@/types/marketTypes';
 import { motion } from 'framer-motion';
 import { OwnershipBadge } from './OwnershipBadge';
 import { LockCountdown } from './LockCountdown';
 import { PriceDisplay } from './PriceDisplay';
 import { useState } from 'react';
-
-interface MarketDriverCardProps {
-  driver: DriverWithOwnership;
-  currentUserId: number;
-  userBudget: number;
-  userDriverCount: number;
-  onBuyFromMarket?: (driverId: number) => void;
-  onBuyFromUser?: (driverId: number) => void;
-  onSell?: (driverId: number) => void;
-  onList?: (driverId: number) => void;
-  onUnlist?: (driverId: number) => void;
-  onBuyout?: (driverId: number) => void;
-  onViewDetails?: (driver: DriverWithOwnership) => void;
-  loading?: boolean;
-}
 
 export const MarketDriverCard = ({
   driver,
@@ -79,6 +64,15 @@ export const MarketDriverCard = ({
 
     // Owned by me
     if (isOwnedByMe) {
+      // Driver is locked - can't sell
+      if (isLocked) {
+        return (
+          <div className="w-full px-3 py-2 rounded-lg font-medium text-sm bg-gray-700 text-gray-400 text-center cursor-not-allowed flex items-center justify-center gap-1">
+            🔒 Locked
+          </div>
+        );
+      }
+
       if (isForSale) {
         return (
           <button

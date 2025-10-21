@@ -1,23 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import type { DriverWithOwnership } from '@/types/marketTypes';
+import type { MarketDriverListProps } from '@/types/marketTypes';
 import { MarketDriverCard } from './MarketDriverCard';
-
-interface MarketDriverListProps {
-  drivers: DriverWithOwnership[];
-  loading: boolean;
-  currentUserId: number;
-  userBudget: number;
-  userDriverCount: number;
-  onBuyFromMarket?: (driverId: number) => void;
-  onBuyFromUser?: (driverId: number) => void;
-  onSell?: (driverId: number) => void;
-  onList?: (driverId: number) => void;
-  onUnlist?: (driverId: number) => void;
-  onBuyout?: (driverId: number) => void;
-  onViewDetails?: (driver: DriverWithOwnership) => void;
-  emptyMessage?: string;
-  gridColumns?: 2 | 3 | 4;
-}
 
 export const MarketDriverList = ({
   drivers,

@@ -1,3 +1,3 @@
 export { SeasonCalendar } from './SeasonCalendar'
 
-export type { CalendarEvent } from './SeasonCalendar'
+// Types are now exported from @/types/calendarTypes

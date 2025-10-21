@@ -1,16 +1,4 @@
-interface Participant {
-    user_id: number;
-    user_name: string;
-    email: string;
-    is_admin: boolean;
-    joined_at: string;
-}
-
-interface StandingsTabProps {
-    participants: Participant[];
-    totalParticipants: number;
-    isLoading: boolean;
-}
+import type { StandingsTabProps } from '@/types/leagueTypes';
 
 export const StandingsTab = ({
     participants,

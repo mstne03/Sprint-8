@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import type { Driver } from '@/types/marketTypes';
 import { 
     BarChart, 
     Bar, 
@@ -11,18 +12,13 @@ import {
     Pie
 } from 'recharts';
 
+/**
+ * Props for DriverStatsCharts component
+ * Reuses types from Driver interface to avoid duplication
+ */
 interface DriverStatsChartsProps {
-    season_results: {
-        victories: number;
-        poles: number;
-        podiums: number;
-    };
-    fantasy_stats: {
-        avg_finish: number;
-        overtake_efficiency: number;
-        available_points_percentatge: number;
-        pole_win_conversion: number;
-    };
+    season_results: NonNullable<Driver['season_results']>;
+    fantasy_stats: NonNullable<Driver['fantasy_stats']>;
 }
 
 export const DriverStatsCharts = memo(({ season_results, fantasy_stats }: DriverStatsChartsProps) => {

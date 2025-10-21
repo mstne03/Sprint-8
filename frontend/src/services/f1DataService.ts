@@ -1,6 +1,6 @@
 import { http } from '@/services'
 import type { F1DataService } from '@/types/f1DataService'
-import type { Driver } from '@/types/driverTypes'
+import type { Driver } from '@/types/marketTypes'
 import type { Team } from '@/types/teamsTypes'
 
 export const f1DataService: F1DataService = {

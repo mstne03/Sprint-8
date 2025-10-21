@@ -35,7 +35,7 @@ export const TeamCreate = () => {
                             </div>
                             <div className="text-right mr-3">
                                 <p className="text-gray-100 text-sm font-medium">
-                                    ${(driver.fantasy_stats.price / 1_000_000).toFixed(1)}M
+                                    ${(driver.fantasy_stats!.price / 1_000_000).toFixed(1)}M
                                 </p>
                             </div>
                             <button

@@ -245,7 +245,7 @@ def get_user_drivers(
 
 
 # Market POST endpoints
-@router.post("/{league_id}/market/buy-from-market")
+@router.post("/{league_id}/market/buy-from-market/{driver_id}")
 def buy_driver_from_market(
     league_id: int,
     driver_id: int,
@@ -261,7 +261,7 @@ def buy_driver_from_market(
         )
 
 
-@router.post("/{league_id}/market/buy-from-user")
+@router.post("/{league_id}/market/buy-from-user/{driver_id}")
 def buy_driver_from_user(
     league_id: int,
     driver_id: int,
@@ -278,7 +278,7 @@ def buy_driver_from_user(
         )
 
 
-@router.post("/{league_id}/market/sell-to-market")
+@router.post("/{league_id}/market/sell-to-market/{driver_id}")
 def sell_driver_to_market(
     league_id: int,
     driver_id: int,
@@ -294,7 +294,7 @@ def sell_driver_to_market(
         )
 
 
-@router.post("/{league_id}/market/list-for-sale")
+@router.post("/{league_id}/market/list-for-sale/{driver_id}")
 def list_driver_for_sale(
     league_id: int,
     driver_id: int,
@@ -327,7 +327,7 @@ def unlist_driver_from_sale(
         )
 
 
-@router.post("/{league_id}/market/buyout-clause")
+@router.post("/{league_id}/market/buyout-clause/{driver_id}")
 def execute_buyout_clause(
     league_id: int,
     driver_id: int,

@@ -6,21 +6,10 @@ import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import { EventModal } from '@/components/ui';
 import './calendar-theme.css';
 import { useSeasonCalendar } from '@/hooks/calendar';
+import type { CalendarEvent } from '@/types/calendarTypes';
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<CalendarEvent>(Calendar);
-
-export interface CalendarEvent {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  resource?: {
-    description?: string;
-    type?: 'race' | 'qualifying' | 'practice' | 'sprint' | 'shootout';
-    color?: string;
-  };
-}
 
 export const SeasonCalendar = () => {
   const {

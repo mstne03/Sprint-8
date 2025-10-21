@@ -4,7 +4,6 @@ import { LeaguesProvider } from '@/context/LeaguesContext';
 import { ProtectedRoute, PublicRoute } from '@/components/auth';
 import DataServiceProvider from '@/context/ServiceProvider'
 import Teams from '@/pages/Teams'
-import Map from '@/pages/Map'
 import NotFound from '@/pages/NotFound'
 import Login from '@/pages/Login'
 import Register from '@/pages/Register'
@@ -16,7 +15,6 @@ import Leagues from "@/pages/Leagues";
 import LeagueDetail from "@/pages/LeagueDetail";
 import Market from "@/pages/Market";
 import CalendarPage from "@/pages/CalendarPage";
-import MarketNew from "@/pages/Market";
 
 function AppRouter() {
   return (
@@ -45,7 +43,6 @@ function AppRouter() {
                     <Route path="/leagues/:leagueId" element={<LeagueDetail/>}/>
                     <Route path="/leagues" element={<Leagues/>}/>
                     <Route path="/my-teams" element={<Teams/>}/>
-                    <Route path="/map" element={<Map/>}/>
                     <Route path="/calendar" element={<CalendarPage/>}/>
                     <Route path="*" element={<NotFound/>}/>
                   </Routes>

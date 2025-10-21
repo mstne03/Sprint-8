@@ -80,26 +80,32 @@ export const BuyDriverModal = ({
             </div>
 
             {/* Stats */}
-            {driver.fantasy_stats && (
+            {(driver.season_results || driver.fantasy_stats) && (
               <div className="grid grid-cols-3 gap-3">
-                <div className="bg-gray-800/50 rounded-lg p-2">
-                  <p className="text-xs text-gray-400">Points</p>
-                  <p className="text-lg font-bold text-white">
-                    {driver.fantasy_stats.total_points}
-                  </p>
-                </div>
-                <div className="bg-gray-800/50 rounded-lg p-2">
-                  <p className="text-xs text-gray-400">Avg Finish</p>
-                  <p className="text-lg font-bold text-white">
-                    P{driver.fantasy_stats.avg_finish?.toFixed(1)}
-                  </p>
-                </div>
-                <div className="bg-gray-800/50 rounded-lg p-2">
-                  <p className="text-xs text-gray-400">Value</p>
-                  <p className="text-lg font-bold text-green-400">
-                    ${(driver.fantasy_stats.price / 1_000_000).toFixed(1)}M
-                  </p>
-                </div>
+                {driver.season_results && (
+                  <div className="bg-gray-800/50 rounded-lg p-2">
+                    <p className="text-xs text-gray-400">Points</p>
+                    <p className="text-lg font-bold text-white">
+                      {driver.season_results.points}
+                    </p>
+                  </div>
+                )}
+                {driver.fantasy_stats && (
+                  <>
+                    <div className="bg-gray-800/50 rounded-lg p-2">
+                      <p className="text-xs text-gray-400">Avg Finish</p>
+                      <p className="text-lg font-bold text-white">
+                        P{driver.fantasy_stats.avg_finish?.toFixed(1) || 'N/A'}
+                      </p>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-lg p-2">
+                      <p className="text-xs text-gray-400">Value</p>
+                      <p className="text-lg font-bold text-green-400">
+                        ${(driver.fantasy_stats.price / 1_000_000).toFixed(1)}M
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>

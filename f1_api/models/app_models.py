@@ -56,6 +56,7 @@ class UserTeamResponse(BaseModel):
     driver_1_id: int
     driver_2_id: int
     driver_3_id: int
+    reserve_driver_id: int | None
     constructor_id: int
     total_points: int
     budget_remaining: int

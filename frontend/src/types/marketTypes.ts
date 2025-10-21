@@ -2,6 +2,49 @@
  * Market and ownership related types
  */
 
+// ============================================================================
+// DRIVER TYPES
+// ============================================================================
+
+/**
+ * Base Driver type - used across the application
+ * Contains core driver info and stats without ownership data
+ */
+export interface Driver {
+  id: number;
+  driver_number: number;
+  full_name: string;
+  acronym: string;
+  driver_color: string;
+  country_code: string | null;
+  headshot_url: string;
+  team_name?: string;
+  
+  // Stats - estructura real del backend
+  season_results?: {
+    points: number;
+    poles: number;
+    podiums: number;
+    fastest_laps: number;
+    victories: number;
+    sprint_podiums: number;
+    sprint_victories: number;
+    sprint_poles: number;
+  };
+  fantasy_stats?: {
+    price: number;
+    avg_finish: number;
+    avg_grid_position: number;
+    pole_win_conversion: number;
+    overtake_efficiency: number;
+    available_points_percentatge: number;
+  };
+}
+
+// ============================================================================
+// OWNERSHIP TYPES
+// ============================================================================
+
 export interface DriverOwnership {
   driver_id: number;
   league_id: number;
@@ -111,34 +154,22 @@ export interface BuyoutClauseResponse {
   } | null;
 }
 
-// Extended Driver type with ownership info
-export interface DriverWithOwnership {
-  // Driver base info
-  id: number;
-  driver_number: number;
-  full_name: string;
-  acronym: string;
-  driver_color: string;
-  country_code: string | null;
-  headshot_url: string;
-  base_price: number;
-  team_name?: string;
-  
-  // Stats
-  season_results?: {
-    points: number;
-    position: number;
-  };
-  fantasy_stats?: {
-    price: number;
-    avg_finish: number;
-    total_points: number;
-  };
+// ============================================================================
+// EXTENDED DRIVER TYPES
+// ============================================================================
+
+/**
+ * Driver with ownership information - extends base Driver
+ * Used in Market context where ownership matters
+ */
+export interface DriverWithOwnership extends Driver {
+  // Additional market-specific fields
+  base_price: number; // Make required for market context
   
   // Ownership info
   ownership: DriverOwnership | null;
   
-  // Derived properties
+  // Derived properties for UI convenience
   isOwned: boolean;
   isOwnedByMe: boolean;
   isFreeAgent: boolean;
@@ -148,7 +179,9 @@ export interface DriverWithOwnership {
   ownerName?: string;
 }
 
-// Market filters
+// ============================================================================
+// MARKET FILTERS
+// ============================================================================
 export type MarketFilter = 'all' | 'free' | 'owned' | 'for-sale' | 'locked';
 
 export interface MarketFilters {
@@ -156,4 +189,46 @@ export interface MarketFilters {
   searchQuery: string;
   sortBy: 'name' | 'price' | 'points';
   sortOrder: 'asc' | 'desc';
+}
+
+// ============================================================================
+// MARKET COMPONENT PROPS
+// ============================================================================
+
+/**
+ * Base props shared by market components
+ * Contains user context and action callbacks
+ * Extracted to avoid duplication between MarketDriverCard and MarketDriverList
+ */
+export interface MarketComponentBaseProps {
+  currentUserId: number;
+  userBudget: number;
+  userDriverCount: number;
+  onBuyFromMarket?: (driverId: number) => void;
+  onBuyFromUser?: (driverId: number) => void;
+  onSell?: (driverId: number) => void;
+  onList?: (driverId: number) => void;
+  onUnlist?: (driverId: number) => void;
+  onBuyout?: (driverId: number) => void;
+  onViewDetails?: (driver: DriverWithOwnership) => void;
+}
+
+/**
+ * Props for MarketDriverCard component
+ * Extends base props with driver-specific fields
+ */
+export interface MarketDriverCardProps extends MarketComponentBaseProps {
+  driver: DriverWithOwnership;
+  loading?: boolean;
+}
+
+/**
+ * Props for MarketDriverList component
+ * Extends base props with list-specific fields
+ */
+export interface MarketDriverListProps extends MarketComponentBaseProps {
+  drivers: DriverWithOwnership[];
+  loading: boolean;
+  emptyMessage?: string;
+  gridColumns?: 2 | 3 | 4;
 }

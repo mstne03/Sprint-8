@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useLeagueDetail } from "@/hooks/leagues";
 import { useCreateOrUpdateTeam, useUserTeam } from "@/hooks/userTeams";
 import { useEffect, useState } from "react";
-import type { Driver } from "@/types/driverTypes";
+import type { Driver } from "@/types/marketTypes";
 import type { Team } from "@/types/teamsTypes";
 import { useQuery } from "@tanstack/react-query";
 import { f1DataService } from "@/services";
@@ -129,7 +129,7 @@ export const useTeamBuilder = () => {
         const searchTerm = searchFilter.toLowerCase();
         return (
             driver.full_name.toLowerCase().includes(searchTerm) ||
-            driver.team_name.toLowerCase().includes(searchTerm)
+            driver.team_name?.toLowerCase().includes(searchTerm)
         );
     });
 
@@ -139,7 +139,7 @@ export const useTeamBuilder = () => {
         return team.team_name.toLowerCase().includes(searchTerm);
     });
 
-    const budgetBarWidth = Math.min((selectedDrivers.reduce((acc, driver) => acc + driver.fantasy_stats.price, 0) / 1_000_000) / 100 * 100, 100);
+    const budgetBarWidth = Math.min((selectedDrivers.reduce((acc, driver) => acc + (driver.fantasy_stats?.price || 0), 0) / 1_000_000) / 100 * 100, 100);
     
     return {
         leagueLoading, driversLoading, 
