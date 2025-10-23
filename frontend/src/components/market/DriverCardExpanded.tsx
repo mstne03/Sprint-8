@@ -3,6 +3,7 @@ import { GlassCard } from '@/components/ui'
 import { DriverInfo } from '@/components/ui'
 import { DriverImage } from '@/components/ui'
 import { DriverStatsCharts } from '@/components/ui'
+import { formatCurrencyPrecise } from '@/utils/currencyFormat'
 
 interface DriverCardProps {
     d:DriverWithOwnership;
@@ -70,7 +71,7 @@ export const DriverCardExpanded = ({ d, setExpanded }: DriverCardProps) =>  {
                 {d.driver_number}
             </span>
             <div className="absolute top-4 right-4 bg-green-600/90 text-white px-5 py-3 rounded-full text-lg md:text-xl font-bold border-2 border-green-400/50 backdrop-blur-sm shadow-xl">
-                ${(( d.base_price || d.fantasy_stats?.price || 0) / 1_000_000).toFixed(1)}M
+                {formatCurrencyPrecise(d.fantasy_stats?.price || 0)}
             </div>
             <div className="flex gap-10 md:ms-0 mt-5">
                 <DriverImage

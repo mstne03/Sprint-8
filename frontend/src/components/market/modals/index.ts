@@ -1,2 +1,1 @@
-export { BuyDriverModal } from './BuyDriverModal';
-export { SellDriverModal } from './SellDriverModal';
+export { DriverSaleModal } from './DriverSaleModal';

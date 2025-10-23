@@ -1,4 +1,5 @@
 import type { TeamDisplayProps, LineupDriver } from '@/types/leagueTypes';
+import { formatCurrencyPrecise } from '@/utils/currencyFormat';
 
 export const TeamDisplay = ({ drivers, constructor }: TeamDisplayProps) => {
     const validDrivers = drivers.filter(Boolean) as LineupDriver[];
@@ -36,10 +37,10 @@ export const TeamDisplay = ({ drivers, constructor }: TeamDisplayProps) => {
                                     <p className="text-white font-medium">{driver.full_name}</p>
                                     <p className="text-gray-100 text-sm">{driver.team_name}</p>
                                 </div>
-                                {driver.fantasy_stats?.price && (
+                                {driver.ownership?.acquisition_price && (
                                     <div className="text-right">
                                         <p className="text-white text-sm font-medium">
-                                            ${(driver.fantasy_stats.price / 1_000_000).toFixed(1)}M
+                                            {formatCurrencyPrecise(driver.ownership.acquisition_price)}
                                         </p>
                                     </div>
                                 )}
@@ -86,10 +87,10 @@ export const TeamDisplay = ({ drivers, constructor }: TeamDisplayProps) => {
                                 <p className="text-white font-medium">{reserveDriver.full_name}</p>
                                 <p className="text-gray-100 text-sm">{reserveDriver.team_name}</p>
                             </div>
-                            {reserveDriver.fantasy_stats?.price && (
+                            {reserveDriver.ownership?.acquisition_price && (
                                 <div className="text-right">
                                     <p className="text-white text-sm font-medium">
-                                        ${(reserveDriver.fantasy_stats.price / 1_000_000).toFixed(1)}M
+                                        {formatCurrencyPrecise(reserveDriver.ownership.acquisition_price)}
                                     </p>
                                 </div>
                             )}

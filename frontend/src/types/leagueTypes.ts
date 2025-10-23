@@ -67,6 +67,11 @@ export type LineupDriver = Pick<
   fantasy_stats?: {
     price: number;
   };
+  ownership?: {
+    acquisition_price: number;
+    asking_price: number | null;
+    is_listed_for_sale: boolean;
+  };
 };
 
 /**

@@ -54,6 +54,7 @@ export interface UserTeamServiceType {
     createOrUpdateTeam(leagueId: number, teamData: CreateUserTeamRequest, userId: string): Promise<UserTeam>
     getMyTeam(leagueId: number, userId: string): Promise<UserTeam | null>
     getAllMyTeams(userId: string): Promise<UserTeamWithDetails[]>
+    swapReserveDriver(leagueId: number, driverId: number, userId: number): Promise<{ success: boolean; message: string; team: any }>
 }
 
 export const userTeamService: UserTeamServiceType = {
@@ -76,6 +77,14 @@ export const userTeamService: UserTeamServiceType = {
 
     async getAllMyTeams(userId: string): Promise<UserTeamWithDetails[]> {
         const { data } = await http.get(`/users/my-teams?user_id=${userId}`)
+        return data
+    },
+
+    async swapReserveDriver(leagueId: number, driverId: number, userId: number): Promise<{ success: boolean; message: string; team: any }> {
+        const { data } = await http.post(`/leagues/${leagueId}/teams/swap-reserve`, {
+            user_id: userId,
+            driver_id: driverId
+        })
         return data
     }
 }

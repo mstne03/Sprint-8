@@ -1,4 +1,5 @@
 import { useTeamBuilderContext } from "@/context/TeamBuilderContext";
+import { formatCurrencyPrecise } from "@/utils/currencyFormat";
 
 export const TeamCreate = () => {
     const { 
@@ -35,7 +36,7 @@ export const TeamCreate = () => {
                             </div>
                             <div className="text-right mr-3">
                                 <p className="text-gray-100 text-sm font-medium">
-                                    ${(driver.fantasy_stats!.price / 1_000_000).toFixed(1)}M
+                                    {formatCurrencyPrecise(driver.fantasy_stats!.price)}
                                 </p>
                             </div>
                             <button

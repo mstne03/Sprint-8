@@ -1,10 +1,11 @@
 """User Teams Controller with proper MVC structure"""
+import logging
 from datetime import datetime
 from sqlmodel import select
 from fastapi import HTTPException
 from f1_api.controllers.base_controller import BaseController
 from f1_api.models.app_models import (
-    Users, UserTeams, UserLeagueLink, UserTeamUpdate, UserTeamResponse
+    Users, UserTeams, UserLeagueLink, UserTeamUpdate, UserTeamResponse, Leagues
 )
 from f1_api.models.f1_schemas import Drivers, Teams, SessionResult
 
@@ -16,14 +17,14 @@ class UserTeamsController(BaseController):
     def _calculate_driver_price(self, driver_id: int) -> int:
         """
         Calculate driver price based on season performance
-        Formula: 1M + (points × 1000) + (podiums × 5000) + (victories × 10000)
-        Same formula as frontend fantasy_stats.price
+        Formula: 10M + (points × 10k) + (podiums × 50k) + (victories × 100k)
+        Same formula as market_controller to ensure consistency
         
         Args:
             driver_id: ID of the driver
             
         Returns:
-            int: Calculated price for the driver
+            int: Calculated price for the driver (no rounding for max precision)
         """
         # Get driver's season results
         results = self.session.exec(
@@ -47,10 +48,10 @@ class UserTeamsController(BaseController):
                 elif result.position in ["2", "3"]:
                     podiums += 1
         
-        # Calculate price using same formula as frontend
-        price = round(1_000_000 + (total_points * 1000) + (podiums * 5000) + (victories * 10000), 0)
+        # Calculate price using unified formula (no rounding for precision)
+        price = 10_000_000 + (int(total_points) * 10_000) + (podiums * 50_000) + (victories * 100_000)
         
-        return int(price)
+        return price
     
     def _calculate_budget_remaining(
         self, 
@@ -303,3 +304,166 @@ class UserTeamsController(BaseController):
             created_at=team.created_at,
             updated_at=team.updated_at
         )
+
+    def swap_reserve_driver(self, user_id: int, driver_id: int, league_id: int) -> dict:
+        """
+        Swap a main driver with the reserve driver.
+        The specified driver_id will become the reserve, and the current reserve will take its slot.
+        
+        Args:
+            user_id: Internal user ID
+            driver_id: ID of the driver to make reserve (currently in slot 1, 2, or 3)
+            league_id: League ID
+            
+        Returns:
+            dict with updated team configuration
+        """
+        # Get user's team
+        team = self.session.exec(
+            select(UserTeams).where(
+                UserTeams.user_id == user_id,
+                UserTeams.league_id == league_id,
+                UserTeams.is_active == True
+            )
+        ).first()
+        
+        if not team:
+            raise HTTPException(404, "Team not found")
+        
+        # Find which slot the driver is in
+        current_reserve = team.reserve_driver_id
+        driver_slot = None
+        
+        if team.driver_1_id == driver_id:
+            driver_slot = 1
+        elif team.driver_2_id == driver_id:
+            driver_slot = 2
+        elif team.driver_3_id == driver_id:
+            driver_slot = 3
+        elif team.reserve_driver_id == driver_id:
+            # Driver is already reserve, no swap needed
+            raise HTTPException(400, "Driver is already in reserve position")
+        else:
+            raise HTTPException(400, "Driver not found in team")
+        
+        # Swap drivers
+        if driver_slot == 1:
+            team.driver_1_id = current_reserve
+        elif driver_slot == 2:
+            team.driver_2_id = current_reserve
+        elif driver_slot == 3:
+            team.driver_3_id = current_reserve
+        
+        team.reserve_driver_id = driver_id
+        team.updated_at = datetime.now()
+        
+        # Changes will be committed by BaseController.__exit__
+        
+        return {
+            "success": True,
+            "message": "Reserve driver swapped successfully",
+            "team": {
+                "driver_1_id": team.driver_1_id,
+                "driver_2_id": team.driver_2_id,
+                "driver_3_id": team.driver_3_id,
+                "reserve_driver_id": team.reserve_driver_id
+            }
+        }
+
+
+def get_my_teams_service(user_id: str, session):
+    """
+    Get all teams belonging to the current user across all leagues
+    
+    Args:
+        user_id: Supabase user ID of the team owner
+        session: Database session
+        
+    Returns:
+        list[dict]: List of team data with detailed information
+        
+    Raises:
+        HTTPException: If user not found or other errors occur
+    """
+    
+    
+    try:
+        # Verify user exists
+        user = session.exec(
+            select(Users).where(Users.supabase_user_id == user_id)
+        ).first()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Get all user's teams
+        user_teams = session.exec(
+            select(UserTeams).where(
+                UserTeams.user_id == user.id,
+                UserTeams.is_active == True
+            )
+        ).all()
+        
+        # Format the response with basic information
+        teams_data = []
+        for team in user_teams:
+            # Get league name
+            league = session.exec(
+                select(Leagues).where(Leagues.id == team.league_id)
+            ).first()
+            
+            # Get drivers and constructor info
+            driver1 = session.exec(
+                select(Drivers).where(Drivers.id == team.driver_1_id)
+            ).first()
+            driver2 = session.exec(
+                select(Drivers).where(Drivers.id == team.driver_2_id)
+            ).first()
+            driver3 = session.exec(
+                select(Drivers).where(Drivers.id == team.driver_3_id)
+            ).first()
+            constructor = session.exec(
+                select(Teams).where(Teams.id == team.constructor_id)
+            ).first()
+            
+            team_data = {
+                "id": team.id,
+                "team_name": team.team_name,
+                "league_id": team.league_id,
+                "league_name": league.name if league else "Unknown League",
+                "total_points": team.total_points,
+                "budget_remaining": team.budget_remaining,
+                "created_at": team.created_at,
+                "updated_at": team.updated_at,
+                "drivers": [
+                    {
+                        "id": driver1.id if driver1 else None,
+                        "name": driver1.full_name if driver1 else "Unknown Driver",
+                        "headshot": driver1.headshot_url if driver1 else None
+                    },
+                    {
+                        "id": driver2.id if driver2 else None,
+                        "name": driver2.full_name if driver2 else "Unknown Driver",
+                        "headshot": driver2.headshot_url if driver2 else None
+                    },
+                    {
+                        "id": driver3.id if driver3 else None,
+                        "name": driver3.full_name if driver3 else "Unknown Driver",
+                        "headshot": driver3.headshot_url if driver3 else None
+                    }
+                ],
+                "constructor": {
+                    "id": constructor.id if constructor else None,
+                    "name": constructor.team_name if constructor else "Unknown Constructor",
+                    "logo": f"/teams/{constructor.team_name.lower().replace(' ', '')}.svg" if constructor else None
+                }
+            }
+            teams_data.append(team_data)
+        
+        return teams_data
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logging.error("Error fetching user teams: %s", e)
+        raise HTTPException(status_code=500, detail="Internal server error")

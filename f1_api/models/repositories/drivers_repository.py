@@ -49,8 +49,7 @@ class DriversRepository:
                     existing.headshot_url = driver["headshot_url"]
                 return existing
             return None
-        # Set base price and current market value to 10M for new drivers
-        driver["base_price"] = 10_000_000
+        # Set current market value to 10M for new drivers (base_price removed - not used)
         driver["current_market_value"] = 10_000_000
         return Drivers(**driver)
     

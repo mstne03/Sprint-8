@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from f1_api.controllers.user_controller import UserController
-from f1_api.controllers.user_teams_controller import get_my_teams_service
+from f1_api.controllers.user_teams_controller_new import get_my_teams_service
 from f1_api.dependencies import get_db_session
 from f1_api.models.app_models import (
     UserCreate, UserResponse, Users

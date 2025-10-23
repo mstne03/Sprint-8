@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLeagues } from '../../context/LeaguesContext';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import { formatCurrencyPrecise } from '@/utils/currencyFormat';
 
 interface JoinLeagueModalProps {
     isOpen: boolean;
@@ -27,9 +28,9 @@ export const JoinLeagueModal: React.FC<JoinLeagueModalProps> = ({ isOpen, onClos
             // Show success message with team initialization info
             if (result.team_initialized) {
                 const budget = result.team_details?.budget_remaining 
-                    ? (result.team_details.budget_remaining / 1_000_000).toFixed(1) 
-                    : '100.0';
-                setSuccessMessage(`Welcome! Your starter team has been created with 3 free drivers. Full budget available: $${budget}M`);
+                    ? formatCurrencyPrecise(result.team_details.budget_remaining)
+                    : '$100M';
+                setSuccessMessage(`Welcome! Your starter team has been created with 3 free drivers. Full budget available: ${budget}`);
             } else {
                 setSuccessMessage('Successfully joined league!');
             }

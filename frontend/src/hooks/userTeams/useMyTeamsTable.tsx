@@ -2,6 +2,7 @@ import type { MyTeamsRow } from "@/types/tableTypes";
 import type { ColDef, ICellRendererParams } from "ag-grid-community";
 import type { AgGridReact } from "ag-grid-react";
 import { useRef, useState, useMemo } from "react";
+import { formatCurrencyPrecise } from "@/utils/currencyFormat";
 
 export const useMyTeamsTable = () => {
     const gridRef = useRef<AgGridReact>(null);
@@ -119,7 +120,7 @@ export const useMyTeamsTable = () => {
                 <div className="flex items-center justify-center h-full p-2">
                     <div className="bg-white/5 backdrop-blur-sm px-3 py-2 rounded-lg border border-white/10 text-center">
                         <span className="text-green-400 font-bold text-lg">
-                            ${(params.value / 1_000_000).toFixed(1)}M
+                            {formatCurrencyPrecise(params.value)}
                         </span>
                     </div>
                 </div>

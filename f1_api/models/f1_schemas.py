@@ -48,7 +48,7 @@ class Drivers(SQLModel, table=True):
     # MARKET PRICING FIELDS
     purchase_count: int | None = Field(default=0)  # Veces comprado en el mercado
     sale_count: int | None = Field(default=0)  # Veces vendido en el mercado
-    base_price: float = Field(default=10000000.0)  # Precio base de mercado (10M)
+    # base_price removed - not used, fantasy_stats.price is the dynamic market price
     current_market_value: float | None = Field(default=10000000.0)  # Precio actual dinámico
     performance_score: float | None = Field(default=50.0)  # Score de rendimiento (0-100)
     last_price_update: datetime | None = Field(default=None)  # Última actualización de precio

@@ -1,14 +1,12 @@
 import logging
 import math
 from sqlmodel import Session
-
 from f1_api.controllers.season_context_controller import SeasonContextController
 from f1_api.data_sources.ff1_client import FastF1Client
 from f1_api.models.f1_schemas import SessionResult
 from f1_api.models.repositories.drivers_repository import DriversRepository
 from f1_api.models.repositories.sessions_results_repository import SessionResultsRepository
 from f1_api.models.repositories.teams_repository import TeamsRepository
-
 
 class SessionResultsController:
     def __init__(self, session: Session, year: int):

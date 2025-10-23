@@ -50,7 +50,8 @@ export interface DriverOwnership {
   league_id: number;
   owner_id: number | null; // null = free agent
   is_listed_for_sale: boolean;
-  acquisition_price: number;
+  acquisition_price: number; // Price originally paid by current owner
+  asking_price: number | null; // Price when listed for sale (null when not listed)
   locked_until: string | null; // ISO datetime string
   created_at: string;
   updated_at: string;
@@ -163,8 +164,7 @@ export interface BuyoutClauseResponse {
  * Used in Market context where ownership matters
  */
 export interface DriverWithOwnership extends Driver {
-  // Additional market-specific fields
-  base_price: number; // Make required for market context
+  // base_price removed - not used, fantasy_stats.price is the dynamic market price
   
   // Ownership info
   ownership: DriverOwnership | null;
@@ -204,6 +204,7 @@ export interface MarketComponentBaseProps {
   currentUserId: number;
   userBudget: number;
   userDriverCount: number;
+  reserveDriverId?: number | null;
   onBuyFromMarket?: (driverId: number) => void;
   onBuyFromUser?: (driverId: number) => void;
   onSell?: (driverId: number) => void;
@@ -231,4 +232,6 @@ export interface MarketDriverListProps extends MarketComponentBaseProps {
   loading: boolean;
   emptyMessage?: string;
   gridColumns?: 2 | 3 | 4;
+  enableDragDrop?: boolean;
+  swappingDriverIds?: { mainDriver: number; reserve: number } | null;
 }

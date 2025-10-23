@@ -1,7 +1,7 @@
 """League-related routes"""
 from typing import List
-from fastapi import APIRouter, Depends
-from sqlmodel import Session
+from fastapi import APIRouter, Depends, HTTPException
+from sqlmodel import Session, select
 from f1_api.controllers.league_controller import LeagueController
 from f1_api.controllers.user_teams_controller_new import UserTeamsController
 from f1_api.controllers.driver_ownership_controller import DriverOwnershipController
@@ -34,6 +34,10 @@ class UnlistDriverRequest(BaseModel):
 class BuyoutClauseRequest(BaseModel):
     buyer_user_id: int
     victim_user_id: int
+
+class SwapReserveDriverRequest(BaseModel):
+    user_id: int
+    driver_id: int  # Driver to make reserve (will swap with current reserve)
 
 router = APIRouter(prefix="/leagues", tags=["leagues"])
 
@@ -236,12 +240,32 @@ def get_drivers_for_sale(
 @router.get("/{league_id}/market/user-drivers/{user_id}")
 def get_user_drivers(
     league_id: int,
-    user_id: int,
+    user_id: str,  # Changed to str to accept UUID
     session: Session = Depends(get_db_session)
 ):
-    """Get all drivers owned by a specific user"""
+    """Get all drivers owned by a specific user (accepts both UUID and internal ID)"""
+    from f1_api.models.app_models import Users
+    
+    # Try to convert UUID to internal user_id
+    try:
+        # First, try to parse as int (backward compatibility)
+        internal_user_id = int(user_id)
+    except ValueError as exc:
+        # It's a UUID string, look up the internal ID
+        user = session.exec(
+            select(Users).where(Users.supabase_user_id == user_id)
+        ).first()
+        
+        if not user:
+            raise HTTPException(
+                status_code=404, 
+                detail=f"User not found with UUID: {user_id}"
+            ) from exc
+        
+        internal_user_id = user.id
+    
     with MarketController(session) as controller:
-        return controller.get_user_drivers(user_id, league_id)
+        return controller.get_user_drivers(internal_user_id, league_id)
 
 
 # Market POST endpoints
@@ -340,5 +364,20 @@ def execute_buyout_clause(
             driver_id=driver_id,
             buyer_id=request.buyer_user_id,
             victim_id=request.victim_user_id,
+            league_id=league_id
+        )
+
+
+@router.post("/{league_id}/teams/swap-reserve")
+def swap_reserve_driver(
+    league_id: int,
+    request: SwapReserveDriverRequest,
+    session: Session = Depends(get_db_session)
+):
+    """Swap a main driver with the reserve driver"""
+    with UserTeamsController(session) as controller:
+        return controller.swap_reserve_driver(
+            user_id=request.user_id,
+            driver_id=request.driver_id,
             league_id=league_id
         )

@@ -14,6 +14,16 @@ class UserTeamsRepository:
             )
         ).first()
     
+    def has_active_team(self, user_id: int, league_id: int) -> bool:
+        """Check if a user already has an active team in a league."""
+        return self.session.exec(
+            select(UserTeams).where(
+                UserTeams.user_id == user_id,
+                UserTeams.league_id == league_id,
+                UserTeams.is_active == True
+            )
+        ).first() is not None
+    
     def soft_delete_team(self, team: UserTeams):
         team.is_active = False
         self.session.add(team)

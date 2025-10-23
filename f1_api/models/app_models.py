@@ -115,7 +115,8 @@ class DriverOwnership(SQLModel, table=True):
     league_id: int = SQLField(foreign_key="leagues.id", primary_key=True)
     owner_id: int | None = SQLField(foreign_key="users.id", default=None)  # None = piloto libre
     is_listed_for_sale: bool = SQLField(default=False)
-    acquisition_price: float  # Precio al que fue adquirido
+    acquisition_price: float  # Precio al que fue adquirido (NO cambiar cuando se lista)
+    asking_price: float | None = SQLField(default=None)  # Precio de venta cuando está listado
     locked_until: datetime | None = SQLField(default=None)  # Fecha de desbloqueo
     created_at: datetime = SQLField(default_factory=datetime.now)
     updated_at: datetime = SQLField(default_factory=datetime.now)

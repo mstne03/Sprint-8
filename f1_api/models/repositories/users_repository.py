@@ -1,4 +1,4 @@
-from sqlmodel import select, Session
+from sqlmodel import select, Session, col
 from f1_api.models.app_models import UserCreate, Users
 
 
@@ -34,3 +34,22 @@ class UserRepository:
         self.session.commit()
         self.session.refresh(new_user)
         return new_user
+    
+    def get_users_names_by_ids(self, user_ids: list[int]) -> dict[int, str]:
+        """
+        Get a mapping of user_id -> user_name for a list of user IDs.
+        
+        Args:
+            user_ids: List of internal user IDs
+        
+        Returns:
+            dict mapping user IDs to user names
+        """
+        if not user_ids:
+            return {}
+        
+        users_list = self.session.exec(
+            select(Users).where(col(Users.id).in_(user_ids))
+        ).all()
+        
+        return {u.id: u.user_name for u in users_list}

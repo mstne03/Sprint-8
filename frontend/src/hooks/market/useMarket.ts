@@ -51,7 +51,7 @@ export const useDriversForSale = (leagueId: number) => {
 /**
  * Get drivers owned by a specific user in a league
  */
-export const useUserDrivers = (leagueId: number, userId: number) => {
+export const useUserDrivers = (leagueId: number, userId: number | string) => {
   return useQuery({
     queryKey: ['user-drivers', leagueId, userId],
     queryFn: () => marketService.getUserDrivers(leagueId, userId),
@@ -160,6 +160,7 @@ export const useListForSale = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['drivers-for-sale', variables.leagueId] });
+      queryClient.invalidateQueries({ queryKey: ['user-drivers', variables.leagueId] });
     },
   });
 };
@@ -179,6 +180,7 @@ export const useUnlistFromSale = () => {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['drivers-for-sale', variables.leagueId] });
+      queryClient.invalidateQueries({ queryKey: ['user-drivers', variables.leagueId] });
     },
   });
 };

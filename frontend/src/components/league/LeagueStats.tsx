@@ -1,3 +1,5 @@
+import { formatCurrencyPrecise } from '@/utils/currencyFormat';
+
 interface LeagueStatsProps {
     budgetRemaining: number;
     teamValue: number;
@@ -14,13 +16,13 @@ export const LeagueStats = ({
             <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 border border-green-500/30 rounded-xl p-6">
                 <p className="text-green-300 text-sm font-medium mb-2">Budget Remaining</p>
                 <p className="text-white text-3xl font-bold">
-                    ${(budgetRemaining / 1_000_000).toFixed(1)}M
+                    {formatCurrencyPrecise(budgetRemaining)}
                 </p>
             </div>
             <div className="bg-gradient-to-br from-purple-600/20 to-pink-800/20 border border-purple-500/30 rounded-xl p-6">
                 <p className="text-purple-300 text-sm font-medium mb-2">Team Value</p>
                 <p className="text-white text-3xl font-bold">
-                    ${(teamValue / 1_000_000).toFixed(1)}M
+                    {formatCurrencyPrecise(teamValue)}
                 </p>
             </div>
             <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-xl p-6">

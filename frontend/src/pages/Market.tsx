@@ -1,16 +1,31 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DndContext, closestCenter } from '@dnd-kit/core';
+import { SortableContext } from '@dnd-kit/sortable';
 import { 
     DriverCardExpanded, 
     MarketDriverList, 
-    BuyDriverModal, 
-    SellDriverModal,
+    DriverSaleModal,
     DriverSlotsDisplay 
 } from '@/components/market';
-import { SearchInput } from '@/components/ui';
+import { SearchInput, ConfirmDialog } from '@/components/ui';
 import { useLeagueDetail } from '@/hooks/leagues';
-import { useFreeDrivers, useDriversForSale, useUserDrivers, useBuyFromMarket, useSellToMarket } from '@/hooks/market';
+import { formatCurrencyPrecise } from '@/utils/currencyFormat';
+import { 
+    useFreeDrivers, 
+    useDriversForSale, 
+    useUserDrivers, 
+    useBuyFromMarket, 
+    useSellToMarket, 
+    useListForSale, 
+    useUnlistFromSale, 
+    useBuyFromUser,
+    useReserveDriverDragDrop,
+    useSortedMyDrivers,
+    useFilteredDrivers,
+    useMarketHandlers,
+} from '@/hooks/market';
 import { useUserTeam } from '@/hooks/userTeams';
 import type { DriverWithOwnership } from '@/types/marketTypes';
 
@@ -22,6 +37,22 @@ const Market = () => {
     const [activeTab, setActiveTab] = useState<'free' | 'for-sale' | 'my-drivers'>('free');
     const [buyModalDriver, setBuyModalDriver] = useState<DriverWithOwnership | null>(null);
     const [sellModalDriver, setSellModalDriver] = useState<DriverWithOwnership | null>(null);
+    const [listModalDriver, setListModalDriver] = useState<DriverWithOwnership | null>(null);
+    
+    // Dialog states
+    const [dialog, setDialog] = useState<{
+        isOpen: boolean;
+        type: 'confirm' | 'success' | 'error' | 'info';
+        title: string;
+        message: string;
+        onConfirm?: () => void;
+        confirmText?: string;
+    }>({
+        isOpen: false,
+        type: 'info',
+        title: '',
+        message: '',
+    });
 
     // Fetch data
     const { league, isLoading: leagueLoading, error: leagueError } = useLeagueDetail(leagueId || '');
@@ -40,118 +71,58 @@ const Market = () => {
     const userDriverCount = myDrivers?.length || 0;
     const userBudget = userTeam?.budget_remaining || 0;
 
+    // Sort drivers for "My Drivers" tab by their slot position
+    const sortedMyDrivers = useSortedMyDrivers({
+        myDrivers,
+        userTeam,
+    });
+
     // Mutations
     const { mutate: buyFromMarket, isPending: isBuyingFromMarket } = useBuyFromMarket();
+    const { mutate: buyFromUser } = useBuyFromUser();
     const { mutate: sellToMarket, isPending: isSellingToMarket } = useSellToMarket();
+    const { mutate: listForSale, isPending: isListing } = useListForSale();
+    const { mutate: unlistFromSale } = useUnlistFromSale();
 
-    // Handlers
-    const handleBuyFromMarket = (driverId: number) => {
-        const driver = freeDrivers?.find(d => d.id === driverId);
-        if (driver) {
-            setBuyModalDriver(driver);
-        }
-    };
+    // Drag & Drop for reserve driver swap
+    const { sensors, swappingDriverIds, handleDragEnd } = useReserveDriverDragDrop({
+        leagueId: Number(leagueId),
+        userId: internalUserId,
+        reserveDriverId: userTeam?.reserve_driver_id,
+    });
 
-    const confirmBuyFromMarket = () => {
-        if (!buyModalDriver || !leagueId) return;
-
-        buyFromMarket(
-            {
-                leagueId: Number(leagueId),
-                driverId: buyModalDriver.id,
-                request: {
-                    buyer_user_id: internalUserId,
-                },
-            },
-            {
-                onSuccess: () => {
-                    setBuyModalDriver(null);
-                    // TODO: Mostrar toast de éxito
-                },
-                onError: (error: any) => {
-                    console.error('Error buying driver:', error);
-                    // TODO: Mostrar toast de error con el mensaje del backend
-                },
-            }
-        );
-    };
-
-    const handleBuyFromUser = (driverId: number) => {
-        console.log('Buy from user:', driverId);
-        // TODO: Mostrar modal de confirmación
-    };
-
-    const handleSell = (driverId: number) => {
-        const driver = myDrivers?.find(d => d.id === driverId);
-        if (driver) {
-            setSellModalDriver(driver);
-        }
-    };
-
-    const confirmSell = () => {
-        if (!sellModalDriver || !leagueId) return;
-
-        sellToMarket(
-            {
-                leagueId: Number(leagueId),
-                driverId: sellModalDriver.id,
-                request: {
-                    seller_user_id: internalUserId,
-                },
-            },
-            {
-                onSuccess: () => {
-                    setSellModalDriver(null);
-                    // TODO: Mostrar toast de éxito
-                },
-                onError: (error: any) => {
-                    console.error('Error selling driver:', error);
-                    // TODO: Mostrar toast de error con el mensaje del backend
-                },
-            }
-        );
-    };
-
-    const handleList = (driverId: number) => {
-        console.log('List for sale:', driverId);
-        // TODO: Mostrar modal para establecer precio
-    };
-
-    const handleUnlist = (driverId: number) => {
-        console.log('Unlist:', driverId);
-        // TODO: Mostrar modal de confirmación
-    };
-
-    const handleBuyout = (driverId: number) => {
-        console.log('Buyout:', driverId);
-        // TODO: Mostrar modal de confirmación con replacement preview
-    };
+    // Market operation handlers
+    const handlers = useMarketHandlers({
+        leagueId: Number(leagueId),
+        internalUserId,
+        freeDrivers,
+        forSaleDrivers,
+        myDrivers,
+        userBudget,
+        userDriverCount,
+        buyFromMarket,
+        buyFromUser,
+        sellToMarket,
+        listForSale,
+        unlistFromSale,
+        setBuyModalDriver,
+        setSellModalDriver,
+        setListModalDriver,
+        setDialog,
+        dialog,
+        buyModalDriver,
+        sellModalDriver,
+        listModalDriver,
+    });
 
     // Filter drivers by search query
-    const filteredDrivers = useMemo(() => {
-        let drivers: DriverWithOwnership[] = [];
-        
-        switch (activeTab) {
-            case 'free':
-                drivers = freeDrivers || [];
-                break;
-            case 'for-sale':
-                drivers = forSaleDrivers || [];
-                break;
-            case 'my-drivers':
-                drivers = myDrivers || [];
-                break;
-        }
-        
-        if (!searchQuery) return drivers;
-
-        const query = searchQuery.toLowerCase();
-        return drivers.filter(driver => 
-            driver.full_name.toLowerCase().includes(query) ||
-            driver.acronym.toLowerCase().includes(query) ||
-            driver.team_name?.toLowerCase().includes(query)
-        );
-    }, [freeDrivers, forSaleDrivers, myDrivers, activeTab, searchQuery]);
+    const filteredDrivers = useFilteredDrivers({
+        freeDrivers,
+        forSaleDrivers,
+        sortedMyDrivers,
+        activeTab,
+        searchQuery,
+    });
 
     // Loading state
     if (leagueLoading || freeDriversLoading || forSaleLoading || myDriversLoading || teamLoading) {
@@ -222,7 +193,7 @@ const Market = () => {
                             <div className="bg-gradient-to-br from-green-600/20 to-green-700/20 border border-green-500/50 rounded-xl px-6 py-3">
                                 <p className="text-green-300 text-sm font-medium">Budget</p>
                                 <p className="text-white text-2xl font-bold">
-                                    ${(userBudget / 1_000_000).toFixed(1)}M
+                                    {formatCurrencyPrecise(userBudget)}
                                 </p>
                             </div>
                             <DriverSlotsDisplay driverCount={userDriverCount} />
@@ -303,32 +274,67 @@ const Market = () => {
                         </p>
                     </div>
                     
-                    <MarketDriverList
-                        drivers={filteredDrivers}
-                        loading={
-                            activeTab === 'free' ? freeDriversLoading : 
-                            activeTab === 'for-sale' ? forSaleLoading : 
-                            myDriversLoading
-                        }
-                        currentUserId={internalUserId}
-                        userBudget={userBudget}
-                        userDriverCount={userDriverCount}
-                        onBuyFromMarket={handleBuyFromMarket}
-                        onBuyFromUser={handleBuyFromUser}
-                        onSell={handleSell}
-                        onList={handleList}
-                        onUnlist={handleUnlist}
-                        onBuyout={handleBuyout}
-                        onViewDetails={setExpandedDriver}
-                        emptyMessage={
-                            searchQuery 
-                                ? "No drivers match your search" 
-                                : activeTab === 'my-drivers' 
-                                    ? "You don't own any drivers yet"
+                    {activeTab === 'my-drivers' ? (
+                        <DndContext
+                            sensors={sensors}
+                            collisionDetection={closestCenter}
+                            onDragEnd={handleDragEnd}
+                        >
+                            <SortableContext
+                                items={filteredDrivers.map(d => `driver-${d.id}`)}
+                            >
+                                <MarketDriverList
+                                    drivers={filteredDrivers}
+                                    loading={myDriversLoading}
+                                    currentUserId={internalUserId}
+                                    userBudget={userBudget}
+                                    userDriverCount={userDriverCount}
+                                    reserveDriverId={userTeam?.reserve_driver_id}
+                                    onBuyFromMarket={handlers.handleBuyFromMarket}
+                                    onBuyFromUser={handlers.handleBuyFromUser}
+                                    onSell={handlers.handleSell}
+                                    onList={handlers.handleList}
+                                    onUnlist={handlers.handleUnlist}
+                                    onBuyout={handlers.handleBuyout}
+                                    onViewDetails={setExpandedDriver}
+                                    emptyMessage={
+                                        searchQuery 
+                                            ? "No drivers match your search" 
+                                            : "You don't own any drivers yet"
+                                    }
+                                    gridColumns={4}
+                                    enableDragDrop={true}
+                                    swappingDriverIds={swappingDriverIds}
+                                />
+                            </SortableContext>
+                        </DndContext>
+                    ) : (
+                        <MarketDriverList
+                            drivers={filteredDrivers}
+                            loading={
+                                activeTab === 'free' ? freeDriversLoading : 
+                                activeTab === 'for-sale' ? forSaleLoading : 
+                                myDriversLoading
+                            }
+                            currentUserId={internalUserId}
+                            userBudget={userBudget}
+                            userDriverCount={userDriverCount}
+                            reserveDriverId={userTeam?.reserve_driver_id}
+                            onBuyFromMarket={handlers.handleBuyFromMarket}
+                            onBuyFromUser={handlers.handleBuyFromUser}
+                            onSell={handlers.handleSell}
+                            onList={handlers.handleList}
+                            onUnlist={handlers.handleUnlist}
+                            onBuyout={handlers.handleBuyout}
+                            onViewDetails={setExpandedDriver}
+                            emptyMessage={
+                                searchQuery 
+                                    ? "No drivers match your search" 
                                     : `No ${activeTab === 'free' ? 'free agents' : 'drivers for sale'} available`
-                        }
-                        gridColumns={4}
-                    />
+                            }
+                            gridColumns={4}
+                        />
+                    )}
                 </div>
             </div>
 
@@ -355,10 +361,11 @@ const Market = () => {
             {/* Buy Driver Modal */}
             <AnimatePresence>
                 {buyModalDriver && (
-                    <BuyDriverModal
+                    <DriverSaleModal
                         driver={buyModalDriver}
                         userBudget={userBudget}
-                        onConfirm={confirmBuyFromMarket}
+                        mode="buyDriver"
+                        onConfirm={handlers.confirmBuyFromMarket}
                         onCancel={() => setBuyModalDriver(null)}
                         loading={isBuyingFromMarket}
                     />
@@ -368,15 +375,41 @@ const Market = () => {
             {/* Sell Driver Modal */}
             <AnimatePresence>
                 {sellModalDriver && (
-                    <SellDriverModal
+                    <DriverSaleModal
                         driver={sellModalDriver}
                         userDriverCount={userDriverCount}
-                        onConfirm={confirmSell}
+                        mode="quickSell"
+                        onConfirm={handlers.confirmSell}
                         onCancel={() => setSellModalDriver(null)}
                         loading={isSellingToMarket}
                     />
                 )}
             </AnimatePresence>
+
+            {/* List for Sale Modal */}
+            <AnimatePresence>
+                {listModalDriver && (
+                    <DriverSaleModal
+                        driver={listModalDriver}
+                        userDriverCount={userDriverCount}
+                        mode="listForSale"
+                        onConfirm={(price) => handlers.confirmList(price!)}
+                        onCancel={() => setListModalDriver(null)}
+                        loading={isListing}
+                    />
+                )}
+            </AnimatePresence>
+
+            {/* Confirm/Success/Error Dialog */}
+            <ConfirmDialog
+                isOpen={dialog.isOpen}
+                onClose={() => setDialog({ ...dialog, isOpen: false })}
+                onConfirm={dialog.onConfirm}
+                title={dialog.title}
+                message={dialog.message}
+                type={dialog.type}
+                confirmText={dialog.confirmText}
+            />
         </div>
     );
 };

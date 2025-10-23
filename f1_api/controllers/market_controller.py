@@ -3,8 +3,9 @@ Market controller module for driver market operations.
 Handles buying, selling, listing drivers, and executing buyout clauses.
 """
 import logging
-from sqlmodel import Session
+import random
 from datetime import datetime, timedelta
+from sqlmodel import Session, select
 from fastapi import HTTPException
 from f1_api.controllers.base_controller import BaseController
 from f1_api.models.repositories.driver_ownership_repository import DriverOwnershipRepository
@@ -13,8 +14,12 @@ from f1_api.models.repositories.buyout_clause_history_repository import BuyoutCl
 from f1_api.models.repositories.user_teams_repository import UserTeamsRepository
 from f1_api.models.repositories.users_repository import UserRepository
 from f1_api.models.repositories.sessions_results_repository import SessionResultsRepository
+from f1_api.models.repositories.driver_team_link_repository import DriverTeamLinkRepository
 from f1_api.models.lib.drivers_utility import DriversUtility
 from f1_api.models.app_models import DriverOwnership, MarketTransactions, BuyoutClauseHistory
+from f1_api.models.repositories.drivers_repository import DriversRepository
+from f1_api.models.app_models import UserTeams
+from f1_api.models.f1_schemas import Teams
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +30,7 @@ SELL_TO_MARKET_REFUND = 0.8  # 80% refund when quick selling
 MAX_BUYOUTS_PER_USER_PAIR_PER_SEASON = 2  # Max buyouts between two users
 MAX_DRIVERS_PER_USER = 4  # 3 lineup + 1 reserve
 CURRENT_SEASON = 2025  # TODO: Get dynamically
+INITIAL_BUDGET = 100_000_000  # 100M
 
 
 class MarketController(BaseController):
@@ -49,6 +55,8 @@ class MarketController(BaseController):
         self.users_repo = UserRepository(session)
         self.results_repo = SessionResultsRepository(CURRENT_SEASON, session)
         self.drivers_utility = DriversUtility()
+        self.drivers_repo = DriversRepository(self.session, CURRENT_SEASON)
+        self.link_repo = DriverTeamLinkRepository(self.session)
     
     def _enrich_drivers_with_stats(self, drivers: list) -> list:
         """
@@ -96,7 +104,7 @@ class MarketController(BaseController):
                         "avg_finish": round(sum(finishes) / len(finishes), 1) if finishes else 0,
                         "avg_grid_position": round(sum(grids) / len(grids), 1) if grids else 0,
                         "pole_win_conversion": round(((pole_victories * 100) / poles), 1) if poles else 0,
-                        "price": round(1000000 + (points * 1000) + (podiums * 5000) + (victories * 10000), 0),
+                        "price": 10_000_000 + (int(points) * 10_000) + (podiums * 50_000) + (victories * 100_000),
                         "overtake_efficiency": round(sum(overtakes) / len(overtakes), 1) if overtakes else 0,
                         "available_points_percentatge": round(points * 100 / available_points, 1) if available_points > 0 else 0,
                     }
@@ -160,22 +168,11 @@ class MarketController(BaseController):
         Returns:
             dict with team_id, assigned_drivers, budget_remaining
         """
-        from f1_api.models.app_models import UserTeams
-        from f1_api.models.f1_schemas import Teams
-        from sqlmodel import select
-        import random
         
         logger.info("Initializing team for user %d in league %d", user_id, league_id)
         
         # Check if user already has a team
-        existing_team = self.session.exec(
-            select(UserTeams).where(
-                UserTeams.user_id == user_id,
-                UserTeams.league_id == league_id,
-                UserTeams.is_active == True
-            )
-        ).first()
-        if existing_team:
+        if self.user_teams_repo.has_active_team(user_id, league_id):
             logger.warning("User %d already has team in league %d", user_id, league_id)
             raise HTTPException(400, "User already has a team in this league")
         
@@ -219,9 +216,9 @@ class MarketController(BaseController):
             if not ownership:
                 continue
             
-            # Assign ownership with 0 cost (starter pack)
+            # Assign ownership (free starter pack, but keep acquisition_price for future sales)
             ownership.owner_id = user_id
-            ownership.acquisition_price = 0  # Free starter pack
+            # Keep acquisition_price = base_price (set during league initialization)
             ownership.is_listed_for_sale = False
             ownership.locked_until = None
             ownership.updated_at = datetime.now()
@@ -247,7 +244,6 @@ class MarketController(BaseController):
             raise HTTPException(500, "No constructors available")
         
         # Create UserTeam with full initial budget
-        INITIAL_BUDGET = 100_000_000  # 100M
         budget_remaining = INITIAL_BUDGET  # Full budget, drivers are free starter pack
         
         new_team = UserTeams(
@@ -287,9 +283,9 @@ class MarketController(BaseController):
         """Find which slot (1, 2, or 3) a driver occupies in lineup. Returns None if not in lineup."""
         if team.driver_1_id == driver_id:
             return 1
-        elif team.driver_2_id == driver_id:
+        if team.driver_2_id == driver_id:
             return 2
-        elif team.driver_3_id == driver_id:
+        if team.driver_3_id == driver_id:
             return 3
         return None
     
@@ -301,8 +297,8 @@ class MarketController(BaseController):
     
     def buy_driver_from_market(
         self, 
-        driver_id: int, 
-        buyer_id: int, 
+        driver_id: int,
+        buyer_id: int,
         league_id: int
     ) -> dict:
         """
@@ -338,13 +334,23 @@ class MarketController(BaseController):
         if current_count >= MAX_DRIVERS_PER_USER:
             raise HTTPException(400, f"Maximum {MAX_DRIVERS_PER_USER} drivers per user")
         
+        # Get driver's current market price (calculated from performance stats)
+        drivers = self.drivers_repo.get_drivers_by_ids([driver_id])
+        
+        if not drivers:
+            raise HTTPException(404, "Driver data not found")
+        
+        # Calculate current market price from driver's performance (fantasy_stats.price)
+        enriched = self._enrich_drivers_with_stats(drivers)
+        current_market_price = enriched[0].get('fantasy_stats', {}).get('price', ownership.acquisition_price)
+        
         # Validate budget
-        price = ownership.acquisition_price
-        if buyer_team.budget_remaining < price:
+        if buyer_team.budget_remaining < current_market_price:
             raise HTTPException(400, "Insufficient budget")
         
         # Execute purchase
         ownership.owner_id = buyer_id
+        ownership.acquisition_price = current_market_price  # Set to current market price
         ownership.locked_until = datetime.now() + timedelta(days=LOCK_DAYS_AFTER_PURCHASE)
         ownership.updated_at = datetime.now()
         self.ownership_repo.update(ownership)
@@ -363,7 +369,7 @@ class MarketController(BaseController):
             raise HTTPException(500, "All driver slots are full")
         
         # Update budget
-        buyer_team.budget_remaining -= price
+        buyer_team.budget_remaining -= current_market_price
         buyer_team.updated_at = datetime.now()
         
         # Create transaction
@@ -372,18 +378,18 @@ class MarketController(BaseController):
             league_id=league_id,
             seller_id=None,  # Free agent purchase
             buyer_id=buyer_id,
-            transaction_price=price,
+            transaction_price=current_market_price,
             transaction_type='buy_from_market',
             transaction_date=datetime.now()
         )
         self.transactions_repo.create(transaction)
         
-        logger.info("User %d bought driver %d from market for %f", buyer_id, driver_id, price)
+        logger.info("User %d bought driver %d from market for %f", buyer_id, driver_id, current_market_price)
         
         return {
             "success": True,
             "driver_id": driver_id,
-            "price": price,
+            "price": current_market_price,
             "locked_until": ownership.locked_until,
             "new_budget": buyer_team.budget_remaining
         }
@@ -431,26 +437,43 @@ class MarketController(BaseController):
         if current_count >= MAX_DRIVERS_PER_USER:
             raise HTTPException(400, f"Maximum {MAX_DRIVERS_PER_USER} drivers per user")
         
-        # Validate budget
-        price = ownership.acquisition_price
+        # Validate budget - use asking_price (the listed sale price)
+        price = ownership.asking_price or ownership.acquisition_price  # Fallback to acquisition if asking_price not set
         if buyer_team.budget_remaining < price:
             raise HTTPException(400, "Insufficient budget")
         
+        # Get driver's current market price (calculated from performance stats)
+        drivers = self.drivers_repo.get_drivers_by_ids([driver_id])
+        
+        if not drivers:
+            raise HTTPException(404, "Driver not found")
+        
+        # Calculate current market price from driver's performance (fantasy_stats.price)
+        enriched = self._enrich_drivers_with_stats(drivers)
+        current_market_price = enriched[0].get('fantasy_stats', {}).get('price', ownership.acquisition_price)
+        
         # Transfer ownership
         ownership.owner_id = buyer_id
-        ownership.acquisition_price = price
+        ownership.acquisition_price = current_market_price  # Set to current market price, not asking_price
         ownership.is_listed_for_sale = False
+        ownership.asking_price = None  # Clear asking price
         ownership.locked_until = datetime.now() + timedelta(days=LOCK_DAYS_AFTER_PURCHASE)
         ownership.updated_at = datetime.now()
         self.ownership_repo.update(ownership)
         
-        # Remove driver from seller's team slots
+        # Remove driver from seller's team and reorganize slots (prevent NULL constraints)
         if seller_team.driver_1_id == driver_id:
-            seller_team.driver_1_id = None
+            seller_team.driver_1_id = seller_team.driver_2_id
+            seller_team.driver_2_id = seller_team.driver_3_id
+            seller_team.driver_3_id = seller_team.reserve_driver_id
+            seller_team.reserve_driver_id = None
         elif seller_team.driver_2_id == driver_id:
-            seller_team.driver_2_id = None
+            seller_team.driver_2_id = seller_team.driver_3_id
+            seller_team.driver_3_id = seller_team.reserve_driver_id
+            seller_team.reserve_driver_id = None
         elif seller_team.driver_3_id == driver_id:
-            seller_team.driver_3_id = None
+            seller_team.driver_3_id = seller_team.reserve_driver_id
+            seller_team.reserve_driver_id = None
         elif seller_team.reserve_driver_id == driver_id:
             seller_team.reserve_driver_id = None
         
@@ -545,8 +568,8 @@ class MarketController(BaseController):
         if not seller_team:
             raise HTTPException(404, "Team not found")
         
-        # Calculate refund (80%)
-        refund = ownership.acquisition_price * SELL_TO_MARKET_REFUND
+        # Calculate refund (80%) - explicit int conversion for precision
+        refund = int(ownership.acquisition_price * SELL_TO_MARKET_REFUND)
         
         # Release driver ownership
         ownership.owner_id = None
@@ -555,19 +578,26 @@ class MarketController(BaseController):
         ownership.updated_at = datetime.now()
         self.ownership_repo.update(ownership)
         
-        # Remove driver from team (lineup or reserve)
+        # Remove driver from team and reorganize slots
         if seller_team.driver_1_id == driver_id:
-            seller_team.driver_1_id = None
+            seller_team.driver_1_id = seller_team.driver_2_id
+            seller_team.driver_2_id = seller_team.driver_3_id
+            seller_team.driver_3_id = seller_team.reserve_driver_id
+            seller_team.reserve_driver_id = None
         elif seller_team.driver_2_id == driver_id:
-            seller_team.driver_2_id = None
+            seller_team.driver_2_id = seller_team.driver_3_id
+            seller_team.driver_3_id = seller_team.reserve_driver_id
+            seller_team.reserve_driver_id = None
         elif seller_team.driver_3_id == driver_id:
-            seller_team.driver_3_id = None
+            seller_team.driver_3_id = seller_team.reserve_driver_id
+            seller_team.reserve_driver_id = None
         elif seller_team.reserve_driver_id == driver_id:
             seller_team.reserve_driver_id = None
         
         # Update budget
         seller_team.budget_remaining += refund
         seller_team.updated_at = datetime.now()
+        # Changes will be committed automatically by BaseController.__exit__
         
         # Create transaction
         transaction = MarketTransactions(
@@ -638,16 +668,18 @@ class MarketController(BaseController):
         # Update listing status
         ownership.is_listed_for_sale = True
         if asking_price is not None:
-            ownership.acquisition_price = asking_price
+            ownership.asking_price = asking_price  # Set asking price (keep acquisition_price unchanged)
+        else:
+            ownership.asking_price = ownership.acquisition_price  # Default to acquisition price
         ownership.updated_at = datetime.now()
         self.ownership_repo.update(ownership)
         
-        logger.info("User %d listed driver %d for sale at %f", owner_id, driver_id, ownership.acquisition_price)
+        logger.info("User %d listed driver %d for sale at %f", owner_id, driver_id, ownership.asking_price)
         
         return {
             "success": True,
             "driver_id": driver_id,
-            "asking_price": ownership.acquisition_price,
+            "asking_price": ownership.asking_price,
             "is_listed": True
         }
     
@@ -679,6 +711,7 @@ class MarketController(BaseController):
         
         # Update listing status
         ownership.is_listed_for_sale = False
+        ownership.asking_price = None  # Clear asking price when unlisting
         ownership.updated_at = datetime.now()
         self.ownership_repo.update(ownership)
         
@@ -793,8 +826,18 @@ class MarketController(BaseController):
             }
         
         # Transfer ownership
+        # Get driver's current market price (calculated from performance stats)
+        drivers = self.drivers_repo.get_drivers_by_ids([driver_id])
+        
+        if not drivers:
+            raise HTTPException(404, "Driver not found")
+        
+        # Calculate current market price from driver's performance (fantasy_stats.price)
+        enriched = self._enrich_drivers_with_stats(drivers)
+        current_market_price = enriched[0].get('fantasy_stats', {}).get('price', ownership.acquisition_price)
+        
         ownership.owner_id = buyer_id
-        ownership.acquisition_price = buyout_price
+        ownership.acquisition_price = current_market_price  # Set to current market price, not buyout_price
         ownership.is_listed_for_sale = False
         ownership.locked_until = datetime.now() + timedelta(days=LOCK_DAYS_AFTER_PURCHASE)
         ownership.updated_at = datetime.now()
@@ -909,188 +952,106 @@ class MarketController(BaseController):
         
         return emergency_driver
     
-    def get_free_drivers(self, league_id: int) -> list:
+    def _build_driver_list_response(
+        self,
+        ownerships: list[DriverOwnership],
+        is_owned: bool,
+        is_owned_by_me: bool,
+        is_free_agent: bool,
+        is_for_sale: bool,
+        include_owner_names: bool = False
+    ) -> list:
         """
-        Get all free agent drivers with their complete information.
+        Generic method to build driver list responses with ownership info.
         
-        Returns list of drivers with ownership info, stats, etc.
+        Args:
+            ownerships: List of DriverOwnership records
+            is_owned: Whether these drivers are owned by someone
+            is_owned_by_me: Whether these drivers are owned by the requesting user
+            is_free_agent: Whether these are free agents
+            is_for_sale: Whether these are listed for sale
+            include_owner_names: Whether to include owner names in response
+        
+        Returns:
+            List of enriched driver dictionaries
         """
-        from f1_api.models.repositories.drivers_repository import DriversRepository
-        from f1_api.models.repositories.driver_team_link_repository import DriverTeamLinkRepository
-        
-        drivers_repo = DriversRepository(self.session, CURRENT_SEASON)
-        link_repo = DriverTeamLinkRepository(self.session)
-        
-        # Get all free ownerships
-        free_ownerships = self.ownership_repo.get_free_drivers_in_league(league_id)
-        
-        if not free_ownerships:
-            return []
-        
-        # Get driver IDs
-        driver_ids = [o.driver_id for o in free_ownerships]
-        
-        # Get complete driver data
-        drivers = drivers_repo.get_drivers_by_ids(driver_ids)
-        
-        # Enrich drivers with season_results and fantasy_stats
-        enriched_drivers = self._enrich_drivers_with_stats(drivers)
-        
-        # Get latest team info for current season with JOIN to Teams
-        from f1_api.models.f1_schemas import DriverTeamLink, Teams
-        from sqlmodel import select
-        
-        latest_round = link_repo.get_latest_round_for_season(CURRENT_SEASON)
-        
-        # Create map of driver_id -> team_name using JOIN
-        team_map = {}
-        if latest_round:
-            results = self.session.exec(
-                select(DriverTeamLink.driver_id, Teams.team_name)
-                .join(Teams, DriverTeamLink.team_id == Teams.id)
-                .where(
-                    DriverTeamLink.season_id == CURRENT_SEASON,
-                    DriverTeamLink.round_number == latest_round
-                )
-            ).all()
-            team_map = {driver_id: team_name for driver_id, team_name in results}
-        
-        # Build response with ownership info
-        result = []
-        for driver_dict in enriched_drivers:
-            ownership = next((o for o in free_ownerships if o.driver_id == driver_dict['id']), None)
-            
-            driver_dict['team_name'] = team_map.get(driver_dict['id'])
-            driver_dict['ownership'] = ownership.model_dump() if ownership else None
-            driver_dict['isOwned'] = False
-            driver_dict['isOwnedByMe'] = False
-            driver_dict['isFreeAgent'] = True
-            driver_dict['isForSale'] = False
-            driver_dict['isLocked'] = False
-            driver_dict['canBuyout'] = False
-            
-            result.append(driver_dict)
-        
-        return result
-    
-    def get_drivers_for_sale(self, league_id: int) -> list:
-        """Get all drivers listed for sale."""
-        from f1_api.models.repositories.drivers_repository import DriversRepository
-        from f1_api.models.repositories.driver_team_link_repository import DriverTeamLinkRepository
-        
-        drivers_repo = DriversRepository(self.session, CURRENT_SEASON)
-        link_repo = DriverTeamLinkRepository(self.session)
-        
-        # Get listed ownerships
-        listed_ownerships = self.ownership_repo.get_drivers_for_sale_in_league(league_id)
-        
-        if not listed_ownerships:
-            return []
-        
-        driver_ids = [o.driver_id for o in listed_ownerships]
-        drivers = drivers_repo.get_drivers_by_ids(driver_ids)
-        
-        # Enrich drivers with season_results and fantasy_stats
-        enriched_drivers = self._enrich_drivers_with_stats(drivers)
-        
-        # Get team names using JOIN
-        from f1_api.models.f1_schemas import DriverTeamLink, Teams
-        from sqlmodel import select
-        
-        latest_round = link_repo.get_latest_round_for_season(CURRENT_SEASON)
-        
-        team_map = {}
-        if latest_round:
-            results = self.session.exec(
-                select(DriverTeamLink.driver_id, Teams.team_name)
-                .join(Teams, DriverTeamLink.team_id == Teams.id)
-                .where(
-                    DriverTeamLink.season_id == CURRENT_SEASON,
-                    DriverTeamLink.round_number == latest_round
-                )
-            ).all()
-            team_map = {driver_id: team_name for driver_id, team_name in results}
-        
-        # Get owner names
-        from f1_api.models.app_models import Users
-        from sqlmodel import col
-        owner_ids = [o.owner_id for o in listed_ownerships if o.owner_id]
-        if owner_ids:
-            owners_list = self.session.exec(
-                select(Users).where(col(Users.id).in_(owner_ids))
-            ).all()
-            owners = {u.id: u.user_name for u in owners_list}
-        else:
-            owners = {}
-        
-        result = []
-        for driver_dict in enriched_drivers:
-            ownership = next((o for o in listed_ownerships if o.driver_id == driver_dict['id']), None)
-            
-            driver_dict['team_name'] = team_map.get(driver_dict['id'])
-            driver_dict['ownership'] = ownership.model_dump() if ownership else None
-            driver_dict['isOwned'] = True
-            driver_dict['isOwnedByMe'] = False
-            driver_dict['isFreeAgent'] = False
-            driver_dict['isForSale'] = True
-            driver_dict['isLocked'] = self._is_driver_locked(ownership) if ownership else False
-            driver_dict['canBuyout'] = False
-            driver_dict['ownerName'] = owners.get(ownership.owner_id) if ownership and ownership.owner_id else None
-            result.append(driver_dict)
-        
-        return result
-    
-    def get_user_drivers(self, user_id: int, league_id: int) -> list:
-        """Get all drivers owned by a specific user."""
-        from f1_api.models.repositories.drivers_repository import DriversRepository
-        from f1_api.models.repositories.driver_team_link_repository import DriverTeamLinkRepository
-        
-        drivers_repo = DriversRepository(self.session, CURRENT_SEASON)
-        link_repo = DriverTeamLinkRepository(self.session)
-        
-        ownerships = self.ownership_repo.get_owned_by_user_in_league(user_id, league_id)
-        
         if not ownerships:
             return []
         
         driver_ids = [o.driver_id for o in ownerships]
-        drivers = drivers_repo.get_drivers_by_ids(driver_ids)
+        drivers = self.drivers_repo.get_drivers_by_ids(driver_ids)
         
         # Enrich drivers with season_results and fantasy_stats
         enriched_drivers = self._enrich_drivers_with_stats(drivers)
         
-        # Get team names using JOIN
-        from f1_api.models.f1_schemas import DriverTeamLink, Teams
-        from sqlmodel import select
+        # Get team names for current season
+        team_map = self.link_repo.get_driver_team_map(CURRENT_SEASON)
         
-        latest_round = link_repo.get_latest_round_for_season(CURRENT_SEASON)
+        # Get owner names if needed
+        owners = {}
+        if include_owner_names:
+            owner_ids = [o.owner_id for o in ownerships if o.owner_id]
+            owners = self.users_repo.get_users_names_by_ids(owner_ids)
         
-        team_map = {}
-        if latest_round:
-            results = self.session.exec(
-                select(DriverTeamLink.driver_id, Teams.team_name)
-                .join(Teams, DriverTeamLink.team_id == Teams.id)
-                .where(
-                    DriverTeamLink.season_id == CURRENT_SEASON,
-                    DriverTeamLink.round_number == latest_round
-                )
-            ).all()
-            team_map = {driver_id: team_name for driver_id, team_name in results}
-        
+        # Build response
         result = []
         for driver_dict in enriched_drivers:
             ownership = next((o for o in ownerships if o.driver_id == driver_dict['id']), None)
             
             driver_dict['team_name'] = team_map.get(driver_dict['id'])
             driver_dict['ownership'] = ownership.model_dump() if ownership else None
-            driver_dict['isOwned'] = True
-            driver_dict['isOwnedByMe'] = True
-            driver_dict['isFreeAgent'] = False
-            driver_dict['isForSale'] = ownership.is_listed_for_sale if ownership else False
+            driver_dict['isOwned'] = is_owned
+            driver_dict['isOwnedByMe'] = is_owned_by_me
+            driver_dict['isFreeAgent'] = is_free_agent
+            driver_dict['isForSale'] = is_for_sale if not is_owned_by_me else (ownership.is_listed_for_sale if ownership else False)
             driver_dict['isLocked'] = self._is_driver_locked(ownership) if ownership else False
-            driver_dict['canBuyout'] = False
-            driver_dict['ownerName'] = None
+            driver_dict['canBuyout'] = False  # TODO: Implement buyout eligibility logic
+            
+            if include_owner_names:
+                driver_dict['ownerName'] = owners.get(ownership.owner_id) if ownership and ownership.owner_id else None
+            else:
+                driver_dict['ownerName'] = None
             
             result.append(driver_dict)
         
         return result
+    
+    def get_free_drivers(self, league_id: int) -> list:
+        """
+        Get all free agent drivers with their complete information.
+        
+        Returns list of drivers with ownership info, stats, etc.
+        """
+        free_ownerships = self.ownership_repo.get_free_drivers_in_league(league_id)
+        return self._build_driver_list_response(
+            ownerships=free_ownerships,
+            is_owned=False,
+            is_owned_by_me=False,
+            is_free_agent=True,
+            is_for_sale=False,
+            include_owner_names=False
+        )
+    
+    def get_drivers_for_sale(self, league_id: int) -> list:
+        """Get all drivers listed for sale."""
+        listed_ownerships = self.ownership_repo.get_drivers_for_sale_in_league(league_id)
+        return self._build_driver_list_response(
+            ownerships=listed_ownerships,
+            is_owned=True,
+            is_owned_by_me=False,
+            is_free_agent=False,
+            is_for_sale=True,
+            include_owner_names=True
+        )
+    
+    def get_user_drivers(self, user_id: int, league_id: int) -> list:
+        """Get all drivers owned by a specific user."""
+        ownerships = self.ownership_repo.get_owned_by_user_in_league(user_id, league_id)
+        return self._build_driver_list_response(
+            ownerships=ownerships,
+            is_owned=True,
+            is_owned_by_me=True,
+            is_free_agent=False,
+            is_for_sale=False,  # Will be overridden by ownership.is_listed_for_sale
+            include_owner_names=False
+        )

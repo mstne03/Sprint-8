@@ -69,7 +69,7 @@ class MarketService {
    */
   async getUserDrivers(
     leagueId: number,
-    userId: number
+    userId: number | string  // Accept both internal ID and Supabase UUID
   ): Promise<DriverWithOwnership[]> {
     const response = await http.get<DriverWithOwnership[]>(
       `/leagues/${leagueId}/market/user-drivers/${userId}`
@@ -142,11 +142,11 @@ class MarketService {
    */
   async unlistDriverFromSale(
     leagueId: number,
-    transactionId: number,
+    driverId: number,
     request: UnlistDriverRequest
   ): Promise<ListDriverResponse> {
     const response = await http.delete<ListDriverResponse>(
-      `/leagues/${leagueId}/market/list-for-sale/${transactionId}`,
+      `/leagues/${leagueId}/market/list-for-sale/${driverId}`,
       { data: request }
     );
     return response.data;

@@ -13,6 +13,8 @@ from f1_api.models.repositories.driver_ownership_repository import DriverOwnersh
 from f1_api.models.repositories.drivers_repository import DriversRepository
 from f1_api.models.repositories.driver_team_link_repository import DriverTeamLinkRepository
 from f1_api.models.app_models import DriverOwnership
+from f1_api.models.repositories.sessions_results_repository import SessionResultsRepository
+from f1_api.models.lib.drivers_utility import DriversUtility
 
 logger = logging.getLogger(__name__)
 
@@ -61,26 +63,34 @@ class DriverOwnershipController(BaseController):
                 logger.warning("No active drivers found for season %s", season_year)
                 return 0
             
-            # Get driver details to access base_price - create temporary repo with year
+            # Get driver details with calculated fantasy_stats (includes dynamic pricing)
             drivers_repo = DriversRepository(self.session, season_year)
             drivers = drivers_repo.get_drivers_by_ids(active_driver_ids)
+            
+            # Calculate fantasy_stats.price for each driver
+            enriched_drivers = self._calculate_driver_prices(drivers, season_year)
             
             created_count = 0
             now = datetime.now()
             
-            for driver in drivers:
+            for enriched_driver in enriched_drivers:
+                driver_id = enriched_driver['id']
+                
                 # Check if ownership record already exists
                 existing = self.ownership_repository.get_by_driver_and_league(
-                    driver.id, league_id
+                    driver_id, league_id
                 )
                 
                 if not existing:
+                    # Get fantasy_stats.price (dynamic market price based on performance)
+                    fantasy_price = enriched_driver.get('fantasy_stats', {}).get('price', 10_000_000)
+                    
                     ownership = DriverOwnership(
-                        driver_id=driver.id,
+                        driver_id=driver_id,
                         league_id=league_id,
                         owner_id=None,  # Free agent
                         is_listed_for_sale=False,
-                        acquisition_price=driver.base_price,  # Use driver's base price
+                        acquisition_price=fantasy_price,  # ✅ Use dynamic fantasy_stats.price
                         created_at=now,
                         updated_at=now
                     )
@@ -125,6 +135,56 @@ class DriverOwnershipController(BaseController):
         logger.info("Found %d active drivers in season %s, round %d", len(driver_ids), season_year, latest_round)
         
         return driver_ids
+    
+    def _calculate_driver_prices(self, drivers: list, season_year: int) -> list[dict]:
+        """
+        Calculate fantasy_stats.price for each driver based on their season performance.
+        
+        Price formula: 1,000,000 + (points × 1,000) + (podiums × 5,000) + (victories × 10,000)
+        
+        Uses the same logic as market_controller._enrich_drivers_with_stats() to ensure consistency.
+        
+        Args:
+            drivers: List of Driver objects
+            season_year: Season year for stats lookup
+        
+        Returns:
+            List of dicts with driver data + fantasy_stats.price
+        """
+        
+        # Initialize repositories
+        results_repo = SessionResultsRepository(season_year, self.session)
+        drivers_utility = DriversUtility()
+        
+        # Get driver results data (same approach as market_controller)
+        database_data = results_repo.get_driver_results()
+        all_results = database_data["all_results"]
+        
+        # Calculate stats using DriversUtility
+        stats = drivers_utility.get_driver_stats(all_results)
+        points_map = {r.driver_id: r.total_points for r in database_data["results"]}
+        
+        # Enrich each driver with fantasy_stats.price
+        enriched = []
+        for driver in drivers:
+            driver_stats = stats.get(driver.id, {})
+            points = points_map.get(driver.id, 0)
+            podiums = driver_stats.get("podiums", 0)
+            victories = driver_stats.get("victories", 0)
+            
+            # Calculate fantasy price (same formula as market_controller)
+            # Base: 10M + (points × 10k) + (podiums × 50k) + (victories × 100k)
+            # No rounding for maximum precision
+            fantasy_price = 10_000_000 + (int(points) * 10_000) + (podiums * 50_000) + (victories * 100_000)
+            
+            enriched.append({
+                'id': driver.id,
+                'fantasy_stats': {
+                    'price': fantasy_price
+                }
+            })
+        
+        return enriched
     
     def get_driver_ownership_status(self, driver_id: int, league_id: int) -> DriverOwnership | None:
         """

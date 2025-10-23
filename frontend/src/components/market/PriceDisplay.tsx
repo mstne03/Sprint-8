@@ -1,3 +1,5 @@
+import { formatCurrency } from '@/utils/currencyFormat';
+
 interface PriceDisplayProps {
   price: number;
   type?: 'base' | 'buyout' | 'sale' | 'refund';
@@ -11,7 +13,7 @@ export const PriceDisplay = ({
   showIcon = true,
   compact = false 
 }: PriceDisplayProps) => {
-  const priceInMillions = (price / 1_000_000).toFixed(1);
+  const priceInMillions = formatCurrency(price, { prefix: false, suffix: false, removeTrailingZeros: true });
 
   const getStyles = () => {
     switch (type) {
@@ -78,9 +80,9 @@ export const PriceDisplay = ({
         {showIcon && <span className="text-sm">{styles.icon}</span>}
         <p className="text-purple-200 text-xs">
           {type === 'buyout' && 'Buyout'}
-          {type === 'sale' && 'Price'}
+          {type === 'sale' && 'Sale Price'}
           {type === 'refund' && 'Refund'}
-          {type === 'base' && 'Price'}
+          {type === 'base' && 'Market Price'}
         </p>
       </div>
       <p className={`${styles.text} font-bold text-sm`}>

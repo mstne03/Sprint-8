@@ -7,6 +7,7 @@ import { useLeagues } from '@/context/LeaguesContext';
 import { useUserTeam } from '@/hooks/userTeams/useUserTeam';
 import { useDrivers } from '@/hooks/db/drivers';
 import { useTeams } from '@/hooks/db/teams';
+import { useUserDrivers } from '@/hooks/market/useMarket';
 
 export const useLeagueDetail = (leagueId: string) => {
     const { user } = useAuth();
@@ -30,16 +31,28 @@ export const useLeagueDetail = (leagueId: string) => {
     const { data: allDrivers } = useDrivers();
     const { data: allTeams } = useTeams();
     
-    // Computed values - Obtener los drivers completos desde los IDs (incluyendo reserva)
+    // Get drivers with ownership info (for accurate acquisition_price)
+    const { data: myDriversWithOwnership } = useUserDrivers(
+        parseInt(leagueId),
+        user?.id || ''
+    );
+    
+    // Computed values - Obtener los drivers completos desde los IDs (con ownership info)
     const selectedDrivers = useMemo(() => {
-        if (!userTeam || !allDrivers) return [];
-        return [
-            allDrivers.find(d => d.id === userTeam.driver_1_id),
-            allDrivers.find(d => d.id === userTeam.driver_2_id),
-            allDrivers.find(d => d.id === userTeam.driver_3_id),
-            allDrivers.find(d => d.id === userTeam.reserve_driver_id),
+        if (!userTeam || !myDriversWithOwnership) return [];
+        
+        // Build driver list from myDriversWithOwnership (which includes ownership data)
+        const driverIds = [
+            userTeam.driver_1_id,
+            userTeam.driver_2_id,
+            userTeam.driver_3_id,
+            userTeam.reserve_driver_id,
         ];
-    }, [userTeam, allDrivers]);
+        
+        return driverIds.map(driverId => 
+            myDriversWithOwnership.find(d => d.id === driverId)
+        );
+    }, [userTeam, myDriversWithOwnership]);
     
     // Obtener el constructor completo desde el ID
     const selectedConstructor = useMemo(() => {
@@ -47,13 +60,14 @@ export const useLeagueDetail = (leagueId: string) => {
         return allTeams.find(t => t.id === userTeam.constructor_id) || null;
     }, [userTeam, allTeams]);
     
-    // Calcular el valor total del equipo
+    // Calcular el valor total del equipo basado en acquisition_price (lo que pagaste)
     const teamValue = useMemo(() => {
-        if (!selectedDrivers.length) return 0;
-        return selectedDrivers.reduce((total, driver) => {
-            return total + (driver?.fantasy_stats?.price || 0);
+        if (!myDriversWithOwnership?.length) return 0;
+        return myDriversWithOwnership.reduce((total, driver) => {
+            // Usar acquisition_price (precio pagado) en lugar de fantasy_stats.price (valor de mercado)
+            return total + (driver.ownership?.acquisition_price || 0);
         }, 0);
-    }, [selectedDrivers]);
+    }, [myDriversWithOwnership]);
     
     // Actions
     const handleLeaveLeague = async () => {
