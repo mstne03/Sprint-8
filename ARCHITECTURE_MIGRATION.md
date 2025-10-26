@@ -62,6 +62,60 @@ f1_api/
 **Goal:** Create foundation for feature modules
 
 #### Step 1.1: Create Directory Structure
+
+**PowerShell (Windows):**
+```powershell
+# Navigate to f1_api directory
+cd f1_api
+
+# Create feature directories - Market
+mkdir -Force features\market\domain\entities, features\market\domain\value_objects, features\market\domain\services, features\market\domain\interfaces, features\market\application\use_cases, features\market\application\dto\requests, features\market\application\dto\responses, features\market\infrastructure\persistence, features\market\infrastructure\models, features\market\presentation\routers
+
+# Create feature directories - Teams
+mkdir -Force features\teams\domain\entities, features\teams\domain\value_objects, features\teams\domain\services, features\teams\domain\interfaces, features\teams\application\use_cases, features\teams\application\dto\requests, features\teams\application\dto\responses, features\teams\infrastructure\persistence, features\teams\infrastructure\models, features\teams\presentation\routers
+
+# Create feature directories - Drivers
+mkdir -Force features\drivers\domain\entities, features\drivers\domain\services, features\drivers\domain\interfaces, features\drivers\application\use_cases, features\drivers\application\dto, features\drivers\infrastructure\persistence, features\drivers\infrastructure\models, features\drivers\infrastructure\external, features\drivers\presentation\routers
+
+# Create feature directories - Leagues
+mkdir -Force features\leagues\domain\entities, features\leagues\domain\services, features\leagues\domain\interfaces, features\leagues\application\use_cases, features\leagues\application\dto, features\leagues\infrastructure\persistence, features\leagues\infrastructure\models, features\leagues\presentation\routers
+
+# Create feature directories - F1 Data
+mkdir -Force features\f1_data\domain\entities, features\f1_data\domain\services, features\f1_data\application\use_cases, features\f1_data\infrastructure\persistence, features\f1_data\infrastructure\models, features\f1_data\infrastructure\external, features\f1_data\presentation\routers
+
+# Create shared directories
+mkdir -Force shared\domain\interfaces, shared\domain\value_objects, shared\domain\exceptions, shared\infrastructure\persistence, shared\infrastructure\cache, shared\config
+
+# Create __init__.py files (PowerShell)
+New-Item -ItemType File -Path features\__init__.py -Force
+New-Item -ItemType File -Path features\market\__init__.py -Force
+New-Item -ItemType File -Path features\market\domain\__init__.py -Force
+New-Item -ItemType File -Path features\market\domain\entities\__init__.py -Force
+New-Item -ItemType File -Path features\market\domain\value_objects\__init__.py -Force
+New-Item -ItemType File -Path features\market\domain\services\__init__.py -Force
+New-Item -ItemType File -Path features\market\domain\interfaces\__init__.py -Force
+New-Item -ItemType File -Path features\market\application\__init__.py -Force
+New-Item -ItemType File -Path features\market\application\use_cases\__init__.py -Force
+New-Item -ItemType File -Path features\market\application\dto\__init__.py -Force
+New-Item -ItemType File -Path features\market\application\dto\requests\__init__.py -Force
+New-Item -ItemType File -Path features\market\application\dto\responses\__init__.py -Force
+New-Item -ItemType File -Path features\market\infrastructure\__init__.py -Force
+New-Item -ItemType File -Path features\market\infrastructure\persistence\__init__.py -Force
+New-Item -ItemType File -Path features\market\infrastructure\models\__init__.py -Force
+New-Item -ItemType File -Path features\market\presentation\__init__.py -Force
+New-Item -ItemType File -Path features\market\presentation\routers\__init__.py -Force
+New-Item -ItemType File -Path shared\__init__.py -Force
+New-Item -ItemType File -Path shared\domain\__init__.py -Force
+New-Item -ItemType File -Path shared\domain\interfaces\__init__.py -Force
+New-Item -ItemType File -Path shared\domain\value_objects\__init__.py -Force
+New-Item -ItemType File -Path shared\domain\exceptions\__init__.py -Force
+New-Item -ItemType File -Path shared\infrastructure\__init__.py -Force
+New-Item -ItemType File -Path shared\infrastructure\persistence\__init__.py -Force
+New-Item -ItemType File -Path shared\infrastructure\cache\__init__.py -Force
+New-Item -ItemType File -Path shared\config\__init__.py -Force
+```
+
+**Bash/Linux/Mac:**
 ```bash
 # Create feature directories
 mkdir -p features/market/{domain/{entities,value_objects,services,interfaces},application/{use_cases,dto/{requests,responses}},infrastructure/{persistence,models},presentation/routers}
@@ -276,14 +330,14 @@ class MarketConfig(BaseSettings):
 - No external dependencies
 - Quick win to prove architecture works
 
-#### Step 2.1: Create Pricing Domain Value Objects
-**File:** `features/market/domain/value_objects/driver_stats.py`
+#### Step 2.1: Create Shared Value Objects
+**File:** `shared/domain/value_objects/driver_stats.py`
 ```python
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class DriverStats:
-    """Value object for driver statistics used in pricing"""
+    """Value object for driver statistics used across features"""
     points: int
     podiums: int
     victories: int
@@ -295,7 +349,19 @@ class DriverStats:
             raise ValueError("Podiums cannot be negative")
         if self.victories < 0:
             raise ValueError("Victories cannot be negative")
+    
+    @property
+    def has_victories(self) -> bool:
+        """Check if driver has any victories"""
+        return self.victories > 0
+    
+    @property
+    def has_podiums(self) -> bool:
+        """Check if driver has any podiums"""
+        return self.podiums > 0
 ```
+
+#### Step 2.2: Create Market-Specific Value Objects
 
 **File:** `features/market/domain/value_objects/fantasy_price.py`
 ```python
@@ -323,11 +389,11 @@ class FantasyPrice:
         return f"${self.in_millions:.6f}M"
 ```
 
-#### Step 2.2: Create Pricing Strategy Interface
+#### Step 2.3: Create Pricing Strategy Interface
 **File:** `features/market/domain/interfaces/i_pricing_strategy.py`
 ```python
 from abc import ABC, abstractmethod
-from features.market.domain.value_objects.driver_stats import DriverStats
+from shared.domain.value_objects.driver_stats import DriverStats
 from features.market.domain.value_objects.fantasy_price import FantasyPrice
 
 class IPricingStrategy(ABC):
@@ -339,11 +405,11 @@ class IPricingStrategy(ABC):
         pass
 ```
 
-#### Step 2.3: Create Pricing Service
+#### Step 2.4: Create Pricing Service
 **File:** `features/market/domain/services/pricing_service.py`
 ```python
 from features.market.domain.interfaces.i_pricing_strategy import IPricingStrategy
-from features.market.domain.value_objects.driver_stats import DriverStats
+from shared.domain.value_objects.driver_stats import DriverStats
 from features.market.domain.value_objects.fantasy_price import FantasyPrice
 from shared.config.market_config import MarketConfig
 
@@ -382,7 +448,7 @@ class PricingService:
         return acquisition_price.apply_multiplier(refund_rate)
 ```
 
-#### Step 2.4: Update Existing Controllers to Use Pricing Service
+#### Step 2.5: Update Existing Controllers to Use Pricing Service
 **Target Files:**
 1. `controllers/market_controller.py` line 107
 2. `controllers/driver_ownership_controller.py` line 177
@@ -394,7 +460,7 @@ class PricingService:
 "price": 10_000_000 + int(points) * 10_000 + podiums * 50_000 + victories * 100_000
 
 # AFTER
-from features.market.domain.value_objects.driver_stats import DriverStats
+from shared.domain.value_objects.driver_stats import DriverStats
 from features.market.domain.services.pricing_service import PricingService
 
 # In __init__:
@@ -568,7 +634,7 @@ class BuyoutValidator:
 **File:** `features/market/domain/services/tier_classifier.py`
 ```python
 from typing import List, Dict
-from features.market.domain.value_objects.driver_stats import DriverStats
+from shared.domain.value_objects.driver_stats import DriverStats
 
 class DriverTier:
     """Value object for driver tier classification"""
