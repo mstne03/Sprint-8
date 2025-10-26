@@ -1,0 +1,16 @@
+import { useContext, createContext } from 'react'
+import type { PropsWithChildren } from 'react'
+import type { F1DataService } from '@/types/f1DataService'
+import { f1DataService } from '@/services'
+
+const Ctx = createContext<F1DataService | null>(null);
+
+export default function DataServiceProvider({ children }: PropsWithChildren) {
+    return <Ctx.Provider value={f1DataService}>{children}</Ctx.Provider>
+}
+
+export function useDataService(): F1DataService {
+    const val = useContext(Ctx);
+    if (!val) throw new Error("useDataService function must be called inside its context provider")
+    return val;
+}

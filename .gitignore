@@ -14,6 +14,9 @@ dist-ssr
 .env
 .venv
 ff1_cache
+frontend/src/components/Models/
+frontend/src/components/Models/*
+frontend/src/components/Models/**
 
 # Editor directories and files
 .vscode/*
