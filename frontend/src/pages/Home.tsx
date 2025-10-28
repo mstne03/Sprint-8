@@ -1,8 +1,6 @@
-import { PerspectiveCamera, Preload } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
-import MclarenModel from "../components/ui/Models/mclaren";
 import { motion } from 'framer-motion';
 import { Link } from "react-router-dom";
+import { RandomTeamLogo } from "../components/ui/RandomTeamLogo";
 
 const Home = () => {
     return (
@@ -41,7 +39,7 @@ const Home = () => {
                     </motion.div>
                 </div>
 
-                {/* 3D Model Section - Floating model without container */}
+                {/* Team Logo Section - Random team logo display */}
                 <div className="flex-1 flex items-center justify-center px-6 min-h-0">
                     <motion.div 
                         className="w-full max-w-2xl mx-auto h-full max-h-80"
@@ -49,24 +47,11 @@ const Home = () => {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 1.2, delay: 0.6 }}
                     >
-                        {/* McLaren model - Direct canvas without glassmorphism container */}
-                        <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                            <Canvas
-                                className="w-full h-full rounded-3xl absolute md:left-[10%]"
-                                style={{ width: "100%", height: "100%" }}
-                            >
-                                <PerspectiveCamera 
-                                    makeDefault
-                                    fov={60}
-                                    position={[0,0,4]}
-                                    resolution={1048}
-                                />
-                                <MclarenModel />
-                                <ambientLight intensity={2.5}/>
-                                <Preload all />
-                            </Canvas>
+                        {/* Team Logo - Direct display without glassmorphism container */}
+                        <div className="relative w-full h-full rounded-3xl overflow-hidden flex items-center justify-center">
+                            <RandomTeamLogo />
 
-                            {/* Floating decorative elements around the model */}
+                            {/* Floating decorative elements around the logo */}
                             <div className="absolute -top-6 -left-6 w-4 h-4 bg-amber-500/40 rounded-full blur-sm animate-pulse" />
                             <div className="absolute -top-4 -right-8 w-3 h-3 bg-red-500/40 rounded-full blur-sm animate-pulse" style={{ animationDelay: '0.5s' }} />
                             <div className="absolute -bottom-6 -left-4 w-5 h-5 bg-amber-500/30 rounded-full blur-sm animate-pulse" style={{ animationDelay: '1s' }} />
