@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { useCurrentUser } from "../auth/auth"
+import { useCurrentUser } from "../auth/useAuth"
 import { backendUserService } from "@/services"
 
 export const useBackendUser = () => {

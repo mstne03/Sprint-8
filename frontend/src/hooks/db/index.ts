@@ -1,2 +1,2 @@
-export { useDrivers } from './drivers'
-export { useTeams } from './teams'
+export { useDrivers } from './useDrivers'
+export { useTeams } from './useTeams'

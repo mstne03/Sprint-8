@@ -4,10 +4,10 @@ export {
     useSignInWithGoogle,
     useSignOut, useRefreshSession,
     useAuth, authKeys
-} from './auth'
+} from './useAuth'
 
-export { useEmailConfirmation } from './emailConfirmation'
+export { useEmailConfirmation } from './useEmailConfirmation'
 
-export { useLoginForm } from './loginForm'
+export { useLoginForm } from './useLoginForm'
 
-export { useRegisterForm } from './registerForm'
+export { useRegisterForm } from './useRegisterForm'

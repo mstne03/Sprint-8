@@ -5,8 +5,8 @@ import { leagueService } from '@/services';
 import { useAuth } from '@/context/AuthContext';
 import { useLeagues } from '@/context/LeaguesContext';
 import { useUserTeam } from '@/hooks/userTeams/useUserTeam';
-import { useDrivers } from '@/hooks/db/drivers';
-import { useTeams } from '@/hooks/db/teams';
+import { useDrivers } from '@/hooks/db/useDrivers';
+import { useTeams } from '@/hooks/db/useTeams';
 import { useUserDrivers } from '@/hooks/market/useMarket';
 
 export const useLeagueDetail = (leagueId: string) => {

@@ -2,6 +2,19 @@
 
 Una aplicación completa de **F1 Fantasy** que permite a los usuarios crear equipos virtuales, gestionar pilotos, competir en ligas privadas y seguir el rendimiento en tiempo real basado en datos oficiales de Formula 1.
 
+## 📋 Índice
+
+- [¿Qué es Grid Fans Club?](#-qué-es-grid-fans-club)
+- [Estado Actual de Implementación](#-estado-actual-de-implementación)
+- [Tech Stack](#-tech-stack)
+- [Estructura de la Aplicación](#️-estructura-de-la-aplicación)
+- [Tecnologías y Dependencias](#️-tecnologías-y-dependencias)
+- [Instalación](#-instalación)
+- [Configuración](#️-configuración)
+- [Uso](#-uso)
+- [Arquitectura](#️-arquitectura)
+- [Sobre el Proyecto](#-sobre-el-proyecto)
+  
 ## 🎯 ¿Qué es Grid Fans Club?
 
 Grid Fans Club es un juego de gestión deportiva donde los usuarios:
@@ -69,21 +82,15 @@ Grid Fans Club es un juego de gestión deportiva donde los usuarios:
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 
 ### Architecture
+
+#### Current
+![MVC](https://img.shields.io/badge/MVC_Architecture-FF6B6B?style=for-the-badge&logo=architecture&logoColor=white)
+![Layer_Pattern](https://img.shields.io/badge/Layered_Architecture-4ECDC4?style=for-the-badge&logo=layers&logoColor=white)
+
+#### Goal
 ![DDD](https://img.shields.io/badge/Domain_Driven_Design-FF6B6B?style=for-the-badge&logo=architecture&logoColor=white)
 ![TDD](https://img.shields.io/badge/Test_Driven_Development-4ECDC4?style=for-the-badge&logo=checkmarx&logoColor=white)
 
-## 📋 Índice
-
-- [¿Qué es Grid Fans Club?](#-qué-es-grid-fans-club)
-- [Estado Actual de Implementación](#-estado-actual-de-implementación)
-- [Tech Stack](#-tech-stack)
-- [Estructura de la Aplicación](#️-estructura-de-la-aplicación)
-- [Tecnologías y Dependencias](#️-tecnologías-y-dependencias)
-- [Instalación](#-instalación)
-- [Configuración](#️-configuración)
-- [Uso](#-uso)
-- [Arquitectura](#️-arquitectura)
-- [Sobre el Proyecto](#-sobre-el-proyecto)
 
 ## 🏗️ Estructura de la Aplicación
 
@@ -130,12 +137,14 @@ Sprint 8/
 └── README.md                  # Este archivo
 ```
 
-### 🎯 **Estructura Objetivo (refactor/phase-1-foundation - En Migración)**
+### 🎯 **Estructura Objetivo (PLAN FUTURO - Experimental)**
+
+> **⚠️ IMPORTANTE:** Esta es una **estructura planificada**, NO la estructura actual. Uno de los objetivos actuales del proyecto es la migración de la estructura actual a la siguiente:
 
 ```
 Sprint 8/
-├── f1_api/                     # Backend (FastAPI + DDD)
-│   ├── features/               # 🆕 Bounded Contexts (DDD)
+├── f1_api/                     # Backend (FastAPI + DDD Experimental)
+│   ├── features/               # 🆕 Bounded Contexts (DDD) - PLANIFICADO
 │   │   ├── market/            # Contexto de mercado de pilotos
 │   │   │   ├── domain/        # Lógica de negocio pura
 │   │   │   │   ├── entities/  # Entidades (UserTeam, Driver)
@@ -199,36 +208,43 @@ Sprint 8/
 
 | Componente | Estado Actual | Estado Objetivo | Progreso |
 |------------|---------------|-----------------|----------|
-| **Controladores** | ✅ MVC tradicional | 🔄 Use Cases + API Layer | En migración |
-| **Modelos** | ✅ SQLAlchemy directo | 🔄 Entities + Value Objects | Planificado |
-| **Base de datos** | ✅ SQLite | 🔄 PostgreSQL (Supabase) | En progreso |
-| **Tests** | ❌ Escasos | 🔄 TDD con cobertura completa | Iniciando |
-| **Arquitectura** | ✅ MVC monolítico | 🔄 DDD con Bounded Contexts | Fase 1 activa |
+| **Arquitectura** | ✅ MVC por capas tradicional | 🎯 DDD con Bounded Contexts | Planificado |
+| **Testing** | ❌ Configuración básica, pocos tests | 🎯 TDD con cobertura completa | Pendiente |
+| **Controladores** | ✅ MVC tradicional (funcional) | 🎯 Use Cases + API Layer | Pendiente |
+| **Modelos** | ✅ SQLAlchemy directo (funcional) | 🎯 Entities + Value Objects | Pendiente |
+| **Base de datos** | ✅ PostgreSQL con Supabase | ✅ PostgreSQL (Supabase) | Completado |
+| **Estructura** | ✅ Carpetas por tipo (controllers, models) | 🎯 Carpetas por contexto (features) | En investigación |
 
 ### 📋 **Plan de Migración por Fases**
 
-- :arrows_counterclockwise: Plan provisional y en mejora continua
+- 🎯 **Plan futuro y experimental** - Migración hacia DDD/TDD
 
-#### **Fase 1: Foundation (Actual - refactor/phase-1-foundation)**
-- ✅ Configurar estructura de carpetas DDD
-- 🔄 Migrar Value Objects básicos (Money, UserId)
-- 🔄 Implementar interfaces base (Repository, UnitOfWork)
-- 🔄 Configurar testing framework con TDD
+#### **Fase 0: Estabilización Actual (Prioridad)**
+- ✅ Mantener funcionalidad MVC existente
+- 🔄 Completar funcionalidades de mercado y puntuación
+- 🔄 Añadir tests básicos a funcionalidad existente
+- 🔄 Documentar arquitectura actual
 
-#### **Fase 2: Market Context**
-- 🎯 Migrar lógica de mercado de pilotos
+#### **Fase 1: Foundation (Futuro - Experimental)**
+- 🎯 Investigar estructura DDD para F1 Fantasy
+- 🎯 Crear PoC de Value Objects básicos (Money, UserId)
+- 🎯 Configurar testing framework con TDD
+- 🎯 Documentar decisiones arquitectónicas
+
+#### **Fase 2: Market Context (Futuro)**
+- 🎯 Migrar lógica de mercado a DDD (si se decide continuar)
 - 🎯 Implementar agregados (UserTeam)
 - 🎯 Use Cases de compra/venta
 
-#### **Fase 3: F1 Data Context**
+#### **Fase 3: F1 Data Context (Futuro)**
 - 🎯 Migrar integración FastF1
 - 🎯 Optimizar sistema de cache
 - 🎯 APIs de datos de F1
 
-#### **Fase 4: Scoring & League**
-- 🎯 Sistema de puntuación
-- 🎯 Gestión de ligas
-- 🎯 Eliminación del código legacy
+#### **Fase 4: Consolidación (Futuro)**
+- 🎯 Sistema de puntuación completo
+- 🎯 Gestión avanzada de ligas
+- 🎯 Evaluación de eliminar código legacy (si migración exitosa)
 
 ## 🛠️ Tecnologías y Dependencias
 
@@ -248,12 +264,15 @@ Sprint 8/
 - ![Python](https://img.shields.io/badge/FastF1-3776AB?style=flat&logo=python&logoColor=white) **FastF1** - Librería para obtener datos oficiales de Formula 1
 
 **Testing:**
-- ![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat&logo=pytest&logoColor=white) **Pytest** - Framework de testing
-- ![Coverage](https://img.shields.io/badge/Coverage-4c1?style=flat&logo=python&logoColor=white) **Pytest-cov** - Coverage de tests
+- ![Pytest](https://img.shields.io/badge/Pytest-0A9EDC?style=flat&logo=pytest&logoColor=white) **Pytest** - Framework de testing (configuración básica)
 
-**Arquitectura:**
-- ![DDD](https://img.shields.io/badge/DDD-FF6B6B?style=flat&logo=architecture&logoColor=white) **Domain-Driven Design (DDD)** - Patrón arquitectónico
-- ![TDD](https://img.shields.io/badge/TDD-4ECDC4?style=flat&logo=checkmarx&logoColor=white) **Test-Driven Development (TDD)** - Metodología de desarrollo
+**Arquitectura Actual:**
+- ![MVC](https://img.shields.io/badge/MVC-FF6B6B?style=flat&logo=architecture&logoColor=white) **MVC Pattern** - Arquitectura por capas tradicional (Controllers, Models, Routes)
+- ![FastAPI](https://img.shields.io/badge/FastAPI_Structure-009688?style=flat&logo=fastapi&logoColor=white) **FastAPI Standard** - Estructura estándar de FastAPI
+
+**Arquitectura Objetivo (Futuro):**
+- ![DDD](https://img.shields.io/badge/DDD-9B59B6?style=flat&logo=architecture&logoColor=white) **Domain-Driven Design (DDD)** - Patrón arquitectónico (en migración)
+- ![TDD](https://img.shields.io/badge/TDD-E67E22?style=flat&logo=checkmarx&logoColor=white) **Test-Driven Development (TDD)** - Metodología de desarrollo (planificado)
 
 ### Frontend (frontend/)
 
@@ -281,8 +300,8 @@ Sprint 8/
 
 ### Prerrequisitos
 
-- **Python 3.12.7+**
-- **Node.js 18+**
+- **Python 3.12.7**
+- **Node.js 22.15**
 - **npm**
 - **Git**
 
@@ -329,12 +348,8 @@ cd frontend
 # Instalar dependencias
 npm install
 
-# Instalar Supabase client (si no está en package.json)
-npm install @supabase/supabase-js
-
 # O si prefieres yarn:
 yarn install
-yarn add @supabase/supabase-js
 ```
 
 ## ⚙️ Configuración
@@ -424,7 +439,7 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```bash
 cd f1_api
 # Activar entorno virtual si no está activo
-venv\Scripts\activate  # Windows
+.venv\Scripts\activate  # Windows
 # source venv/bin/activate  # macOS/Linux
 
 # Iniciar servidor de desarrollo
@@ -448,6 +463,8 @@ La aplicación estará disponible en:
 
 **Backend Tests:**
 
+:exclamation: Los tests del backend son unos de los __TODOS__, por lo tanto estos comandos no tendrán efecto todavía. Los dejamos aquí con en pro de la documentación del proyecto.
+
 ```bash
 cd f1_api
 pytest                          # Todos los tests
@@ -465,35 +482,25 @@ npm run test:coverage          # Con coverage
 
 ### Build para Producción
 
-**Backend:**
-
-```bash
-cd f1_api
-pip install gunicorn
-gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
-```
-
-**Frontend:**
-
-```bash
-cd frontend
-npm run build                   # Genera dist/
-npm run preview                 # Preview del build
-```
+:exclamation: __TODO__
 
 ## 🏛️ Arquitectura
 
-### Patrón Domain-Driven Design (DDD)
+### Flujo de Datos actual:
 
-La aplicación sigue los principios de DDD con:
+```
+Frontend (React) 
+    ↓ HTTP Requests
+FastAPI Routers 
+    ↓
+Controllers (Application Layer)
+    ↓ Logic
+Repositories (Infrastructure)
+    ↓ ORM
+Database (PostgreSQL)
+```
 
-- **Bounded Contexts:** Separación clara entre dominios (Market, F1 Data, Scoring, League)
-- **Aggregates:** Entidades agrupadas con fronteras transaccionales
-- **Value Objects:** Objetos inmutables sin identidad (Money, FantasyPrice)
-- **Domain Services:** Lógica de negocio que no pertenece a entidades
-- **Use Cases:** Casos de uso de aplicación (comprar piloto, crear liga)
-
-### Flujo de Datos
+### Flujo de Datos a implementar en el futuro:
 
 ```
 Frontend (React) 
@@ -506,8 +513,103 @@ Domain Services & Aggregates
     ↓ Persistence
 Repositories (Infrastructure)
     ↓ ORM
-Database (SQLite/PostgreSQL)
+Database (PostgreSQL)
 ```
+
+### 📦 Patrón actualmente implementado: MVC architecture
+
+### FRONTEND
+
+La aplicación de __frontend__ actualmente se encuentra estructurada en un patrón __Component-Based__.
+
+```mermaid
+graph LR
+    A[App.tsx] --> B[Pages]
+    B --> B1[Home]
+    B --> B2[Leagues]
+    B --> B3[LeagueDetail]
+    B --> B4[Login]
+    B --> B5[Register]
+    B --> B6[Market]
+    B --> B7[Teams]
+    A --> C[Components]
+    C --> C1[auth]
+    C --> C2[layout]
+    C2 --> C2a[Header]
+    C --> C3[league]
+    C3 --> C3a[LeagueHeader]
+    C3 --> C3b[LeagueStats]
+    C3 --> C3c[LineupTab]
+    C3 --> C3d[StandingsTab]
+    C3 --> C3e[TeamDisplay]
+    C --> C4[leagues]
+    C4 --> C4a[LeagueAction]
+    C4 --> C4b[LeagueCard]
+    C --> C5[market]
+    C5 --> C5a[DraggableDriverCard]
+    C5 --> C5b[DriverCardExpanded]
+    C5 --> C5c[DriverSlotsDrisplay]
+    C5 --> C5d[LockCountdown]
+    C5 --> C5e[MarketDriverCard]
+    C5 --> C5f[MarketDriverList]
+    C5 --> C5g[OwnerShipBadge]
+    C5 --> C5h[PriceDisplay]
+    C5 --> C5i[ReserveDriverSlot]
+    C --> C6[modals]
+    C6 --> C6a[CreateLeagueModal]
+    C6 --> C6b[JoinLeagueModal]
+    C6 --> C6c[LeaveLeagueModal]
+    C --> C7[ui]
+    C7 --> C7a[ConfirmDialog]
+    C7 --> C7b[CustomButton]
+    C7 --> C7c[DriverImage]
+    C7 --> C7d[DriverInfo]
+    C7 --> C7e[DriverStatsCharts]
+    C7 --> C7f[EmptyState]
+    C7 --> C7g[EventModal]
+    C7 --> C7h[ExpandButton]
+    C7 --> C7i[GlassCard]
+    C7 --> C7j[LoadingError]
+    C7 --> C7k[LoadingSpinner]
+    C7 --> C7l[SearchInput]
+    C7 --> C7m[TeamCreate] 
+    A --> D[Hooks]
+    D --> D1[auth]
+    D1 --> D1a[useAuth]
+    D1 --> D1b[useEmailConfirmation]
+    D1 --> D1c[useLoginForm]
+    D1 --> D1d[useRegister]
+    D --> D2[db]
+    D2 --> D2a[useDrivers]
+    D2 --> D2b[useTeams]
+    D --> D3[market]
+    D3 --> D3a[useDriverActionButton]
+    D3 --> D3b[useFilteredDrivers]
+    D3 --> D3c[useMarket]
+    D3 --> D3d[useMarketHandler]
+    D3 --> D3e[useReserveDriverDragDrop]
+    D3 --> D3f[useSortedMyDrivers]
+    D3 --> D3g[useSwapReserveDriver]
+    D --> D4[user]
+    D4 --> D4a[u]
+    A --> E[Context]
+    E --> E1[AuthContext]
+    E --> E2[LeagueContext]
+    A --> F[Assets]
+    F --> F1[images/]
+    F --> F2[styles/]
+```
+
+### :exclamation: __TODO__ Patrón Domain-Driven Design (DDD)
+
+La aplicación del backend __está migrando__ hacia los principios de DDD:
+
+- **Bounded Contexts:** Separación clara entre dominios (Market, F1 Data, Scoring, League)
+- **Aggregates:** Entidades agrupadas con fronteras transaccionales
+- **Value Objects:** Objetos inmutables sin identidad (Money, FantasyPrice)
+- **Domain Services:** Lógica de negocio que no pertenece a entidades
+- **Use Cases:** Casos de uso de aplicación (comprar piloto, crear liga)
+
 
 ### Bounded Contexts
 

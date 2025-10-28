@@ -9,7 +9,7 @@ export const TeamDisplay = ({ drivers, constructor }: TeamDisplayProps) => {
     return (
         <div className="grid md:grid-cols-2 gap-6">
             {/* Drivers Section */}
-            <div>
+            <section>
                 {/* Main Drivers */}
                 <div className="mb-4">
                     <h3 className="text-lg font-semibold text-gray-300 mb-3 flex items-center gap-2">
@@ -102,10 +102,10 @@ export const TeamDisplay = ({ drivers, constructor }: TeamDisplayProps) => {
                         </div>
                     )}
                 </div>
-            </div>
+            </section>
 
             {/* Constructor Section */}
-            <div>
+            <section>
                 <h3 className="text-lg font-semibold text-gray-300 mb-3">
                     Constructor
                 </h3>
@@ -134,7 +134,7 @@ export const TeamDisplay = ({ drivers, constructor }: TeamDisplayProps) => {
                         <p className="text-gray-500">Select a team</p>
                     </div>
                 )}
-            </div>
+            </section>
         </div>
     );
 };
