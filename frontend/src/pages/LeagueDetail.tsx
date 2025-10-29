@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useLeagueDetail } from '@/hooks/leagues/useLeagueDetail';
 import { useLeagueParticipants } from '@/hooks/leagues';
 import { LoadingSpinner, LoadingError } from '@/components/ui';
-import { LeagueHeader, LineupTab, StandingsTab } from '@/components/league';
+import { LeagueHeader, LineupTab, StandingsTab } from '@/components/leagueDetail';
 import { LeaveLeagueModal } from '@/components/modals';
 
 const LeagueDetail = () => {
@@ -48,7 +48,7 @@ const LeagueDetail = () => {
     }
 
     return (
-        <div className="p-6">
+        <div className="p-4 sm:p-6 lg:p-8">
             <div className="max-w-6xl mx-auto">
                 <LeagueHeader
                     name={league.name}
@@ -80,11 +80,11 @@ const LeagueDetail = () => {
                 )}
 
                 {/* Leave League Button - Bottom of page */}
-                <div className="mt-8 flex justify-center">
+                <div className="mt-6 sm:mt-8 flex justify-center">
                     <button 
                         onClick={() => setShowLeaveModal(true)}
                         disabled={isLeavingLeague}
-                        className="hover:cursor-pointer bg-gradient-to-r from-red-600/20 to-red-700/20 hover:from-red-600/30 hover:to-red-700/30 disabled:from-red-400/10 disabled:to-red-500/10 text-red-400 hover:text-red-300 disabled:text-red-500 px-6 py-3 rounded-lg font-medium transition-all duration-200 border border-red-500/30 hover:border-red-500/50"
+                        className="hover:cursor-pointer bg-gradient-to-r from-red-600/20 to-red-700/20 hover:from-red-600/30 hover:to-red-700/30 disabled:from-red-400/10 disabled:to-red-500/10 text-red-400 hover:text-red-300 disabled:text-red-500 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base rounded-lg font-medium transition-all duration-200 border border-red-500/30 hover:border-red-500/50"
                     >
                         {isLeavingLeague ? 'Leaving...' : 'Leave League'}
                     </button>

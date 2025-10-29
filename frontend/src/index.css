@@ -8,6 +8,15 @@
     .shadow-solid {
         box-shadow: 4px 4px 0 3px var(--color-red-600);
     }
+    
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 @font-face {

@@ -55,7 +55,7 @@ export const MarketDriverCard = ({
   return (
     <motion.div
       key={driver.id}
-      className="p-4 rounded-lg border backdrop-blur-[10px] cursor-default"
+      className="p-3 sm:p-4 rounded-lg border backdrop-blur-[10px] cursor-default"
       style={{
         borderColor: `${driver.driver_color}60`,
         backgroundColor: `${driver.driver_color}20`,
@@ -71,15 +71,15 @@ export const MarketDriverCard = ({
       }}
     >
       {/* Header with photo, name, and badges */}
-      <div className="flex items-start gap-3 mb-3">
+      <div className="flex items-start gap-2 sm:gap-3 mb-2 sm:mb-3">
         <img
           src={driver.headshot_url}
           alt={driver.full_name}
-          className="w-12 h-12 rounded-full object-cover object-top"
+          className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover object-top flex-shrink-0"
         />
-        <div className="text-[70%] flex-1 min-w-0">
-          <p className="text-white font-medium truncate">{driver.full_name}</p>
-          <p className="text-gray-100 text-sm truncate">{driver.team_name}</p>
+        <div className="flex-1 min-w-0">
+          <p className="text-white font-medium truncate text-sm sm:text-base">{driver.full_name}</p>
+          <p className="text-gray-100 text-xs sm:text-sm truncate">{driver.team_name}</p>
           <div className="mt-1 flex flex-wrap gap-1">
             <OwnershipBadge
               ownership={ownership}
@@ -95,10 +95,10 @@ export const MarketDriverCard = ({
             e.stopPropagation();
             onViewDetails?.(driver);
           }}
-          className="p-2 rounded-lg bg-gray-700/60 hover:bg-gray-500/80 border border-gray-600/40 hover:border-gray-400/60 transition-all duration-150 cursor-pointer group shadow-lg hover:shadow-xl flex-shrink-0"
+          className="p-1.5 sm:p-2 rounded-lg bg-gray-700/60 hover:bg-gray-500/80 border border-gray-600/40 hover:border-gray-400/60 transition-all duration-150 cursor-pointer group shadow-lg hover:shadow-xl flex-shrink-0"
         >
           <svg
-            className="w-5 h-5 text-gray-200 group-hover:text-white transition-colors"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-gray-200 group-hover:text-white transition-colors"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -108,14 +108,14 @@ export const MarketDriverCard = ({
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-3 gap-2 text-xs mb-3">
-        <div className="text-center p-2 bg-gray-100/30 rounded">
-          <p className="text-gray-100">Points</p>
-          <p className="text-white font-bold">{driver.season_results?.points || 0}</p>
+      <div className="grid grid-cols-3 gap-1 sm:gap-2 text-xs mb-2 sm:mb-3">
+        <div className="text-center p-1.5 sm:p-2 bg-gray-100/30 rounded">
+          <p className="text-gray-100 text-[10px] sm:text-xs">Points</p>
+          <p className="text-white font-bold text-xs sm:text-sm">{driver.season_results?.points || 0}</p>
         </div>
-        <div className="text-center p-2 bg-gray-100/30 rounded">
-          <p className="text-gray-100">Avg Finish</p>
-          <p className="text-white font-bold">{driver.fantasy_stats?.avg_finish?.toLocaleString(undefined, { maximumFractionDigits: 1, useGrouping: false }) || 'N/A'}</p>
+        <div className="text-center p-1.5 sm:p-2 bg-gray-100/30 rounded">
+          <p className="text-gray-100 text-[10px] sm:text-xs">Avg Finish</p>
+          <p className="text-white font-bold text-xs sm:text-sm">{driver.fantasy_stats?.avg_finish?.toLocaleString(undefined, { maximumFractionDigits: 1, useGrouping: false }) || 'N/A'}</p>
         </div>
         <PriceDisplay
           price={

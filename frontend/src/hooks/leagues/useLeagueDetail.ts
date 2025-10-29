@@ -8,6 +8,7 @@ import { useUserTeam } from '@/hooks/userTeams/useUserTeam';
 import { useDrivers } from '@/hooks/db/useDrivers';
 import { useTeams } from '@/hooks/db/useTeams';
 import { useUserDrivers } from '@/hooks/market/useMarket';
+import type { LineupDriver } from '@/types/leagueTypes';
 
 export const useLeagueDetail = (leagueId: string) => {
     const { user } = useAuth();
@@ -38,7 +39,7 @@ export const useLeagueDetail = (leagueId: string) => {
     );
     
     // Computed values - Obtener los drivers completos desde los IDs (con ownership info)
-    const selectedDrivers = useMemo(() => {
+    const selectedDrivers: LineupDriver[] = useMemo(() => {
         if (!userTeam || !myDriversWithOwnership) return [];
         
         // Build driver list from myDriversWithOwnership (which includes ownership data)
@@ -51,7 +52,7 @@ export const useLeagueDetail = (leagueId: string) => {
         
         return driverIds.map(driverId => 
             myDriversWithOwnership.find(d => d.id === driverId)
-        );
+        ) as LineupDriver[];
     }, [userTeam, myDriversWithOwnership]);
     
     // Obtener el constructor completo desde el ID

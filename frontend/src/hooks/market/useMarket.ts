@@ -1,6 +1,7 @@
 /**
  * Market API hooks for driver ownership and transactions
  */
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { marketService } from '@/services';
 import type {
@@ -10,6 +11,7 @@ import type {
   ListDriverForSaleRequest,
   UnlistDriverRequest,
   BuyoutClauseRequest,
+  DriverWithOwnership,
 } from '@/types/marketTypes';
 
 /**
@@ -230,3 +232,37 @@ export const useBuyoutHistory = (leagueId: number) => {
     enabled: !!leagueId,
   });
 };
+
+export const useMarketStates = () => {
+  const [expandedDriver, setExpandedDriver] = useState<DriverWithOwnership | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'free' | 'for-sale' | 'my-drivers'>('free');
+  const [buyModalDriver, setBuyModalDriver] = useState<DriverWithOwnership | null>(null);
+  const [sellModalDriver, setSellModalDriver] = useState<DriverWithOwnership | null>(null);
+  const [listModalDriver, setListModalDriver] = useState<DriverWithOwnership | null>(null);
+
+  // Dialog states
+  const [dialog, setDialog] = useState<{
+      isOpen: boolean;
+      type: 'confirm' | 'success' | 'error' | 'info';
+      title: string;
+      message: string;
+      onConfirm?: () => void;
+      confirmText?: string;
+  }>({
+      isOpen: false,
+      type: 'info',
+      title: '',
+      message: '',
+  });
+
+  return {
+    expandedDriver, setExpandedDriver,
+    searchQuery, setSearchQuery,
+    activeTab, setActiveTab,
+    buyModalDriver, setBuyModalDriver,
+    sellModalDriver, setSellModalDriver,
+    listModalDriver, setListModalDriver,
+    dialog, setDialog
+  }
+}

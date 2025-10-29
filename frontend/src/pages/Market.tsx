@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DndContext, closestCenter } from '@dnd-kit/core';
@@ -27,32 +26,20 @@ import {
     useMarketHandlers,
 } from '@/hooks/market';
 import { useUserTeam } from '@/hooks/userTeams';
-import type { DriverWithOwnership } from '@/types/marketTypes';
+import { useMarketStates } from '@/hooks/market/useMarket';
 
 const Market = () => {
     const { leagueId } = useParams<{ leagueId: string }>();
     const navigate = useNavigate();
-    const [expandedDriver, setExpandedDriver] = useState<DriverWithOwnership | null>(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [activeTab, setActiveTab] = useState<'free' | 'for-sale' | 'my-drivers'>('free');
-    const [buyModalDriver, setBuyModalDriver] = useState<DriverWithOwnership | null>(null);
-    const [sellModalDriver, setSellModalDriver] = useState<DriverWithOwnership | null>(null);
-    const [listModalDriver, setListModalDriver] = useState<DriverWithOwnership | null>(null);
-    
-    // Dialog states
-    const [dialog, setDialog] = useState<{
-        isOpen: boolean;
-        type: 'confirm' | 'success' | 'error' | 'info';
-        title: string;
-        message: string;
-        onConfirm?: () => void;
-        confirmText?: string;
-    }>({
-        isOpen: false,
-        type: 'info',
-        title: '',
-        message: '',
-    });
+    const {
+        expandedDriver, setExpandedDriver,
+        searchQuery, setSearchQuery,
+        activeTab, setActiveTab,
+        buyModalDriver, setBuyModalDriver,
+        sellModalDriver, setSellModalDriver,
+        listModalDriver, setListModalDriver,
+        dialog, setDialog
+    } = useMarketStates()
 
     // Fetch data
     const { league, isLoading: leagueLoading, error: leagueError } = useLeagueDetail(leagueId || '');
@@ -127,11 +114,11 @@ const Market = () => {
     // Loading state
     if (leagueLoading || freeDriversLoading || forSaleLoading || myDriversLoading || teamLoading) {
         return (
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center py-12">
-                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-500 mx-auto mb-4"></div>
-                        <p className="text-gray-400 text-lg">
+                    <div className="text-center py-8 sm:py-12">
+                        <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-red-500 mx-auto mb-4"></div>
+                        <p className="text-gray-400 text-base sm:text-lg">
                             Loading market...
                         </p>
                     </div>
@@ -143,17 +130,17 @@ const Market = () => {
     // Error state
     if (leagueError || !league) {
         return (
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center py-12">
-                        <svg className="w-16 h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="text-center py-8 sm:py-12">
+                        <svg className="w-12 h-12 sm:w-16 sm:h-16 text-red-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <h2 className="text-red-400 text-2xl font-bold mb-2">Access Denied</h2>
-                        <p className="text-gray-400 text-lg mb-4">You are not a member of this league</p>
+                        <h2 className="text-red-400 text-xl sm:text-2xl font-bold mb-2">Access Denied</h2>
+                        <p className="text-gray-400 text-base sm:text-lg mb-4">You are not a member of this league</p>
                         <button
                             onClick={() => navigate('/leagues')}
-                            className="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-lg transition-colors cursor-pointer"
+                            className="bg-gray-600 hover:bg-gray-700 text-white px-4 sm:px-6 py-2 text-sm sm:text-base rounded-lg transition-colors cursor-pointer"
                         >
                             Back to Leagues
                         </button>
@@ -164,35 +151,40 @@ const Market = () => {
     }
 
     return (
-        <div className="p-6">
+        <div className="p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-8">
+                <div className="mb-6 sm:mb-8">
                     <button
                         onClick={() => navigate(`/leagues/${leagueId}`)}
-                        className="flex items-center text-gray-400 hover:text-white mb-4 transition-colors cursor-pointer"
+                        className="flex items-center text-gray-400 hover:text-white mb-3 sm:mb-4 transition-colors cursor-pointer"
                     >
-                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
-                        Back to {league.name}
+                        <span className="text-sm sm:text-base">Back to {league.name}</span>
                     </button>
                     
-                    <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex flex-col gap-4">
                         <div>
-                            <h1 className="text-4xl font-bold text-white mb-2">
+                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
                                 Driver Market
                             </h1>
-                            <p className="text-gray-300 text-lg">
+                            <p className="text-gray-300 text-sm sm:text-base lg:text-lg">
                                 Buy, sell, and trade drivers for <span className="text-blue-400 font-medium">{league.name}</span>
                             </p>
                         </div>
                         
                         {/* Budget & Driver Count */}
-                        <div className="flex gap-4">
-                            <div className="bg-gradient-to-br from-green-600/20 to-green-700/20 border border-green-500/50 rounded-xl px-6 py-3">
-                                <p className="text-green-300 text-sm font-medium">Budget</p>
-                                <p className="text-white text-2xl font-bold">
+                        <div className="flex gap-2 sm:gap-4">
+                            <div className="
+                                    w-fit bg-gradient-to-br from-green-600/20 
+                                    to-green-700/20 border border-green-500/50 
+                                    rounded-lg sm:rounded-xl px-4 sm:px-6 py-2 sm:py-3
+                                    flex flex-col items-center 
+                            ">
+                                <p className="text-green-300 text-xs sm:text-sm font-medium">Budget</p>
+                                <p className="text-white text-lg sm:text-2xl font-bold whitespace-nowrap">
                                     {formatCurrencyPrecise(userBudget)}
                                 </p>
                             </div>
@@ -202,52 +194,55 @@ const Market = () => {
                 </div>
 
                 {/* Search */}
-                <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 border border-gray-700/50 backdrop-blur-sm rounded-2xl p-6 mb-8">
+                <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 border border-gray-700/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
                     {/* Tabs */}
-                    <div className="flex gap-2 mb-6 border-b border-gray-700/50">
+                    <div className="flex gap-1 mb-4 sm:mb-6 border-b border-gray-700/50 overflow-hidden">
                         <button
                             onClick={() => setActiveTab('free')}
-                            className={`px-6 py-3 font-medium transition-all cursor-pointer ${
+                            className={`flex-1 sm:flex-none sm:px-6 py-2 sm:py-3 text-[11px] sm:text-base font-medium transition-all cursor-pointer whitespace-nowrap ${
                                 activeTab === 'free'
                                     ? 'text-blue-400 border-b-2 border-blue-400'
                                     : 'text-gray-400 hover:text-gray-300'
                             }`}
                         >
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                                 </svg>
-                                Free Agents ({freeDrivers?.length || 0})
+                                <span className="hidden sm:inline">Free Agents ({freeDrivers?.length || 0})</span>
+                                <span className="sm:hidden">Free ({freeDrivers?.length || 0})</span>
                             </div>
                         </button>
                         <button
                             onClick={() => setActiveTab('for-sale')}
-                            className={`px-6 py-3 font-medium transition-all cursor-pointer ${
+                            className={`flex-1 sm:flex-none sm:px-6 py-2 sm:py-3 text-[11px] sm:text-base font-medium transition-all cursor-pointer whitespace-nowrap ${
                                 activeTab === 'for-sale'
                                     ? 'text-yellow-400 border-b-2 border-yellow-400'
                                     : 'text-gray-400 hover:text-gray-300'
                             }`}
                         >
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
-                                For Sale ({forSaleDrivers?.length || 0})
+                                <span className="hidden sm:inline">For Sale ({forSaleDrivers?.length || 0})</span>
+                                <span className="sm:hidden">Sale ({forSaleDrivers?.length || 0})</span>
                             </div>
                         </button>
                         <button
                             onClick={() => setActiveTab('my-drivers')}
-                            className={`px-6 py-3 font-medium transition-all cursor-pointer ${
+                            className={`flex-1 sm:flex-none sm:px-6 py-2 sm:py-3 text-[11px] sm:text-base font-medium transition-all cursor-pointer whitespace-nowrap ${
                                 activeTab === 'my-drivers'
                                     ? 'text-green-400 border-b-2 border-green-400'
                                     : 'text-gray-400 hover:text-gray-300'
                             }`}
                         >
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
+                                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
-                                My Drivers ({myDrivers?.length || 0})
+                                <span className="hidden sm:inline">My Drivers ({myDrivers?.length || 0})</span>
+                                <span className="sm:hidden">Mine ({myDrivers?.length || 0})</span>
                             </div>
                         </button>
                     </div>
@@ -262,14 +257,14 @@ const Market = () => {
                 </div>
 
                 {/* Driver List */}
-                <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 border border-gray-700/50 backdrop-blur-sm rounded-2xl p-6">
-                    <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-2xl font-bold text-white">
+                <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 border border-gray-700/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-4 sm:mb-6">
+                        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
                             {activeTab === 'free' && 'Free Agent Drivers'}
                             {activeTab === 'for-sale' && 'Drivers For Sale'}
                             {activeTab === 'my-drivers' && 'My Drivers'}
                         </h2>
-                        <p className="text-gray-400">
+                        <p className="text-gray-400 text-xs sm:text-sm lg:text-base">
                             {filteredDrivers.length} {filteredDrivers.length === 1 ? 'driver' : 'drivers'}
                         </p>
                     </div>
@@ -343,7 +338,7 @@ const Market = () => {
                 {expandedDriver && (
                     <div>
                         <motion.div
-                            className="fixed inset-0 backdrop-blur-md bg-black/50 z-40"
+                            className="fixed inset-0 backdrop-blur-md bg-black/50 z-[60]"
                             onClick={() => setExpandedDriver(null)}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}

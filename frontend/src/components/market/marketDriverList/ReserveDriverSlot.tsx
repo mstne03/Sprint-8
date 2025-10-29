@@ -36,31 +36,31 @@ export const ReserveDriverSlot = ({
   isSwapping = false,
 }: ReserveDriverSlotProps) => {
   return (
-    <div className="mt-6">
+    <div className="mt-4 sm:mt-6">
       {/* Section Header */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-600/50 to-transparent"></div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg">
-          <span className="text-gray-300 text-sm font-semibold">RESERVE DRIVER</span>
+        <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-4 py-1.5 sm:py-2 bg-gray-800/50 border border-gray-600/50 rounded-lg">
+          <span className="text-gray-300 text-xs sm:text-sm font-semibold whitespace-nowrap">RESERVE DRIVER</span>
         </div>
         <div className="h-px flex-1 bg-gradient-to-r from-transparent via-gray-600/50 to-transparent"></div>
       </div>
 
-      {/* Reserve Slot - Centered and 35% width */}
+      {/* Reserve Slot - Centered and responsive width */}
       <div className="flex justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="relative w-full max-w-[35%]"
+          className="relative w-full sm:max-w-[50%] lg:max-w-[35%]"
         >
         {isEmpty ? (
           // Empty slot
-          <div className="border-2 border-dashed border-gray-600/50 rounded-xl p-8 bg-gray-800/10 backdrop-blur-sm">
+          <div className="border-2 border-dashed border-gray-600/50 rounded-xl p-4 sm:p-8 bg-gray-800/10 backdrop-blur-sm">
             <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-800/30 border-2 border-gray-600/30 flex items-center justify-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-gray-800/30 border-2 border-gray-600/30 flex items-center justify-center">
                 <svg
-                  className="w-8 h-8 text-gray-400/50"
+                  className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400/50"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -73,8 +73,8 @@ export const ReserveDriverSlot = ({
                   />
                 </svg>
               </div>
-              <h3 className="text-gray-300 font-semibold mb-1">Reserve Slot Empty</h3>
-              <p className="text-gray-400/60 text-sm">
+              <h3 className="text-gray-300 font-semibold mb-1 text-sm sm:text-base">Reserve Slot Empty</h3>
+              <p className="text-gray-400/60 text-xs sm:text-sm">
                 Buy a 4th driver to fill this position
               </p>
             </div>
