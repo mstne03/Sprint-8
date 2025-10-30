@@ -5,4 +5,4 @@ export { MarketTabs } from './MarketTabs';
 export { MarketDriverSection } from './MarketDriverSection';
 
 // Modals
-export * from './MarketHeader/modals';
+export * from './modals';
