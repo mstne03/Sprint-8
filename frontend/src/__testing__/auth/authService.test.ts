@@ -1,8 +1,7 @@
-
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import type { User, Session, OAuthResponse } from '@supabase/supabase-js'
 
-vi.mock('@/services/env', () => ({
+vi.mock('@/core/services/env', () => ({
     ENV: {
         APP_URL: 'http://localhost:5173',
         SUPABASE_URL: 'http://localhost:54321',
@@ -10,7 +9,7 @@ vi.mock('@/services/env', () => ({
     }
 }))
 
-vi.mock('@/config/supabase', () => ({
+vi.mock('@/core/config/supabase', () => ({
     supabase: {
         auth: {
             signUp: vi.fn(),
@@ -24,14 +23,14 @@ vi.mock('@/config/supabase', () => ({
     },
 }))
 
-import { authService } from '@/services'
-import { supabase } from '@/config/supabase'
-import { ENV } from '@/services/env'
+import { authService } from '@/core/services'
+import { supabase } from '@/core/config/supabase'
+import { ENV } from '@/core/services/env'
 
 describe('authService', () => {
     beforeEach(() => {
         vi.clearAllMocks()
-    })
+    }) //mocks son stateful
     
     const fakeUserName = 'testuser'
     const fakeFullName = 'Test User'

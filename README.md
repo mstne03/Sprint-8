@@ -1,10 +1,10 @@
-# 🏎️ Grid Fans Club Application
+# 🏎️ Grid Fans Application
 
 Una aplicación completa de **F1 Fantasy** que permite a los usuarios crear equipos virtuales, gestionar pilotos, competir en ligas privadas y seguir el rendimiento en tiempo real basado en datos oficiales de Formula 1.
 
 ## 📋 Índice
 
-- [¿Qué es Grid Fans Club?](#-qué-es-grid-fans-club)
+- [¿Qué es Grid Fans?](#-qué-es-grid-fans-club)
 - [Estado Actual de Implementación](#-estado-actual-de-implementación)
 - [Tech Stack](#-tech-stack)
 - [Estructura de la Aplicación](#️-estructura-de-la-aplicación)
@@ -15,9 +15,9 @@ Una aplicación completa de **F1 Fantasy** que permite a los usuarios crear equi
 - [Arquitectura](#️-arquitectura)
 - [Sobre el Proyecto](#-sobre-el-proyecto)
   
-## 🎯 ¿Qué es Grid Fans Club?
+## 🎯 ¿Qué es Grid Fans?
 
-Grid Fans Club es un juego de gestión deportiva donde los usuarios:
+Grid Fans es un juego de gestión deportiva donde los usuarios:
 - **Crean equipos virtuales** seleccionando pilotos reales de Formula 1
 - **Gestionan presupuestos** comprando y vendiendo pilotos según precios dinámicos
 - **Compiten en ligas** privadas con amigos o públicas con otros usuarios
