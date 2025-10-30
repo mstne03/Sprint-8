@@ -1,16 +1,14 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DndContext, closestCenter } from '@dnd-kit/core';
-import { SortableContext } from '@dnd-kit/sortable';
 import { 
     DriverCardExpanded, 
-    MarketDriverList, 
     DriverSaleModal,
-    DriverSlotsDisplay 
+    MarketHeader,
+    MarketTabs,
+    MarketDriverSection
 } from '@/features/Market/components';
-import { SearchInput, ConfirmDialog } from '@/core/components';
+import { ConfirmDialog } from '@/core/components';
 import { useLeagueDetail } from '@/features/League/hooks';
-import { formatCurrencyPrecise } from '@/features/Market/utils/currencyFormat';
 import { 
     useFreeDrivers, 
     useDriversForSale, 
@@ -154,183 +152,44 @@ const Market = () => {
         <div className="p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <div className="mb-6 sm:mb-8">
-                    <button
-                        onClick={() => navigate(`/leagues/${leagueId}`)}
-                        className="flex items-center text-gray-400 hover:text-white mb-3 sm:mb-4 transition-colors cursor-pointer"
-                    >
-                        <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                        </svg>
-                        <span className="text-sm sm:text-base">Back to {league.name}</span>
-                    </button>
-                    
-                    <div className="flex flex-col gap-4">
-                        <div>
-                            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-2">
-                                Driver Market
-                            </h1>
-                            <p className="text-gray-300 text-sm sm:text-base lg:text-lg">
-                                Buy, sell, and trade drivers for <span className="text-blue-400 font-medium">{league.name}</span>
-                            </p>
-                        </div>
-                        
-                        {/* Budget & Driver Count */}
-                        <div className="flex gap-2 sm:gap-4">
-                            <div className="
-                                    w-fit bg-gradient-to-br from-green-600/20 
-                                    to-green-700/20 border border-green-500/50 
-                                    rounded-lg sm:rounded-xl px-4 sm:px-6 py-2 sm:py-3
-                                    flex flex-col items-center 
-                            ">
-                                <p className="text-green-300 text-xs sm:text-sm font-medium">Budget</p>
-                                <p className="text-white text-lg sm:text-2xl font-bold whitespace-nowrap">
-                                    {formatCurrencyPrecise(userBudget)}
-                                </p>
-                            </div>
-                            <DriverSlotsDisplay driverCount={userDriverCount} />
-                        </div>
-                    </div>
-                </div>
+                <MarketHeader
+                    leagueId={leagueId || ''}
+                    leagueName={league.name}
+                    userBudget={userBudget}
+                    userDriverCount={userDriverCount}
+                />
 
-                {/* Search */}
-                <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 border border-gray-700/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8">
-                    {/* Tabs */}
-                    <div className="flex gap-1 mb-4 sm:mb-6 border-b border-gray-700/50 overflow-hidden">
-                        <button
-                            onClick={() => setActiveTab('free')}
-                            className={`flex-1 sm:flex-none sm:px-6 py-2 sm:py-3 text-[11px] sm:text-base font-medium transition-all cursor-pointer whitespace-nowrap ${
-                                activeTab === 'free'
-                                    ? 'text-blue-400 border-b-2 border-blue-400'
-                                    : 'text-gray-400 hover:text-gray-300'
-                            }`}
-                        >
-                            <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
-                                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                                <span className="hidden sm:inline">Free Agents ({freeDrivers?.length || 0})</span>
-                                <span className="sm:hidden">Free ({freeDrivers?.length || 0})</span>
-                            </div>
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('for-sale')}
-                            className={`flex-1 sm:flex-none sm:px-6 py-2 sm:py-3 text-[11px] sm:text-base font-medium transition-all cursor-pointer whitespace-nowrap ${
-                                activeTab === 'for-sale'
-                                    ? 'text-yellow-400 border-b-2 border-yellow-400'
-                                    : 'text-gray-400 hover:text-gray-300'
-                            }`}
-                        >
-                            <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
-                                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                <span className="hidden sm:inline">For Sale ({forSaleDrivers?.length || 0})</span>
-                                <span className="sm:hidden">Sale ({forSaleDrivers?.length || 0})</span>
-                            </div>
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('my-drivers')}
-                            className={`flex-1 sm:flex-none sm:px-6 py-2 sm:py-3 text-[11px] sm:text-base font-medium transition-all cursor-pointer whitespace-nowrap ${
-                                activeTab === 'my-drivers'
-                                    ? 'text-green-400 border-b-2 border-green-400'
-                                    : 'text-gray-400 hover:text-gray-300'
-                            }`}
-                        >
-                            <div className="flex items-center justify-center sm:justify-start gap-1 sm:gap-2">
-                                <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                                <span className="hidden sm:inline">My Drivers ({myDrivers?.length || 0})</span>
-                                <span className="sm:hidden">Mine ({myDrivers?.length || 0})</span>
-                            </div>
-                        </button>
-                    </div>
-                    
-                    <SearchInput
-                        value={searchQuery}
-                        onChange={setSearchQuery}
-                        placeholder="Search by driver name, team, or acronym..."
-                        label="Search Drivers"
-                        showResultsText={true}
-                    />
-                </div>
+                {/* Tabs & Search */}
+                <MarketTabs
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    freeDriversCount={freeDrivers?.length || 0}
+                    forSaleDriversCount={forSaleDrivers?.length || 0}
+                    myDriversCount={myDrivers?.length || 0}
+                />
 
-                {/* Driver List */}
-                <div className="bg-gradient-to-br from-gray-800/40 to-gray-900/40 border border-gray-700/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-6">
-                    <div className="flex items-center justify-between mb-4 sm:mb-6">
-                        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
-                            {activeTab === 'free' && 'Free Agent Drivers'}
-                            {activeTab === 'for-sale' && 'Drivers For Sale'}
-                            {activeTab === 'my-drivers' && 'My Drivers'}
-                        </h2>
-                        <p className="text-gray-400 text-xs sm:text-sm lg:text-base">
-                            {filteredDrivers.length} {filteredDrivers.length === 1 ? 'driver' : 'drivers'}
-                        </p>
-                    </div>
-                    
-                    {activeTab === 'my-drivers' ? (
-                        <DndContext
-                            sensors={sensors}
-                            collisionDetection={closestCenter}
-                            onDragEnd={handleDragEnd}
-                        >
-                            <SortableContext
-                                items={filteredDrivers.map(d => `driver-${d.id}`)}
-                            >
-                                <MarketDriverList
-                                    drivers={filteredDrivers}
-                                    loading={myDriversLoading}
-                                    currentUserId={internalUserId}
-                                    userBudget={userBudget}
-                                    userDriverCount={userDriverCount}
-                                    reserveDriverId={userTeam?.reserve_driver_id}
-                                    onBuyFromMarket={handlers.handleBuyFromMarket}
-                                    onBuyFromUser={handlers.handleBuyFromUser}
-                                    onSell={handlers.handleSell}
-                                    onList={handlers.handleList}
-                                    onUnlist={handlers.handleUnlist}
-                                    onBuyout={handlers.handleBuyout}
-                                    onViewDetails={setExpandedDriver}
-                                    emptyMessage={
-                                        searchQuery 
-                                            ? "No drivers match your search" 
-                                            : "You don't own any drivers yet"
-                                    }
-                                    gridColumns={4}
-                                    enableDragDrop={true}
-                                    swappingDriverIds={swappingDriverIds}
-                                />
-                            </SortableContext>
-                        </DndContext>
-                    ) : (
-                        <MarketDriverList
-                            drivers={filteredDrivers}
-                            loading={
-                                activeTab === 'free' ? freeDriversLoading : 
-                                activeTab === 'for-sale' ? forSaleLoading : 
-                                myDriversLoading
-                            }
-                            currentUserId={internalUserId}
-                            userBudget={userBudget}
-                            userDriverCount={userDriverCount}
-                            reserveDriverId={userTeam?.reserve_driver_id}
-                            onBuyFromMarket={handlers.handleBuyFromMarket}
-                            onBuyFromUser={handlers.handleBuyFromUser}
-                            onSell={handlers.handleSell}
-                            onList={handlers.handleList}
-                            onUnlist={handlers.handleUnlist}
-                            onBuyout={handlers.handleBuyout}
-                            onViewDetails={setExpandedDriver}
-                            emptyMessage={
-                                searchQuery 
-                                    ? "No drivers match your search" 
-                                    : `No ${activeTab === 'free' ? 'free agents' : 'drivers for sale'} available`
-                            }
-                            gridColumns={4}
-                        />
-                    )}
-                </div>
+                {/* Driver List Section */}
+                <MarketDriverSection
+                    activeTab={activeTab}
+                    filteredDrivers={filteredDrivers}
+                    searchQuery={searchQuery}
+                    loading={
+                        activeTab === 'free' ? freeDriversLoading : 
+                        activeTab === 'for-sale' ? forSaleLoading : 
+                        myDriversLoading
+                    }
+                    currentUserId={internalUserId}
+                    userBudget={userBudget}
+                    userDriverCount={userDriverCount}
+                    reserveDriverId={userTeam?.reserve_driver_id}
+                    swappingDriverIds={swappingDriverIds}
+                    sensors={sensors}
+                    onDragEnd={handleDragEnd}
+                    handlers={handlers}
+                    onViewDetails={setExpandedDriver}
+                />
             </div>
 
             {/* Expanded Driver Modal */}
