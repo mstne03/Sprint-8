@@ -54,22 +54,6 @@ export const Header = () => {
                         } to={`/leagues`}>
                             <h2>Leagues</h2>
                         </Link>
-                        <Link className={`
-                            hover:text-red-600 active:backdrop-opacity-5 
-                            transition-all ease-in-out
-                            ${teamsActive}
-                            `
-                        } to={`/my-teams`}>
-                            <h2>Teams</h2>
-                        </Link>
-                        <Link className={`
-                            hover:text-red-600 active:backdrop-opacity-5 
-                            transition-all ease-in-out
-                            ${calendarActive}
-                            `
-                        } to={`/calendar`}>
-                            <h2>Calendar</h2>
-                        </Link>
                     </ul>
                     <div className="flex text-[80%] items-center gap-4 ml-6 pl-6 border-l border-gray-600">
                         <span className="text-sm text-gray-300 hidden xl:inline">
