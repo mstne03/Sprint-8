@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useDriverActionButton } from '@/features/Market/hooks';
 import { calculateDriverPricing } from '@/features/Market/utils';
 import { determineDriverAction } from '@/features/Market/utils';
+import { getDriverLastName } from '@/features/Market/utils/driverNameUtils';
 
 export const MarketDriverCard = ({
   driver,
@@ -78,7 +79,7 @@ export const MarketDriverCard = ({
           className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover object-top flex-shrink-0"
         />
         <div className="flex-1 min-w-0">
-          <p className="text-white font-medium truncate text-sm sm:text-base">{driver.full_name}</p>
+          <p className="text-white font-medium truncate text-sm sm:text-base">{getDriverLastName(driver.full_name)}</p>
           <p className="text-gray-100 text-xs sm:text-sm truncate">{driver.team_name}</p>
           <div className="mt-1 flex flex-wrap gap-1">
             <OwnershipBadge
