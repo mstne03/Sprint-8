@@ -3,9 +3,10 @@ import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
 import { MarketDriverList } from '@/features/Market/components';
 import type { DriverWithOwnership } from '@/features/Market/types/marketTypes';
+import type { ActiveTab } from '../../hooks/useMarketState';
 
 export interface MarketDriverSectionProps {
-    activeTab: 'free' | 'for-sale' | 'my-drivers';
+    activeTab: ActiveTab | null;
     filteredDrivers: DriverWithOwnership[];
     searchQuery: string;
     loading: boolean;
@@ -47,7 +48,7 @@ const MarketDriverSection = ({
         'free': 'Free Agent Drivers',
         'for-sale': 'Drivers For Sale',
         'my-drivers': 'My Drivers',
-    }[activeTab];
+    }[activeTab?? 'free'];
 
     // Compute empty message based on tab and search
     const getEmptyMessage = () => {

@@ -1,11 +1,12 @@
 import { useMemo } from 'react';
 import type { DriverWithOwnership } from '@/features/Market/types/marketTypes';
+import type { ActiveTab } from './useMarketState';
 
 interface UseFilteredDriversParams {
     freeDrivers?: DriverWithOwnership[];
     forSaleDrivers?: DriverWithOwnership[];
     sortedMyDrivers?: DriverWithOwnership[];
-    activeTab: 'free' | 'for-sale' | 'my-drivers';
+    activeTab: ActiveTab | null;
     searchQuery: string;
 }
 

@@ -1,10 +1,9 @@
 import { SearchInput } from '@/core/components';
-
-type TabType = 'free' | 'for-sale' | 'my-drivers';
+import type { ActiveTab } from '@/features/Market/hooks/useMarketState';
 
 interface MarketTabsProps {
-    activeTab: TabType;
-    setActiveTab: (tab: TabType) => void;
+    activeTab: ActiveTab | null;
+    setActiveTab: (tab: ActiveTab | null) => void;
     searchQuery: string;
     setSearchQuery: (query: string) => void;
     freeDriversCount: number;

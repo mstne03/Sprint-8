@@ -24,7 +24,7 @@ import {
     useMarketHandlers,
 } from '@/features/Market/hooks';
 import { useUserTeam } from '@/core/hooks/userTeams';
-import { useMarketStates } from '@/features/Market/hooks/useMarket';
+import { useMarketStates } from '@/features/Market/hooks';
 
 const Market = () => {
     const { leagueId } = useParams<{ leagueId: string }>();

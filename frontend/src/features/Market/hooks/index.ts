@@ -14,8 +14,9 @@ export {
   useBuyoutClause,
   useMarketTransactions,
   useBuyoutHistory,
-} from './useMarket';
+} from './useMarketOps';
 
+export { useMarketStates } from './useMarketState'
 export { useReserveDriverDragDrop } from './useReserveDriverDragDrop';
 export { useSortedMyDrivers } from './useSortedMyDrivers';
 export { useFilteredDrivers } from './useFilteredDrivers';

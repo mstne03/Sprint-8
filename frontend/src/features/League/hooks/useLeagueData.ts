@@ -4,7 +4,7 @@ import { useAuth } from '@/core/contexts/AuthContext';
 import { useUserTeam } from '@/core/hooks/userTeams/useUserTeam';
 import { useDrivers } from '@/core/hooks/db/useDrivers';
 import { useTeams } from '@/core/hooks/db/useTeams';
-import { useUserDrivers } from '@/features/Market/hooks/useMarket';
+import { useUserDrivers } from '@/features/Market/hooks/useMarketOps';
 
 /**
  * Hook: Fetch all league-related data

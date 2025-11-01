@@ -1,7 +1,6 @@
-/**
+ /**
  * Market API hooks for driver ownership and transactions
  */
-import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { marketService } from '@/core/services';
 import type {
@@ -11,8 +10,32 @@ import type {
   ListDriverForSaleRequest,
   UnlistDriverRequest,
   BuyoutClauseRequest,
-  DriverWithOwnership,
 } from '@/features/Market/types/marketTypes';
+
+type DriverTransactionParams = {
+  leagueId: number;
+  driverId: number;
+}
+
+export interface BuyFromMarketMutation extends DriverTransactionParams {
+  request: BuyDriverFromMarketRequest;
+}
+
+export interface BuyFromUserMutation extends DriverTransactionParams {
+  request: BuyDriverFromUserRequest;
+}
+
+export interface SellToMarketMutation extends DriverTransactionParams {
+  request: SellDriverToMarketRequest
+}
+
+export interface ListForSaleMutation extends DriverTransactionParams {
+  request: ListDriverForSaleRequest
+}
+
+export interface UnlistDriverMutation extends DriverTransactionParams {
+  request: UnlistDriverRequest
+}
 
 /**
  * Get all driver ownerships for a league
@@ -81,11 +104,7 @@ export const useBuyFromMarket = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ leagueId, driverId, request }: {
-      leagueId: number;
-      driverId: number;
-      request: BuyDriverFromMarketRequest;
-    }) => marketService.buyDriverFromMarket(leagueId, driverId, request),
+    mutationFn: ({ leagueId, driverId, request }: BuyFromMarketMutation) => marketService.buyDriverFromMarket(leagueId, driverId, request),
     onSuccess: (_, variables) => {
       // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
@@ -106,11 +125,7 @@ export const useBuyFromUser = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ leagueId, driverId, request }: {
-      leagueId: number;
-      driverId: number;
-      request: BuyDriverFromUserRequest;
-    }) => marketService.buyDriverFromUser(leagueId, driverId, request),
+    mutationFn: ({ leagueId, driverId, request }: BuyFromUserMutation) => marketService.buyDriverFromUser(leagueId, driverId, request),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['drivers-for-sale', variables.leagueId] });
@@ -130,11 +145,7 @@ export const useSellToMarket = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ leagueId, driverId, request }: {
-      leagueId: number;
-      driverId: number;
-      request: SellDriverToMarketRequest;
-    }) => marketService.sellDriverToMarket(leagueId, driverId, request),
+    mutationFn: ({ leagueId, driverId, request }: SellToMarketMutation) => marketService.sellDriverToMarket(leagueId, driverId, request),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['free-drivers', variables.leagueId] });
@@ -154,11 +165,7 @@ export const useListForSale = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ leagueId, driverId, request }: {
-      leagueId: number;
-      driverId: number;
-      request: ListDriverForSaleRequest;
-    }) => marketService.listDriverForSale(leagueId, driverId, request),
+    mutationFn: ({ leagueId, driverId, request }: ListForSaleMutation) => marketService.listDriverForSale(leagueId, driverId, request),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['drivers-for-sale', variables.leagueId] });
@@ -174,11 +181,7 @@ export const useUnlistFromSale = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationFn: ({ leagueId, driverId, request }: {
-      leagueId: number;
-      driverId: number;
-      request: UnlistDriverRequest;
-    }) => marketService.unlistDriverFromSale(leagueId, driverId, request),
+    mutationFn: ({ leagueId, driverId, request }: UnlistDriverMutation) => marketService.unlistDriverFromSale(leagueId, driverId, request),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['driver-ownerships', variables.leagueId] });
       queryClient.invalidateQueries({ queryKey: ['drivers-for-sale', variables.leagueId] });
@@ -232,37 +235,3 @@ export const useBuyoutHistory = (leagueId: number) => {
     enabled: !!leagueId,
   });
 };
-
-export const useMarketStates = () => {
-  const [expandedDriver, setExpandedDriver] = useState<DriverWithOwnership | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'free' | 'for-sale' | 'my-drivers'>('free');
-  const [buyModalDriver, setBuyModalDriver] = useState<DriverWithOwnership | null>(null);
-  const [sellModalDriver, setSellModalDriver] = useState<DriverWithOwnership | null>(null);
-  const [listModalDriver, setListModalDriver] = useState<DriverWithOwnership | null>(null);
-
-  // Dialog states
-  const [dialog, setDialog] = useState<{
-      isOpen: boolean;
-      type: 'confirm' | 'success' | 'error' | 'info';
-      title: string;
-      message: string;
-      onConfirm?: () => void;
-      confirmText?: string;
-  }>({
-      isOpen: false,
-      type: 'info',
-      title: '',
-      message: '',
-  });
-
-  return {
-    expandedDriver, setExpandedDriver,
-    searchQuery, setSearchQuery,
-    activeTab, setActiveTab,
-    buyModalDriver, setBuyModalDriver,
-    sellModalDriver, setSellModalDriver,
-    listModalDriver, setListModalDriver,
-    dialog, setDialog
-  }
-}
