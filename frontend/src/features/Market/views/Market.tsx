@@ -152,12 +152,7 @@ const Market = () => {
         <div className="p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
-                <MarketHeader
-                    leagueId={leagueId || ''}
-                    leagueName={league.name}
-                    userBudget={userBudget}
-                    userDriverCount={userDriverCount}
-                />
+                <MarketHeader/>
 
                 {/* Tabs & Search */}
                 <MarketTabs

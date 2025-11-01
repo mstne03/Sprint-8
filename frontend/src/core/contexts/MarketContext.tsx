@@ -92,7 +92,11 @@ interface MarketContext extends MarketStates, MarketDataFetch, MarketMutations, 
 
 const MarketContext = createContext<MarketContext | null>(null)
 
-export const MarketProvider = (children: ReactNode) => {
+interface MarketProviderProps {
+    children: ReactNode
+}
+
+export const MarketProvider = ({ children }: MarketProviderProps) => {
     const { leagueId } = useParams<{ leagueId: string }>();
     const {
         expandedDriver, setExpandedDriver,

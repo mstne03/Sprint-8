@@ -1,21 +1,18 @@
 import { useNavigate } from 'react-router-dom';
 import { DriverSlotsDisplay } from './DriverSlotsDisplay';
 import { formatCurrencyPrecise } from '@/features/Market/utils/currencyFormat';
+import { useMarketContext } from '@/core/contexts/MarketContext';
 
-interface MarketHeaderProps {
-    leagueId: string;
-    leagueName: string;
-    userBudget: number;
-    userDriverCount: number;
-}
-
-export const MarketHeader = ({ 
-    leagueId, 
-    leagueName, 
-    userBudget, 
-    userDriverCount 
-}: MarketHeaderProps) => {
+export const MarketHeader = () => {
     const navigate = useNavigate();
+    const {
+        leagueId, 
+        league,
+        userBudget,
+        userDriverCount
+    } = useMarketContext()
+
+    const leagueName = league!.name;
 
     return (
         <div className="mb-6 sm:mb-8">

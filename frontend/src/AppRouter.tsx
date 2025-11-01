@@ -13,6 +13,7 @@ import Home from "@/core/views/Home";
 import Leagues from "@/features/League/views/Leagues";
 import LeagueDetail from "@/features/League/views/LeagueDetail";
 import Market from "@/features/Market/views/Market";
+import { MarketProvider } from "./core/contexts/MarketContext";
 
 function AppRouter() {
   return (
@@ -37,7 +38,11 @@ function AppRouter() {
                 <ProtectedRoute>
                   <Header />
                   <Routes>
-                    <Route path="/leagues/:leagueId/market" element={<Market/>}/>
+                    <Route path="/leagues/:leagueId/market" element={
+                      <MarketProvider>
+                        <Market/>
+                      </MarketProvider>
+                    }/>
                     <Route path="/leagues/:leagueId" element={<LeagueDetail/>}/>
                     <Route path="/leagues" element={<Leagues/>}/>
                     <Route path="*" element={<NotFound/>}/>
